@@ -20,7 +20,7 @@ interface PricingPlanProps {
 const PricingPlan = ({ data }: PricingPlanProps) => {
   const pricingData = {
     ...data,
-    plans: data?.plans,
+    plans: data.plans,
   };
   return (
     <section className="section pricing-section">
@@ -50,7 +50,7 @@ const PricingPlan = ({ data }: PricingPlanProps) => {
         <div className="row justify-content-center">
           <div className="col-12 col-xxl-10">
             <div className="pricing-section__inner">
-              {pricingData?.plans?.map((plan, index) => {
+              {pricingData.plans.map((plan, index) => {
                 return (
                   <div
                     key={plan.id || index}

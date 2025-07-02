@@ -2,7 +2,7 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 
-// Define default banner data.
+// Define default banner data
 const DEFAULT_BANNER_DATA = {
   subtitle: "Get pixel perfect image editing services",
   title: "Photo Editing & Graphic Design Made for Everyone",
@@ -84,7 +84,7 @@ const HomeOneBanner = ({ data }: HomeOneBannerProps) => {
                   aria-label="create account"
                   className="btn btn--primary"
                 >
-                  Free Trial <i className="fa-solid fa-paper-plane"></i>
+                  Get Proposal <i className="fa-solid fa-paper-plane"></i>
                 </Link>
               </div>
             </div>

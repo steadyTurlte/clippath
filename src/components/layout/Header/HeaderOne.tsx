@@ -344,7 +344,7 @@ const HeaderOne = ({ openNav, handleNav, setOpenNav }: HeaderProps) => {
                       </li>
                       <li className="nav__menu-item d-block d-md-none">
                         <Link href="get-quote" className="btn btn--secondary">
-                         Free Trial
+                          Get A proposal
                         </Link>
                       </li>
                     </ul>
@@ -374,7 +374,7 @@ const HeaderOne = ({ openNav, handleNav, setOpenNav }: HeaderProps) => {
                   <div className="nav__uncollapsed">
                     <div className="nav__uncollapsed-item d-none d-md-flex">
                       <Link href="get-quote" className="btn btn--secondary">
-                        Free Trial
+                        get a proposal
                       </Link>
                     </div>
                     <button
