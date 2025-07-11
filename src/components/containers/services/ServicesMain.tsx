@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import Image from "next/image";
+import ImageWithFallback from "@/components/admin/ImageWithFallback";
 
 interface ServiceItem {
   id: number;
@@ -24,6 +24,23 @@ interface ServicesMainProps {
 }
 
 const ServicesMain = ({ data, services = [] }: ServicesMainProps) => {
+  // Helper function to get image URL from various formats
+  const getImageUrl = (imageData: any) => {
+    if (!imageData) return "/images/services/slide-one.png";
+
+    // If it's a string, return it directly
+    if (typeof imageData === "string") return imageData;
+
+    // If it's an object with url property (from API)
+    if (typeof imageData === "object" && imageData.url) return imageData.url;
+
+    // If it's an object with src property (imported images)
+    if (typeof imageData === "object" && imageData.src) return imageData.src;
+
+    // Fallback
+    return "/images/services/slide-one.png";
+  };
+
   // Use provided data or fallback to defaults
   const mainData = data || {
     subtitle: "our services",
@@ -66,12 +83,12 @@ const ServicesMain = ({ data, services = [] }: ServicesMainProps) => {
                 className={`service-card ${service.className || ""}`}
               >
                 <div className="service-card__img">
-                  <Image
-                    src={service.image}
+                  <ImageWithFallback
+                    src={getImageUrl(service.image)}
                     alt={service.title}
                     width={400}
                     height={300}
-                    className="img-fluid"
+                    fallbackSrc="/images/services/slide-one.png"
                   />
                 </div>
                 <div className="service-card__content">

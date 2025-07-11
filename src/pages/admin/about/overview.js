@@ -252,8 +252,8 @@ const AboutOverviewEditor = () => {
                   <label className="admin-editor__label">Image {index + 1}</label>
                   <div className="admin-editor__input-group">
                     <ImageUploader
-                      value={overviewData.images[index] || ''}
-                      onChange={(url, publicId) => handleImageUpload(index, url, publicId)}
+                      currentImage={overviewData.images[index] || ''}
+                      onImageUpload={(url, publicId) => handleImageUpload(index, url, publicId)}
                       folder="about/overview"
                       className="admin-editor__image-uploader"
                       width={400}

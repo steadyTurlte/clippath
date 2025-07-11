@@ -4,22 +4,43 @@ import Layout from "@/components/layout/Layout";
 import CmnBanner from "@/components/layout/Banner/CmnBanner";
 import SponsorSlider from "@/components/containers/home/SponsorSlider";
 import TeamMainSec from "@/components/containers/TeamMainSec";
-import { fetchPageData, fetchSettings } from "@/utils/fetchPageData";
 
 // This gets called on every request
 export const getServerSideProps: GetServerSideProps = async () => {
   try {
-    // Fetch data for the Teams page
-    const teamsData = fetchPageData('teams');
+    // Fetch teams data from API
+    const teamsResponse = await fetch(
+      `${
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
+      }/api/content/teams`
+    );
+    const teamsData = await teamsResponse.json();
 
-    // Fetch settings data
-    const settings = fetchSettings();
+    // Fetch settings data from API
+    const settingsResponse = await fetch(
+      `${
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
+      }/api/content/settings`
+    );
+    const settings = await settingsResponse.json();
+
+    // Fetch sponsors data from about API
+    const sponsorsResponse = await fetch(
+      `${
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
+      }/api/content/about?section=sponsors`
+    );
+    if (sponsorsResponse.ok) {
+      const sponsorsData = await sponsorsResponse.json();
+      // Update teams data with sponsors from about.json
+      teamsData.sponsors = sponsorsData;
+    }
 
     return {
       props: {
         teamsData,
-        settings
-      }
+        settings,
+      },
     };
   } catch (error) {
     console.error("Error in getServerSideProps:", error);
@@ -28,11 +49,11 @@ export const getServerSideProps: GetServerSideProps = async () => {
     return {
       props: {
         teamsData: {},
-        settings: {}
-      }
+        settings: {},
+      },
     };
   }
-}
+};
 
 interface TeamsProps {
   teamsData: {

@@ -1,5 +1,5 @@
 import React from "react";
-import Image from "next/image";
+import ImageWithFallback from "@/components/admin/ImageWithFallback";
 import One from "public/images/about/about-overview-one.png";
 import Two from "public/images/about/about-overview-two.png";
 
@@ -13,9 +13,26 @@ interface AboutOverviewProps {
 }
 
 const AboutOverview = ({ data }: AboutOverviewProps) => {
+  // Helper function to extract image URL from various formats
+  const getImageUrl = (imageData: any, fallback: any) => {
+    if (!imageData) return fallback;
+
+    // If it's a string, return it directly
+    if (typeof imageData === "string") return imageData;
+
+    // If it's an object with url property
+    if (typeof imageData === "object" && imageData.url) return imageData.url;
+
+    // If it's an object with src property
+    if (typeof imageData === "object" && imageData.src) return imageData.src;
+
+    // Fallback
+    return fallback;
+  };
+
   const overviewData = {
     ...data,
-    images: data.images,
+    images: data.images || [],
   };
   return (
     <section className="about-overview section pt-0">
@@ -28,11 +45,12 @@ const AboutOverview = ({ data }: AboutOverviewProps) => {
               data-aos-duration="600"
               data-aos-delay="100"
             >
-              <Image
-                src={overviewData.images[0] || One}
+              <ImageWithFallback
+                src={getImageUrl(overviewData.images[0], One)}
                 alt="Overview Image 1"
                 width={600}
                 height={400}
+                fallbackSrc="/images/about/about-overview-one.png"
               />
             </div>
           </div>
@@ -43,11 +61,12 @@ const AboutOverview = ({ data }: AboutOverviewProps) => {
               data-aos-duration="600"
               data-aos-delay="100"
             >
-              <Image
-                src={overviewData.images[1] || Two}
+              <ImageWithFallback
+                src={getImageUrl(overviewData.images[1], Two)}
                 alt="Overview Image 2"
                 width={400}
                 height={300}
+                fallbackSrc="/images/about/about-overview-two.png"
               />
             </div>
           </div>
@@ -77,6 +96,56 @@ const AboutOverview = ({ data }: AboutOverviewProps) => {
           </div>
         </div>
       </div>
+      <style jsx>{`
+        .about-overview {
+          color: #fff;
+        }
+        .about-overview .title,
+        .about-overview .h2,
+        .about-overview .h6 {
+          color: #fff;
+          text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7),
+            0 1px 3px rgba(0, 0, 0, 0.9), 1px 1px 0 rgba(0, 0, 0, 0.8),
+            -1px -1px 0 rgba(0, 0, 0, 0.8), 1px -1px 0 rgba(0, 0, 0, 0.8),
+            -1px 1px 0 rgba(0, 0, 0, 0.8);
+          font-weight: 600;
+        }
+        .about-overview .paragraph p {
+          color: #fff;
+          text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8),
+            0 1px 2px rgba(0, 0, 0, 0.9), 1px 1px 0 rgba(0, 0, 0, 0.7),
+            -1px -1px 0 rgba(0, 0, 0, 0.7), 1px -1px 0 rgba(0, 0, 0, 0.7),
+            -1px 1px 0 rgba(0, 0, 0, 0.7);
+          font-weight: 500;
+        }
+        .about-overview__single {
+          /* Add overlay for better text contrast over images */
+          position: relative;
+        }
+        .about-overview__single::before {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.15);
+          z-index: 1;
+          pointer-events: none;
+        }
+        .about-overview__single img {
+          filter: brightness(0.8) contrast(1.1);
+          position: relative;
+          z-index: 0;
+        }
+        .about-overview .title,
+        .about-overview .h2,
+        .about-overview .h6,
+        .about-overview .paragraph {
+          position: relative;
+          z-index: 2;
+        }
+      `}</style>
     </section>
   );
 };

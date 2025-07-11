@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Image from "next/image";
+import ImageWithFallback from "@/components/admin/ImageWithFallback";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Navigation } from "swiper/modules";
 import "swiper/swiper-bundle.css";
@@ -24,6 +25,23 @@ interface TestimonialSecProps {
 }
 
 const TestimonialSec = ({ data }: TestimonialSecProps) => {
+  // Helper function to get image URL from various formats
+  const getImageUrl = (imageData: any) => {
+    if (!imageData) return "/images/testimonial/author-one.png";
+
+    // If it's a string, return it directly
+    if (typeof imageData === "string") return imageData;
+
+    // If it's an imported image object with src property
+    if (typeof imageData === "object" && imageData.src) return imageData.src;
+
+    // If it's an object with url property (from API)
+    if (typeof imageData === "object" && imageData.url) return imageData.url;
+
+    // Fallback
+    return "/images/testimonial/author-one.png";
+  };
+
   // Default data
   const defaultData = {
     subtitle: "customer testimonial",
@@ -178,12 +196,12 @@ const TestimonialSec = ({ data }: TestimonialSecProps) => {
                       <hr />
                       <div className="item__meta">
                         <div className="meta__thumb">
-                          <Image
-                            priority
-                            src={item.image}
+                          <ImageWithFallback
+                            src={getImageUrl(item.image)}
                             alt={item.name}
                             width={60}
                             height={60}
+                            fallbackSrc="/images/testimonial/author-one.png"
                           />
                         </div>
                         <div className="meta__content">
@@ -208,12 +226,12 @@ const TestimonialSec = ({ data }: TestimonialSecProps) => {
                       <hr />
                       <div className="item__meta">
                         <div className="meta__thumb">
-                          <Image
-                            priority
-                            src={item.image}
+                          <ImageWithFallback
+                            src={getImageUrl(item.image)}
                             alt={item.name}
                             width={60}
                             height={60}
+                            fallbackSrc="/images/testimonial/author-one.png"
                           />
                         </div>
                         <div className="meta__content">

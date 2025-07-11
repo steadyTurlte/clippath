@@ -16,6 +16,7 @@ const AboutFaqEditor = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -59,6 +60,12 @@ const AboutFaqEditor = () => {
       image: imageUrl,
       imagePublicId: publicId
     }));
+
+    // Show upload success message
+    setUploadSuccess(true);
+    setTimeout(() => {
+      setUploadSuccess(false);
+    }, 3000);
   };
 
   const handleChange = (field, value) => {
@@ -241,8 +248,8 @@ const AboutFaqEditor = () => {
               
               <div className="admin-editor__image-uploader-wrapper">
                 <ImageUploader
-                  value={faqData.image}
-                  onChange={handleImageUpload}
+                  currentImage={faqData.image}
+                  onImageUpload={handleImageUpload}
                   folder="about/faq"
                   width={1410}
                   height={605}

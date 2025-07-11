@@ -12,7 +12,19 @@ const ImageWithFallback = ({
   ...props
 }) => {
   // Clean the src by removing query parameters
-  const cleanSrc = src ? src.split('?')[0] : '';
+  // Handle cases where src might be an object or not a string
+  let cleanSrc = '';
+  if (src) {
+    if (typeof src === 'string') {
+      cleanSrc = src.split('?')[0];
+    } else if (typeof src === 'object' && src.url) {
+      // Handle case where src is an object with url property
+      cleanSrc = src.url.split('?')[0];
+    } else if (typeof src === 'object' && src.src) {
+      // Handle case where src is an object with src property
+      cleanSrc = src.src.split('?')[0];
+    }
+  }
 
   const [imgSrc, setImgSrc] = useState(cleanSrc || fallbackSrc);
   const [error, setError] = useState(false);

@@ -32,6 +32,18 @@ export const getServerSideProps: GetServerSideProps = async () => {
       servicesData.pricing = pricingData;
     }
 
+    // Fetch sponsors data from about API
+    const sponsorsResponse = await fetch(
+      `${
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
+      }/api/content/about?section=sponsors`
+    );
+    if (sponsorsResponse.ok) {
+      const sponsorsData = await sponsorsResponse.json();
+      // Update the services data with the latest sponsors data
+      servicesData.sponsors = sponsorsData;
+    }
+
     // Fetch settings data
     const settingsResponse = await fetch(
       `${

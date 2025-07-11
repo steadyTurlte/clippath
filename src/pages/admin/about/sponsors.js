@@ -45,22 +45,15 @@ const AboutSponsorsEditor = () => {
   // Handle logo upload completion
   const handleLogoUpload = (index, imageUrl, publicId) => {
     if (!imageUrl) return;
-    
+
     setSponsorsData(prev => {
       const updatedLogos = [...prev.logos];
       updatedLogos[index] = imageUrl;
-      
+
       return {
         ...prev,
         logos: updatedLogos
       };
-    });
-    
-    // Also update the logo in the local state immediately
-    setLogos(prev => {
-      const newLogos = [...prev];
-      newLogos[index] = imageUrl;
-      return newLogos;
     });
   };
 
@@ -69,18 +62,11 @@ const AboutSponsorsEditor = () => {
     setSponsorsData(prev => {
       const updatedLogos = [...prev.logos];
       updatedLogos.splice(index, 1);
-      
+
       return {
         ...prev,
         logos: updatedLogos
       };
-    });
-    
-    // Also update the local state immediately
-    setLogos(prev => {
-      const newLogos = [...prev];
-      newLogos.splice(index, 1);
-      return newLogos;
     });
   };
   
@@ -90,9 +76,6 @@ const AboutSponsorsEditor = () => {
       ...prev,
       logos: [...prev.logos, '']
     }));
-    
-    // Also update the local state
-    setLogos(prev => [...prev, '']);
   };
 
   const handleSave = async (e) => {

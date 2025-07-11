@@ -5,7 +5,6 @@ import CmnBanner from "@/components/layout/Banner/CmnBanner";
 import QuoteOverview from "@/components/containers/quote/QuoteOverview";
 import CustomQuote from "@/components/containers/quote/CustomQuote";
 import QuoteInstructions from "@/components/containers/quote/QuoteInstructions";
-import { fetchPageData, fetchSettings } from "@/utils/fetchPageData";
 
 interface GetQuoteProps {
   quoteData: {
@@ -57,17 +56,9 @@ const GetQuote = ({ quoteData, settings }: GetQuoteProps) => {
         image={quoteData.banner.image}
         breadcrumbs={quoteData.banner.breadcrumbs}
       />
-      <QuoteOverview
-        hero={quoteData.hero}
-        statistics={quoteData.statistics}
-      />
-      <CustomQuote
-        gallery={quoteData.gallery}
-        form={quoteData.form}
-      />
-      <QuoteInstructions
-        instructions={quoteData.instructions}
-      />
+      <QuoteOverview hero={quoteData.hero} statistics={quoteData.statistics} />
+      <CustomQuote gallery={quoteData.gallery} form={quoteData.form} />
+      <QuoteInstructions instructions={quoteData.instructions} />
     </Layout>
   );
 };
@@ -114,95 +105,110 @@ interface QuotePageData {
 export const getServerSideProps: GetServerSideProps = async () => {
   const defaultQuoteData: QuotePageData = {
     banner: {
-      title: 'Get A Quote',
+      title: "Get A Quote",
       breadcrumbs: [],
-      image: ''
+      image: "",
     },
     hero: {
-      subtitle: 'Custom Photography Services',
-      title: 'Get A Quote',
-      description: 'Tell us about your project and we\'ll get back to you with a customized quote.'
+      subtitle: "Custom Photography Services",
+      title: "Get A Quote",
+      description:
+        "Tell us about your project and we'll get back to you with a customized quote.",
     },
     statistics: [
-      { id: 1, value: '100', symbol: '+', label: 'Happy Clients' },
-      { id: 2, value: '5', symbol: 'k', label: 'Photos Taken' },
-      { id: 3, value: '10', symbol: '+', label: 'Years Experience' },
+      { id: 1, value: "100", symbol: "+", label: "Happy Clients" },
+      { id: 2, value: "5", symbol: "k", label: "Photos Taken" },
+      { id: 3, value: "10", symbol: "+", label: "Years Experience" },
     ],
     gallery: {
-      title: 'Our Work',
-      description: 'Check out some of our recent projects',
-      images: []
+      title: "Our Work",
+      description: "Check out some of our recent projects",
+      images: [],
     },
     form: {
       // Default form structure
     },
     instructions: {
-      title: 'How It Works',
+      title: "How It Works",
       steps: [
         {
-          id: 'step-1',
-          title: 'Submit Request',
-          description: 'Fill out the quote request form with your project details.',
-          icon: 'flaticon-edit'
+          id: "step-1",
+          title: "Submit Request",
+          description:
+            "Fill out the quote request form with your project details.",
+          icon: "flaticon-edit",
         },
         {
-          id: 'step-2',
-          title: 'Get a Quote',
-          description: 'We\'ll review your request and send you a customized quote.',
-          icon: 'flaticon-document'
+          id: "step-2",
+          title: "Get a Quote",
+          description:
+            "We'll review your request and send you a customized quote.",
+          icon: "flaticon-document",
         },
         {
-          id: 'step-3',
-          title: 'Start Project',
-          description: 'Once approved, we\'ll begin working on your project.',
-          icon: 'flaticon-photo-camera'
-        }
-      ]
-    }
+          id: "step-3",
+          title: "Start Project",
+          description: "Once approved, we'll begin working on your project.",
+          icon: "flaticon-photo-camera",
+        },
+      ],
+    },
   };
 
   try {
-    // Fetch data for the Get A Quote page
-    const quoteData = (await fetchPageData('get-quote')) as Partial<QuotePageData>;
-    
+    // Fetch data for the Get A Quote page from API
+    const quoteResponse = await fetch(
+      `${
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
+      }/api/content/get-quote`
+    );
+    const quoteData = quoteResponse.ok
+      ? await quoteResponse.json()
+      : ({} as Partial<QuotePageData>);
+
     // Merge with default data to ensure all required fields are present
     const mergedQuoteData: QuotePageData = {
       ...defaultQuoteData,
       ...quoteData,
       banner: {
         ...defaultQuoteData.banner,
-        ...(quoteData?.banner || {})
+        ...(quoteData?.banner || {}),
       },
       hero: {
         ...defaultQuoteData.hero,
-        ...(quoteData?.hero || {})
+        ...(quoteData?.hero || {}),
       },
       gallery: {
         ...defaultQuoteData.gallery,
-        ...(quoteData?.gallery || {})
+        ...(quoteData?.gallery || {}),
       },
       instructions: {
         ...defaultQuoteData.instructions,
-        ...(quoteData?.instructions || {})
-      }
+        ...(quoteData?.instructions || {}),
+      },
     };
 
-    // Fetch settings data
-    const settings = await fetchSettings() || {};
+    // Fetch settings data from API
+    const settingsResponse = await fetch(
+      `${
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
+      }/api/content/settings`
+    );
+    const settings = settingsResponse.ok ? await settingsResponse.json() : {};
 
     return {
       props: {
         quoteData: JSON.parse(JSON.stringify(mergedQuoteData)),
-        settings: JSON.parse(JSON.stringify(settings))
-      }
+        settings: JSON.parse(JSON.stringify(settings)),
+      },
     };
   } catch (error) {
-    console.error('Error in getServerSideProps:', error);
+    console.error("Error in getServerSideProps:", error);
     return {
       props: {
         quoteData: defaultQuoteData,
-        settings: {}
-      }
+        settings: {},
+      },
     };
   }
 };

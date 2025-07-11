@@ -5,7 +5,6 @@ import PricingMain from "@/components/containers/pricing/PricingMain";
 import PricingProject from "@/components/containers/pricing/PricingProject";
 import AboutFaq from "@/components/containers/about/AboutFaq";
 import { GetServerSideProps } from "next";
-import { fetchSettings } from "@/utils/fetchPageData";
 
 interface PricingPageProps {
   pricingData: {
@@ -79,8 +78,13 @@ export const getServerSideProps: GetServerSideProps = async () => {
     );
     const pricingData = await response.json();
 
-    // Fetch settings data
-    const settings = fetchSettings();
+    // Fetch settings data from API
+    const settingsResponse = await fetch(
+      `${
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
+      }/api/content/settings`
+    );
+    const settings = await settingsResponse.json();
 
     return {
       props: {
