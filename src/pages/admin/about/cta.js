@@ -16,6 +16,7 @@ const AboutCtaEditor = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -66,6 +67,12 @@ const AboutCtaEditor = () => {
       image: imageUrl,
       imagePublicId: publicId
     }));
+
+    // Show upload success message
+    setUploadSuccess(true);
+    setTimeout(() => {
+      setUploadSuccess(false);
+    }, 3000);
   };
 
   const handleSave = async () => {
@@ -191,8 +198,8 @@ const AboutCtaEditor = () => {
               
               <div className="admin-editor__image-uploader-wrapper">
                 <ImageUploader
-                  value={ctaData.image}
-                  onChange={handleImageUpload}
+                  currentImage={ctaData.image}
+                  onImageUpload={handleImageUpload}
                   folder="about/cta"
                   width={1920}
                   height={600}

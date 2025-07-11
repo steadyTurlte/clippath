@@ -1,5 +1,6 @@
 import React from "react";
 import Image from "next/image";
+import ImageWithFallback from "@/components/admin/ImageWithFallback";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
 import "swiper/swiper-bundle.css";
@@ -27,15 +28,15 @@ const SponsorSlider = ({ data }: SponsorSliderProps) => {
       "/images/sponsor/three.png",
       "/images/sponsor/four.png",
       "/images/sponsor/five.png",
-      "/images/sponsor/six.png"
-    ]
+      "/images/sponsor/six.png",
+    ],
   };
 
   // Merge with default data
   const sponsorData = {
     ...defaultData,
     ...data,
-    logos: data?.logos || defaultData.logos
+    logos: data?.logos || defaultData.logos,
   };
   return (
     <div className="sponsor section">
@@ -74,12 +75,12 @@ const SponsorSlider = ({ data }: SponsorSliderProps) => {
                 {sponsorData.logos.map((logo, index) => (
                   <SwiperSlide key={index}>
                     <div className="sponsor__slider-item">
-                      <Image
+                      <ImageWithFallback
                         src={logo}
-                        priority
                         alt={`Sponsor ${index + 1}`}
                         width={200}
                         height={100}
+                        fallbackSrc="/images/sponsor/one.png"
                       />
                     </div>
                   </SwiperSlide>
@@ -89,12 +90,12 @@ const SponsorSlider = ({ data }: SponsorSliderProps) => {
                 {sponsorData.logos.map((logo, index) => (
                   <SwiperSlide key={`dup-${index}`}>
                     <div className="sponsor__slider-item">
-                      <Image
+                      <ImageWithFallback
                         src={logo}
-                        priority
                         alt={`Sponsor ${index + 1}`}
                         width={200}
                         height={100}
+                        fallbackSrc="/images/sponsor/one.png"
                       />
                     </div>
                   </SwiperSlide>
