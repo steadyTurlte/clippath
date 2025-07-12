@@ -3,8 +3,6 @@ import { GetServerSideProps } from "next";
 import Layout from "@/components/layout/Layout";
 import CmnBanner from "@/components/layout/Banner/CmnBanner";
 import DynamicBlogMain from "@/components/containers/DynamicBlogMain";
-import { fetchSettings } from "@/utils/fetchPageData";
-import { getData } from "@/utils/dataUtils";
 
 interface BlogProps {
   settings: any;
@@ -27,21 +25,48 @@ const Blog = ({ settings, blogSettings }: BlogProps) => {
 };
 
 export const getServerSideProps: GetServerSideProps = async () => {
-  // Fetch settings data
-  const settings = fetchSettings();
+  try {
+    // Fetch settings data from API
+    const settingsResponse = await fetch(
+      `${
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
+      }/api/content/settings`
+    );
+    const settings = await settingsResponse.json();
 
-  // Fetch blog settings
-  const blogSettings = getData("blog-settings") || {
-    pageTitle: "Blog",
-    pageDescription: "Latest news and updates from our team",
-  };
+    // Fetch blog settings from API
+    const blogSettingsResponse = await fetch(
+      `${
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
+      }/api/content/blog-settings`
+    );
+    const blogSettings = blogSettingsResponse.ok
+      ? await blogSettingsResponse.json()
+      : {
+          pageTitle: "Blog",
+          pageDescription: "Latest news and updates from our team",
+        };
 
-  return {
-    props: {
-      settings,
-      blogSettings,
-    },
-  };
+    return {
+      props: {
+        settings,
+        blogSettings,
+      },
+    };
+  } catch (error) {
+    console.error("Error in getServerSideProps:", error);
+
+    // Return default empty data to prevent rendering errors
+    return {
+      props: {
+        settings: {},
+        blogSettings: {
+          pageTitle: "Blog",
+          pageDescription: "Latest news and updates from our team",
+        },
+      },
+    };
+  }
 };
 
 export default Blog;

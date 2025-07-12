@@ -81,10 +81,9 @@ const ImageUploader = ({
     setUploading(true);
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('folder', folder);
 
     try {
-      const response = await fetch('/api/upload/image', {
+      const response = await fetch(`/api/upload/image?folder=${encodeURIComponent(folder)}`, {
         method: 'POST',
         body: formData,
       });

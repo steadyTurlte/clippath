@@ -1,5 +1,6 @@
 import React from "react";
 import Image from "next/image";
+import ImageWithFallback from "@/components/admin/ImageWithFallback";
 import Link from "next/link";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination } from "swiper/modules";
@@ -88,7 +89,8 @@ const Services = ({ data }: ServicesProps) => {
 
   // Get service items or use defaults
   // Support both items and services properties for backward compatibility
-  const serviceItems = serviceData.services || serviceData.items || defaultServiceItems;
+  const serviceItems =
+    serviceData.services || serviceData.items || defaultServiceItems;
 
   // Use the service items directly without duplication
   const allServiceItems = serviceItems;
@@ -152,11 +154,12 @@ const Services = ({ data }: ServicesProps) => {
                   item.className || classNames[index % classNames.length]
                 }`}
               >
-                <Image
+                <ImageWithFallback
                   src={item.image}
                   alt={item.title}
                   width={400}
                   height={450}
+                  fallbackSrc="/images/services/slide-one.png"
                 />
                 <div className="services__slider-single__content">
                   <h4 className="h4">{item.title}</h4>
@@ -165,7 +168,8 @@ const Services = ({ data }: ServicesProps) => {
                   </Link>
                   <div className="price-tag">
                     <p>
-                      {item.pricePrefix || "starting at"} <span>{item.price}</span>
+                      {item.pricePrefix || "starting at"}{" "}
+                      <span>{item.price}</span>
                     </p>
                   </div>
                 </div>
