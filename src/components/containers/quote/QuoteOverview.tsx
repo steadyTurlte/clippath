@@ -86,7 +86,7 @@ const QuoteOverview = ({ hero, statistics }: QuoteOverviewProps) => {
                 ))}
               </div>
               <div className="cta__group justify-content-start">
-                <Link href="sign-in" className="btn btn--secondary">
+                <Link href="contact-us" className="btn btn--secondary">
                   Get Started
                 </Link>
               </div>

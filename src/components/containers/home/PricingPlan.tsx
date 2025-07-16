@@ -68,39 +68,43 @@ const PricingPlan = ({ data }: PricingPlanProps) => {
                   </div>
                 )}
 
-                <div className="content">
-                  <h4 className="h4">{plan.name}</h4>
-                  <div className="paragraph">
-                    <p>{plan.description}</p>
-                    <p>
-                      starting at <strong>{plan.price} Only</strong>{" "}
-                      <span>{plan.unit}</span>
-                    </p>
-                  </div>
-                  {plan.features && plan.features.length > 0 && (
-                    <div className="features">
-                      <ul className="features-list">
-                        {plan.features.map((feature, idx) => (
-                          <li key={idx} className="feature-item" style={{ textAlign: 'start' }}>
-                            {feature}
-                          </li>
-                        ))}
-                      </ul>
+                <div className="content-wrapper">
+                  <div className="content">
+                    <div>
+                      <h4 className="h4">{plan.name}</h4>
+                      <div className="paragraph">
+                        <p>{plan.description}</p>
+                        <p>
+                          starting at <strong>{plan.price} Only</strong>{" "}
+                          <span>{plan.unit}</span>
+                        </p>
+                      </div>
+                      {plan.features && plan.features.length > 0 && (
+                        <div className="features">
+                          <ul className="features-list">
+                            {plan.features.map((feature, idx) => (
+                              <li key={idx} className="feature-item">
+                                {feature}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-                <div className="cta__group">
-                  <Link
-                    href="/sign-in"
-                    aria-label="Get Started"
-                    className="btn btn--secondary text-uppercase"
-                  >
-                    Get Started
-                  </Link>
-                </div>
-                <div className="anime">
-                  <Image src={star} alt="Decoration" />
-                  <Image src={starhover} alt="Decoration" />
+                    <div className="cta__group">
+                      <Link
+                        href="/contact-us"
+                        aria-label="Get Started"
+                        className="btn btn--secondary text-uppercase"
+                      >
+                        Get Started
+                      </Link>
+                    </div>
+                  </div>
+                  <div className="anime">
+                    <Image src={star} alt="Decoration" />
+                    <Image src={starhover} alt="Decoration" />
+                  </div>
                 </div>
               </div>
             </div>
@@ -115,8 +119,34 @@ const PricingPlan = ({ data }: PricingPlanProps) => {
           padding: 40px 30px;
           position: relative;
           height: 100%;
+          display: flex;
+          flex-direction: column;
           transition: all 0.4s ease;
           border: 1px solid #e2e8f0;
+        }
+        
+        .content-wrapper {
+          display: flex;
+          flex-direction: column;
+          height: 100%;
+        }
+        
+        .content {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          height: 100%;
+        }
+        
+        .cta__group {
+          margin-top: 30px;
+          padding-top: 20px;
+          width: 100%;
+        }
+        
+        .cta__group .btn {
+          width: 100%;
         }
 
         .pricing-main__single:hover {

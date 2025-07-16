@@ -167,7 +167,7 @@ const ServiceProject = ({ data }: ServiceProjectProps) => {
           <div className="col-12">
             <div className="section__cta">
               <Link
-                href="sign-in"
+                href="contact-us"
                 aria-label="create account"
                 className="btn btn--primary"
               >
