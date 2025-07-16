@@ -205,7 +205,7 @@ const FooterOne = () => {
                         </Link>
                       </li>
                       <li>
-                        <Link href="sign-in">
+                        <Link href="contact-us">
                           <i className="fa-solid fa-angle-right"></i>Free Trial
                         </Link>
                       </li>
