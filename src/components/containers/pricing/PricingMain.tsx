@@ -146,21 +146,24 @@ const PricingMain = ({ data }: PricingMainProps) => {
         }
 
         .features {
-          margin-top: 16px;
+          margin: 24px 0;
+          text-align: start;
         }
 
         .features-list {
-          list-style-type: none;
+          list-style: none;
           padding: 0;
           margin: 0;
         }
 
         .feature-item {
-          font-size: 14px;
-          color: #334155;
-          padding: 4px 0;
           position: relative;
-          padding-left: 20px;
+          padding-left: 24px;
+          margin-bottom: 12px;
+          color: #475569;
+          font-size: 14px;
+          line-height: 1.6;
+          text-align: start;
         }
 
         .feature-item:before {
@@ -168,6 +171,7 @@ const PricingMain = ({ data }: PricingMainProps) => {
           position: absolute;
           left: 0;
           color: #10b981;
+          font-weight: bold;
         }
       `}</style>
     </section>
