@@ -128,25 +128,26 @@ const PricingProject = ({ data }: PricingProjectProps) => {
                         <div className="recent-project__slider-item">
                           <div className="recent-project__slider-item-inner">
                             <div className="thumb">
-                              {item.image.startsWith("/") ? (
+                              {item.image && item.image.trim() !== "" ? (
                                 <Image
                                   src={item.image}
                                   alt={item.title}
                                   width={600}
                                   height={400}
+                                  unoptimized={item.image.startsWith("http")}
                                 />
                               ) : (
                                 <Image src={Car} alt={item.title} />
                               )}
                             </div>
-                            <div className="content section__content">
+                            <div className="content section__content text-center">
                               <h2 className="h2 title">{item.title}</h2>
                               {item.category && (
                                 <div className="category">
                                   <span>{item.category}</span>
                                 </div>
                               )}
-                              <div className="cta__group justify-content-start">
+                              <div className="cta__group justify-content-center">
                                 <Link
                                   href={item.link}
                                   className="btn btn--secondary"

@@ -312,7 +312,7 @@ const TrickyBackgroundsEditor = ({ data = {}, onChange, preview }) => {
 
                 <div className="before-after-help">
                   <p className="form-text">
-                    <strong>Recommended size:</strong> 600x400px (both before and after images)
+                    <strong>Recommended size:</strong> 916x534px (both before and after images)
                   </p>
                   <p className="form-text">
                     <strong>Image types:</strong> JPEG, PNG, WEBP

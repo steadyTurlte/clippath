@@ -1387,6 +1387,11 @@
     width: 100%;
   }
 
+  // Exception for banner buttons - keep them auto width
+  .banner .cta__group .btn {
+    width: auto;
+  }
+
   .work-section {
     .work-section__inner {
       padding: 60px 20px;

@@ -85,7 +85,7 @@ const BeforeAfterComparison = ({ beforeImage, afterImage, alt }) => {
               fill
               sizes="100vw"
               priority
-              style={{ objectFit: 'cover', objectPosition: 'center' }}
+              style={{ objectFit: 'contain', objectPosition: 'center' }}
               unoptimized={beforeImage.startsWith('http')}
             />
           </div>
@@ -106,7 +106,7 @@ const BeforeAfterComparison = ({ beforeImage, afterImage, alt }) => {
               fill
               sizes="100vw"
               priority
-              style={{ objectFit: 'cover', objectPosition: 'center' }}
+              style={{ objectFit: 'contain', objectPosition: 'center' }}
               unoptimized={afterImage.startsWith('http')}
             />
           </div>
@@ -142,7 +142,7 @@ const BeforeAfterComparison = ({ beforeImage, afterImage, alt }) => {
         .comparison-wrapper {
           position: relative;
           width: 100%;
-          height: 400px;
+          aspect-ratio: 916 / 534;
           overflow: hidden;
           border-radius: 8px;
           box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -235,7 +235,7 @@ const BeforeAfterComparison = ({ beforeImage, afterImage, alt }) => {
 
         @media (max-width: 768px) {
           .comparison-wrapper {
-            height: 300px;
+            aspect-ratio: 916 / 534;
           }
         }
       `}</style>
