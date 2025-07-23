@@ -82,7 +82,7 @@ const HomeOneBanner = ({ data }: HomeOneBannerProps) => {
                 <Link
                   href="/get-quote"
                   aria-label="create account"
-                  className="btn btn--primary"
+                  className="btn btn--primary w-auto"
                 >
                   Free Trial <i className="fa-solid fa-paper-plane"></i>
                 </Link>

@@ -133,12 +133,6 @@ const HomeCtaEditor = () => {
           </div>
         )}
 
-        {uploadSuccess && (
-          <div className="admin-editor__success">
-            <p>Image uploaded successfully!</p>
-          </div>
-        )}
-
         <div className="admin-editor__content">
           <div className="admin-editor__section">
             <h2 className="admin-editor__section-title">CTA Content</h2>
