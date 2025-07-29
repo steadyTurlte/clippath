@@ -106,10 +106,22 @@ const CustomQuote = ({ gallery, form }: CustomQuoteProps) => {
       options: [
         "Clipping Path",
         "Background Removal",
+        "Ghost Mannequin",
+        "Symmetrical Neck Joint",
+        "Jewelry Retouching",
+        "Car Photo Editing",
+        "E-Commerce Product",
         "Image Masking",
         "Shadow Creation",
-        "Color Correction",
-        "Photo Retouching",
+        "Color Correction & Color Matching",
+        "Multiple Clipping Path",
+        "High-End Photo Retouching",
+        "Headshot Retouching",
+        "Image Resizing & Cropping",
+        "Lightroom Photo Editing",
+        "AI Retouching with Human Touch (Optional)",
+        "Professional Line Art",
+        "Vector Conversion",
         "Other",
       ],
     },
@@ -333,28 +345,29 @@ const CustomQuote = ({ gallery, form }: CustomQuoteProps) => {
           }
 
           const uploadData = await uploadResponse.json();
-          
+
           if (!uploadData.url) {
             throw new Error("Invalid response from file upload");
           }
-          
+
           filePath = uploadData.url;
           setUploadedFilePath(filePath);
-          
+
           // Log successful upload
           console.log("File uploaded successfully:", {
             url: filePath,
             publicId: uploadData.publicId,
             size: uploadedFile.size,
-            type: uploadedFile.type
+            type: uploadedFile.type,
           });
-          
         } catch (uploadError: any) {
           console.error("File upload error:", uploadError);
           setFormStatus({
             submitting: false,
             success: false,
-            error: `File upload failed: ${uploadError.message || 'Unknown error'}`,
+            error: `File upload failed: ${
+              uploadError.message || "Unknown error"
+            }`,
           });
           return;
         }
