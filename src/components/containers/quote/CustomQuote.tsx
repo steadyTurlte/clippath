@@ -130,14 +130,27 @@ const CustomQuote = ({ gallery, form }: CustomQuoteProps) => {
       fileFormat: [
         { id: "jpg", label: "JPG", isDefault: true },
         { id: "png", label: "PNG", isDefault: false },
+        { id: "tif", label: "TIFF", isDefault: false },
+        { id: "psd", label: "PSD", isDefault: false },
+        { id: "webp", label: "WEBP", isDefault: false },
+        { id: "svg", label: "SVG", isDefault: false },
+        { id: "pdf", label: "PDF", isDefault: false },
       ],
       background: [
         { id: "transparent", label: "Transparent Background", isDefault: true },
         { id: "white", label: "White Background", isDefault: false },
+        { id: "black", label: "Black Background", isDefault: false },
+        { id: "custom", label: "Custom Color Background", isDefault: false },
       ],
       path: [
         { id: "includePath", label: "Include Path", isDefault: true },
         { id: "noPath", label: "No Path", isDefault: false },
+        {
+          id: "separateLayer",
+          label: "Separate Layer (PSD)",
+          isDefault: false,
+        },
+        { id: "vectorPath", label: "Vector Path (SVG/PDF)", isDefault: false },
       ],
     },
     message: {
