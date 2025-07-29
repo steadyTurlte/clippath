@@ -279,7 +279,7 @@ const PaymentMethodsEditor = () => {
                   borderRadius: '8px',
                   marginTop: '10px'
                 }}>
-                  <p>No payment method logos added yet. Click "Add Logo" to get started.</p>
+                  <p>No payment method logos added yet. Click &quot;Add Logo&quot; to get started.</p>
                 </div>
               )}
             </div>
