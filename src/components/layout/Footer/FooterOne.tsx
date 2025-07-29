@@ -194,12 +194,6 @@ const FooterOne = () => {
                     <ul>
                       <li>
                         <Link href="about-us">
-                          <i className="fa-solid fa-angle-right"></i>Privacy
-                          Policy
-                        </Link>
-                      </li>
-                      <li>
-                        <Link href="about-us">
                           <i className="fa-solid fa-angle-right"></i>Terms &
                           Conditions
                         </Link>
