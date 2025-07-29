@@ -60,7 +60,11 @@ const ServiceDetail = () => {
         ) : (
           <div className="service-detail-card">
             <Image
-              src={serviceData.image || "/images/services/slide-one.png"}
+              src={
+                typeof serviceData.image === "object" && serviceData.image?.url
+                  ? serviceData.image.url
+                  : serviceData.image || "/images/services/slide-one.png"
+              }
               alt={serviceData.title}
               width={400}
               height={300}

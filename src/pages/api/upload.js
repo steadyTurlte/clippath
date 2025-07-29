@@ -27,7 +27,7 @@ export default async function handler(req, res) {
       });
     });
 
-    const { files } = formData;
+    const { files, fields } = formData;
     const fileArray = files.file;
     if (!fileArray) {
       return res.status(400).json({ message: 'No file uploaded' });
@@ -37,15 +37,20 @@ export default async function handler(req, res) {
     if (!allowedTypes.includes(file.mimetype)) {
       return res.status(400).json({ message: 'Only image files are allowed' });
     }
+
+    // Get folder from form data or use default
+    const folder = fields.folder ? (Array.isArray(fields.folder) ? fields.folder[0] : fields.folder) : 'photodit';
+
     const fileBuffer = await fs.promises.readFile(file.filepath);
     const cloudinaryResult = await uploadToCloudinary(fileBuffer, {
-      folder: 'photodit',
+      folder: `photodit/${folder}`,
       public_id: `${Date.now()}-${file.originalFilename.replace(/\s+/g, '-')}`,
       resource_type: 'image',
     });
     return res.status(200).json({
       message: 'File uploaded successfully',
       url: cloudinaryResult.secure_url,
+      secure_url: cloudinaryResult.secure_url,
       filePath: cloudinaryResult.secure_url,
       publicId: cloudinaryResult.public_id,
       width: cloudinaryResult.width,
