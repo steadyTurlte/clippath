@@ -94,7 +94,9 @@ const ServicesMain = ({ data, services = [] }: ServicesMainProps) => {
                 <div className="service-card__content">
                   <h3 className="h4 service-card__title">{service.title}</h3>
                   <p className="service-card__description">
-                    {service.description}
+                    {service.description.length > 80
+                      ? service.description.slice(0, 80) + "..."
+                      : service.description}
                   </p>
                   <div className="service-card__price">
                     <p>
@@ -102,7 +104,9 @@ const ServicesMain = ({ data, services = [] }: ServicesMainProps) => {
                     </p>
                   </div>
                   <Link
-                    href={service.link || "#"}
+                    href={`/services/${encodeURIComponent(
+                      service.title.toLowerCase().replace(/\s+/g, "-")
+                    )}`}
                     className="service-card__link"
                   >
                     Learn More <i className="fa-solid fa-arrow-right"></i>

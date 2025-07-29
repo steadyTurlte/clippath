@@ -24,19 +24,18 @@ export default async function handler(req, res) {
       service,
       fileOptions,
       message,
-      uploadedFile,
+      uploadedFiles = [],
       cloudLink,
     } = req.body;
 
-    // Handle uploaded file URL
-    let fileMetadata = null;
-    if (uploadedFile) {
-      // If uploadedFile is a URL, create a basic metadata object
-      fileMetadata = {
-        cloudinaryUrl: uploadedFile,
-        originalName: uploadedFile.split('/').pop() || 'uploaded-file',
+    // Handle multiple uploaded file URLs
+    let fileMetadatas = [];
+    if (Array.isArray(uploadedFiles) && uploadedFiles.length > 0) {
+      fileMetadatas = uploadedFiles.map(url => ({
+        cloudinaryUrl: url,
+        originalName: url.split('/').pop() || 'uploaded-file',
         fileSize: 0 // Size not available since we only have the URL
-      };
+      }));
     }
 
     // Format file options for email
@@ -50,20 +49,18 @@ export default async function handler(req, res) {
       fileOptionsText = fileOptions;
     }
 
-    // Prepare email content
+    // Prepare email content for multiple files
     const emailContent = `
       <h2>New Quote Request</h2>
       <p><strong>Name:</strong> ${name}</p>
       <p><strong>Email:</strong> ${email}</p>
       <p><strong>Service:</strong> ${service}</p>
-      <p><strong>File Options:</strong> ${
-        fileOptionsText || "None selected"
-      }</p>
+      <p><strong>File Options:</strong> ${fileOptionsText || "None selected"}</p>
       <p><strong>Message:</strong> ${message || "No message provided"}</p>
       ${
-        fileMetadata
-          ? `<p><strong>Uploaded File:</strong> <a href="${fileMetadata.cloudinaryUrl}">${fileMetadata.originalName}</a> (${(fileMetadata.fileSize / 1024).toFixed(2)} KB)</p>`
-          : "<p><strong>Uploaded File:</strong> No file uploaded</p>"
+        fileMetadatas.length > 0
+          ? `<p><strong>Uploaded Files:</strong></p><ul>${fileMetadatas.map(f => `<li><a href="${f.cloudinaryUrl}">${f.originalName}</a></li>`).join('')}</ul>`
+          : "<p><strong>Uploaded Files:</strong> No files uploaded</p>"
       }
       ${
         cloudLink
@@ -71,7 +68,6 @@ export default async function handler(req, res) {
           : "<p><strong>Cloud Link:</strong> No link provided</p>"
       }
       <p><strong>Submitted At:</strong> ${new Date().toLocaleString()}</p>
-      
       <hr>
       <p>You can view and manage this quote request in the admin panel.</p>
     `;
@@ -82,7 +78,7 @@ export default async function handler(req, res) {
       service,
       fileOptions: fileOptionsText || "None selected",
       message: message ? "[Provided]" : "No message",
-      hasUploadedFile: !!fileMetadata,
+      hasUploadedFiles: fileMetadatas.length > 0,
       cloudLink: cloudLink || "None",
       timestamp: new Date().toISOString()
     });
@@ -96,12 +92,11 @@ export default async function handler(req, res) {
         service,
         fileOptions: fileOptionsText,
         message,
-        uploadedFile: fileMetadata ? {
-          url: fileMetadata.cloudinaryUrl,
-          name: fileMetadata.originalName,
-          size: fileMetadata.fileSize,
-          publicId: fileMetadata.cloudinaryPublicId
-        } : null,
+        uploadedFiles: fileMetadatas.map(f => ({
+          url: f.cloudinaryUrl,
+          name: f.originalName,
+          size: f.fileSize
+        })),
         cloudLink,
         status: 'new',
         createdAt: new Date().toISOString()

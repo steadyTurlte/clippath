@@ -216,9 +216,9 @@ const CustomQuote = ({ gallery, form }: CustomQuoteProps) => {
     error: null as string | null | undefined,
   });
 
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-  const [uploadedFileName, setUploadedFileName] = useState("");
-  const [uploadedFilePath, setUploadedFilePath] = useState("");
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [uploadedFileNames, setUploadedFileNames] = useState<string[]>([]);
+  const [uploadedFilePaths, setUploadedFilePaths] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dropAreaRef = useRef<HTMLDivElement>(null);
 
@@ -268,9 +268,11 @@ const CustomQuote = ({ gallery, form }: CustomQuoteProps) => {
   // Handle file selection
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
-      setUploadedFile(file);
-      setUploadedFileName(file.name);
+      let files = Array.from(e.target.files).slice(0, 3);
+      // Validate size
+      files = files.filter((f) => f.size <= 50 * 1024 * 1024);
+      setUploadedFiles(files);
+      setUploadedFileNames(files.map((f) => f.name));
     }
   };
 
@@ -294,16 +296,15 @@ const CustomQuote = ({ gallery, form }: CustomQuoteProps) => {
     if (dropAreaRef.current) {
       dropAreaRef.current.classList.remove("drag-over");
     }
-
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      const file = e.dataTransfer.files[0];
-      setUploadedFile(file);
-      setUploadedFileName(file.name);
-
+      let files = Array.from(e.dataTransfer.files).slice(0, 3);
+      files = files.filter((f) => f.size <= 50 * 1024 * 1024);
+      setUploadedFiles(files);
+      setUploadedFileNames(files.map((f) => f.name));
       // Update the file input
       if (fileInputRef.current) {
         const dataTransfer = new DataTransfer();
-        dataTransfer.items.add(file);
+        files.forEach((f) => dataTransfer.items.add(f));
         fileInputRef.current.files = dataTransfer.files;
       }
     }
@@ -335,44 +336,32 @@ const CustomQuote = ({ gallery, form }: CustomQuoteProps) => {
     });
 
     try {
-      // Upload file if selected
-      let filePath = "";
-      if (uploadedFile) {
+      // Upload files if selected
+      let filePaths: string[] = [];
+      if (uploadedFiles.length > 0) {
         try {
-          const formDataObj = new FormData();
-          formDataObj.append("file", uploadedFile);
-
-          // Upload to Cloudinary
-          const uploadResponse = await fetch(
-            "/api/upload?folder=quote-requests",
-            {
-              method: "POST",
-              body: formDataObj,
+          for (const file of uploadedFiles) {
+            const formDataObj = new FormData();
+            formDataObj.append("file", file);
+            const uploadResponse = await fetch(
+              "/api/upload?folder=quote-requests",
+              {
+                method: "POST",
+                body: formDataObj,
+              }
+            );
+            if (!uploadResponse.ok) {
+              const errorData = await uploadResponse.json().catch(() => ({}));
+              console.error("Upload response error:", errorData);
+              throw new Error(errorData.message || "Failed to upload file");
             }
-          );
-
-          if (!uploadResponse.ok) {
-            const errorData = await uploadResponse.json().catch(() => ({}));
-            console.error("Upload response error:", errorData);
-            throw new Error(errorData.message || "Failed to upload file");
+            const uploadData = await uploadResponse.json();
+            if (!uploadData.url) {
+              throw new Error("Invalid response from file upload");
+            }
+            filePaths.push(uploadData.url);
           }
-
-          const uploadData = await uploadResponse.json();
-
-          if (!uploadData.url) {
-            throw new Error("Invalid response from file upload");
-          }
-
-          filePath = uploadData.url;
-          setUploadedFilePath(filePath);
-
-          // Log successful upload
-          console.log("File uploaded successfully:", {
-            url: filePath,
-            publicId: uploadData.publicId,
-            size: uploadedFile.size,
-            type: uploadedFile.type,
-          });
+          setUploadedFilePaths(filePaths);
         } catch (uploadError: any) {
           console.error("File upload error:", uploadError);
           setFormStatus({
@@ -409,7 +398,7 @@ const CustomQuote = ({ gallery, form }: CustomQuoteProps) => {
           service: formData.service,
           fileOptions: fileOptionsString,
           message: formData.message,
-          uploadedFile: filePath || "",
+          uploadedFiles: filePaths,
           cloudLink: formData.cloudLink || "",
         }),
       });
@@ -439,9 +428,9 @@ const CustomQuote = ({ gallery, form }: CustomQuoteProps) => {
           cloudLink: "",
           termsAccepted: false,
         });
-        setUploadedFile(null);
-        setUploadedFileName("");
-        setUploadedFilePath("");
+        setUploadedFiles([]);
+        setUploadedFileNames([]);
+        setUploadedFilePaths([]);
 
         // Clear file input
         if (fileInputRef.current) {
@@ -1074,12 +1063,22 @@ const CustomQuote = ({ gallery, form }: CustomQuoteProps) => {
                       ref={fileInputRef}
                       onChange={handleFileChange}
                       style={{ display: "none" }}
+                      multiple
+                      accept="image/*"
                     />
-                    {uploadedFileName ? (
+                    {uploadedFileNames.length > 0 ? (
                       <>
-                        <p className="file-selected">File selected:</p>
-                        <p className="file-name">{uploadedFileName}</p>
-                        <p className="change-file">Click to change file</p>
+                        <p className="file-selected">Files selected:</p>
+                        <ul className="file-name-list">
+                          {uploadedFileNames.map((name, idx) => (
+                            <li key={idx} className="file-name">
+                              {name}
+                            </li>
+                          ))}
+                        </ul>
+                        <p className="change-file">
+                          Click to change files (max 3, 50MB each)
+                        </p>
                       </>
                     ) : (
                       <>
@@ -1089,6 +1088,9 @@ const CustomQuote = ({ gallery, form }: CustomQuoteProps) => {
                         <p>or</p>
                         <p>
                           {formConfig.fileUpload.description.split(" or ")[1]}
+                        </p>
+                        <p className="change-file">
+                          You can select up to 3 images (50MB each)
                         </p>
                       </>
                     )}

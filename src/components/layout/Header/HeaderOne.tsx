@@ -7,17 +7,6 @@ import {
   ReactCompareSliderImage,
 } from "react-compare-slider";
 import Logo from "public/images/logo.png";
-import sOne from "public/images/services/two.png";
-import sTwo from "public/images/services/three.png";
-import sThree from "public/images/services/four.png";
-import sFour from "public/images/services/five.png";
-import sFive from "public/images/services/six.png";
-import sSix from "public/images/services/one.png";
-import iconone from "public/images/services/icon-one.png";
-import icontwo from "public/images/services/icon-two.png";
-import iconthree from "public/images/services/icon-three.png";
-import iconfour from "public/images/services/icon-four.png";
-import iconfive from "public/images/services/icon-five.png";
 
 interface HeaderProps {
   openNav: boolean;
@@ -33,6 +22,22 @@ interface ContactInfo {
 }
 
 const HeaderOne = ({ openNav, handleNav, setOpenNav }: HeaderProps) => {
+  // Services for navbar dropdown
+  const [services, setServices] = useState<any[]>([]);
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const res = await fetch("/api/content/services?section=services");
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data)) setServices(data);
+        }
+      } catch (err) {
+        console.error("Error fetching services for navbar:", err);
+      }
+    };
+    fetchServices();
+  }, []);
   const [OffInfo, setOffInfo] = useState(false);
   const [contactInfo, setContactInfo] = useState<ContactInfo>({
     phone: "",
@@ -214,46 +219,20 @@ const HeaderOne = ({ openNav, handleNav, setOpenNav }: HeaderProps) => {
                               All Services
                             </Link>
                           </li>
-                          <li>
-                            <Link
-                              className="nav__dropdown-item hide-nav"
-                              href="/services#clipping-path"
-                            >
-                              Clipping Path
-                            </Link>
-                          </li>
-                          <li>
-                            <Link
-                              className="nav__dropdown-item hide-nav"
-                              href="/services#background-removal"
-                            >
-                              Background Removal
-                            </Link>
-                          </li>
-                          <li>
-                            <Link
-                              className="nav__dropdown-item hide-nav"
-                              href="/services#image-masking"
-                            >
-                              Image Masking
-                            </Link>
-                          </li>
-                          <li>
-                            <Link
-                              className="nav__dropdown-item hide-nav"
-                              href="/services#photo-retouching"
-                            >
-                              Photo Retouching
-                            </Link>
-                          </li>
-                          <li>
-                            <Link
-                              className="nav__dropdown-item hide-nav"
-                              href="/services#ghost-mannequin"
-                            >
-                              Ghost Mannequin
-                            </Link>
-                          </li>
+                          {services.map((service) => (
+                            <li key={service.id}>
+                              <Link
+                                className="nav__dropdown-item hide-nav"
+                                href={`/services/${encodeURIComponent(
+                                  service.title
+                                    .toLowerCase()
+                                    .replace(/\s+/g, "-")
+                                )}`}
+                              >
+                                {service.title}
+                              </Link>
+                            </li>
+                          ))}
                         </ul>
                       </li>
                       <li className="nav__menu-item nav__menu-item--dropdown">
