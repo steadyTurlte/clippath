@@ -56,6 +56,16 @@ const PricingAdmin = () => {
               <p className="admin-home__section-card-description">Manage frequently asked questions about pricing.</p>
             </div>
           </Link>
+
+          <Link href="/admin/pricing/payment-methods" className="admin-home__section-card">
+            <div className="admin-home__section-card-icon">
+              <i className="fa-solid fa-credit-card"></i>
+            </div>
+            <div className="admin-home__section-card-content">
+              <h3 className="admin-home__section-card-title">Payment Methods</h3>
+              <p className="admin-home__section-card-description">Manage supported payment method logos and display.</p>
+            </div>
+          </Link>
         </div>
       </div>
 

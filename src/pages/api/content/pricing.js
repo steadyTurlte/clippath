@@ -131,6 +131,16 @@ const DEFAULT_PRICING_DATA = {
       },
     ],
   },
+  paymentMethods: {
+    title: "Supported Payment Methods",
+    logos: [
+      "/images/payment/visa.png",
+      "/images/payment/mastercard.png",
+      "/images/payment/paypal.png",
+      "/images/payment/stripe.png",
+      "/images/payment/american-express.png",
+    ],
+  },
 };
 
 export default async function handler(req, res) {

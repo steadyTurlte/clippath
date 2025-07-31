@@ -234,49 +234,7 @@ const AboutOverviewEditor = () => {
             </div>
           </div>
 
-          <div className="admin-editor__section">
-            <h2 className="admin-editor__section-title">Overview Images</h2>
-
-            <div className="admin-editor__image-help">
-              <p className="admin-editor__help-text">
-                <strong>Recommended size:</strong> 400x300px
-              </p>
-              <p className="admin-editor__help-text">
-                <strong>Image types:</strong> JPEG, PNG, WEBP
-              </p>
-            </div>
-
-            {Array.from({ length: 3 }).map((_, index) => (
-              <div key={index} className="admin-editor__image-field">
-                <div className="admin-editor__field">
-                  <label className="admin-editor__label">Image {index + 1}</label>
-                  <div className="admin-editor__input-group">
-                    <ImageUploader
-                      currentImage={overviewData.images[index] || ''}
-                      onImageUpload={(url, publicId) => handleImageUpload(index, url, publicId)}
-                      folder="about/overview"
-                      className="admin-editor__image-uploader"
-                      width={400}
-                      height={300}
-                    />
-                  </div>
-                </div>
-                <div className="admin-editor__image-preview">
-                  {overviewData.images[index] && (
-                    <Image
-                      src={overviewData.images[index]}
-                      alt={`Preview ${index + 1}`}
-                      className="admin-editor__preview-img"
-                      width={100}
-                      height={100}
-                      style={{ objectFit: 'contain' }}
-                      unoptimized={true}
-                    />
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
+          {/* Overview Images section removed as per requirements */}
         </div>
       </div>
 

@@ -38,40 +38,6 @@ const AboutOverview = ({ data }: AboutOverviewProps) => {
     <section className="about-overview section pt-0">
       <div className="container">
         <div className="row gaper">
-          <div className="col-12 col-lg-7">
-            <div
-              className="about-overview__single "
-              data-aos="fade-up"
-              data-aos-duration="600"
-              data-aos-delay="100"
-            >
-              <ImageWithFallback
-                src={getImageUrl(overviewData.images[0], One)}
-                alt="Overview Image 1"
-                width={600}
-                height={400}
-                fallbackSrc="/images/about/about-overview-one.png"
-              />
-            </div>
-          </div>
-          <div className="col-12 col-lg-5">
-            <div
-              className="about-overview__single "
-              data-aos="fade-right"
-              data-aos-duration="600"
-              data-aos-delay="100"
-            >
-              <ImageWithFallback
-                src={getImageUrl(overviewData.images[1], Two)}
-                alt="Overview Image 2"
-                width={400}
-                height={300}
-                fallbackSrc="/images/about/about-overview-two.png"
-              />
-            </div>
-          </div>
-        </div>
-        <div className="row gaper">
           <div className="col-12 col-lg-6">
             <h2
               className="h2 title "
@@ -117,33 +83,6 @@ const AboutOverview = ({ data }: AboutOverviewProps) => {
             -1px -1px 0 rgba(0, 0, 0, 0.7), 1px -1px 0 rgba(0, 0, 0, 0.7),
             -1px 1px 0 rgba(0, 0, 0, 0.7);
           font-weight: 500;
-        }
-        .about-overview__single {
-          /* Add overlay for better text contrast over images */
-          position: relative;
-        }
-        .about-overview__single::before {
-          content: "";
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: rgba(0, 0, 0, 0.15);
-          z-index: 1;
-          pointer-events: none;
-        }
-        .about-overview__single img {
-          filter: brightness(0.8) contrast(1.1);
-          position: relative;
-          z-index: 0;
-        }
-        .about-overview .title,
-        .about-overview .h2,
-        .about-overview .h6,
-        .about-overview .paragraph {
-          position: relative;
-          z-index: 2;
         }
       `}</style>
     </section>

@@ -4,6 +4,7 @@ import CmnBanner from "@/components/layout/Banner/CmnBanner";
 import PricingMain from "@/components/containers/pricing/PricingMain";
 import PricingProject from "@/components/containers/pricing/PricingProject";
 import AboutFaq from "@/components/containers/about/AboutFaq";
+import PaymentMethodsSlider from "@/components/containers/pricing/PaymentMethodsSlider";
 import { GetServerSideProps } from "next";
 
 interface PricingPageProps {
@@ -49,6 +50,10 @@ interface PricingPageProps {
         answer: string;
       }[];
     };
+    paymentMethods?: {
+      title: string;
+      logos: string[];
+    };
   };
   settings: any;
 }
@@ -62,6 +67,7 @@ const Pricing = ({ pricingData, settings }: PricingPageProps) => {
         breadcrumbs={pricingData.banner?.breadcrumbs}
       />
       <PricingMain data={pricingData.main} />
+      <PaymentMethodsSlider data={pricingData.paymentMethods} />
       <PricingProject data={pricingData.project} />
       <AboutFaq data={pricingData.faq} />
     </Layout>

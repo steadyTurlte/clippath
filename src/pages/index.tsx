@@ -10,6 +10,7 @@ import PricingPlan from "@/components/containers/home/PricingPlan";
 import NewsSec from "@/components/containers/home/NewsSec";
 import CTA from "@/components/containers/home/CTA";
 import SponsorSlider from "@/components/containers/home/SponsorSlider";
+import PaymentMethodsSlider from "@/components/containers/pricing/PaymentMethodsSlider";
 
 import { GetServerSideProps } from "next";
 
@@ -72,8 +73,17 @@ export const getServerSideProps: GetServerSideProps = async () => {
     );
     const sponsorsData = await aboutResponse.json();
 
+    // Fetch payment methods data from pricing.json
+    const paymentMethodsResponse = await fetch(
+      `${
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
+      }/api/content/pricing?section=paymentMethods`
+    );
+    const paymentMethodsData = await paymentMethodsResponse.json();
+
     homeData.pricing = pricingData;
     homeData.sponsors = sponsorsData;
+    homeData.paymentMethods = paymentMethodsData;
 
     return {
       props: {
@@ -106,6 +116,7 @@ interface HomeData {
   news?: any;
   cta?: any;
   sponsors?: any;
+  paymentMethods?: any;
 }
 
 interface NewsData {
@@ -139,6 +150,7 @@ const Home = ({
         newsItems={newsData.news?.slice(0, 3)}
       />
       <CTA data={typedHomeData.cta} />
+      <PaymentMethodsSlider data={typedHomeData.paymentMethods} />
       <SponsorSlider data={typedHomeData.sponsors} />
     </Layout>
   );
