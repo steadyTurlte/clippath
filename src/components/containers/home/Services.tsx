@@ -80,6 +80,14 @@ interface ServicesProps {
 }
 
 const Services = ({ data }: ServicesProps) => {
+  const slugify = (text: string) =>
+    text
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-");
+
   // Use provided data or fallback to defaults
   const serviceData: ServicesData = data || {
     subtitle: "photodit's service",
@@ -163,7 +171,7 @@ const Services = ({ data }: ServicesProps) => {
                 />
                 <div className="services__slider-single__content">
                   <h4 className="h4">{item.title}</h4>
-                  <Link href={item.link || "service-details"}>
+                  <Link href={`/services/${slugify(item.title)}`}>
                     <i className="icon-arrow-up"></i>
                   </Link>
                   <div className="price-tag">

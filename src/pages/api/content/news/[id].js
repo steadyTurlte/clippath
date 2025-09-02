@@ -7,7 +7,7 @@ export default async function handler(req, res) {
   const newsId = typeof id === 'string' ? parseInt(id, 10) : id;
   
   // Get existing news data
-  const data = getData('news') || { news: [] };
+  const data = (await getData('news')) || { news: [] };
   
   // Find the news article
   const newsIndex = data.news.findIndex(item => item.id === newsId);
@@ -33,11 +33,12 @@ export default async function handler(req, res) {
     // Update the news article
     data.news[newsIndex] = {
       ...data.news[newsIndex],
-      ...updatedNews
+      ...updatedNews,
+      updatedAt: new Date().toISOString()
     };
     
     // Save the updated data
-    const success = saveData('news', data);
+    const success = await saveData('news', data);
     
     if (!success) {
       return res.status(500).json({ message: 'Failed to update news data' });
@@ -52,7 +53,7 @@ export default async function handler(req, res) {
     data.news.splice(newsIndex, 1);
     
     // Save the updated data
-    const success = saveData('news', data);
+    const success = await saveData('news', data);
     
     if (!success) {
       return res.status(500).json({ message: 'Failed to delete news data' });

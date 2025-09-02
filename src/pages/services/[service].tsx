@@ -1,7 +1,12 @@
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Layout from "@/components/layout/Layout";
+import ServiceDetailsAbout from "../../../public/service/ServiceDetailsAbout";
+import ServiceProject from "../../../public/service/ServiceProject";
+import ServicePricing from "../../../public/service/ServicePricing";
+import ServiceFaq from "../../../public/service/ServiceFaq";
+import Trial from "../../../public/service/Trial";
 
 const ServiceDetail = () => {
   const router = useRouter();
@@ -9,6 +14,15 @@ const ServiceDetail = () => {
   const [serviceData, setServiceData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [settings, setSettings] = useState<any>(null);
+  const [detail, setDetail] = useState<any>(null);
+
+  const slugify = (text: string) =>
+    (text || "")
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-");
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -30,9 +44,7 @@ const ServiceDetail = () => {
         if (res.ok) {
           const data = await res.json();
           const found = Array.isArray(data)
-            ? data.find(
-                (s) => s.title.toLowerCase().replace(/\s+/g, "-") === service
-              )
+            ? data.find((s) => slugify(s.title) === service)
             : null;
           setServiceData(found);
         }
@@ -43,6 +55,19 @@ const ServiceDetail = () => {
       }
     };
     fetchService();
+  }, [service]);
+
+  useEffect(() => {
+    if (!service) return;
+    const fetchDetail = async () => {
+      try {
+        const res = await fetch(`/api/content/services?section=details&slug=${service}`);
+        if (res.ok) {
+          setDetail(await res.json());
+        }
+      } catch {}
+    };
+    fetchDetail();
   }, [service]);
 
   return (
@@ -58,28 +83,37 @@ const ServiceDetail = () => {
         ) : !serviceData ? (
           <div className="service-detail-error">Service not found.</div>
         ) : (
-          <div className="service-detail-card">
-            <Image
-              src={
-                typeof serviceData.image === "object" && serviceData.image?.url
-                  ? serviceData.image.url
-                  : serviceData.image || "/images/services/slide-one.png"
-              }
-              alt={serviceData.title}
-              width={400}
-              height={300}
-              className="service-detail-img"
-              onError={(e) => {
-                (e.target as HTMLImageElement).src =
-                  "/images/services/slide-one.png";
-              }}
-            />
-            <div className="service-detail-content">
-              <h1>{serviceData.title}</h1>
-              <p className="service-detail-price">{serviceData.price}</p>
-              <p className="service-detail-desc">{serviceData.description}</p>
+          <>
+            <div className="service-detail-card">
+              <Image
+                src={
+                  typeof serviceData.image === "object" && serviceData.image?.url
+                    ? serviceData.image.url
+                    : serviceData.image || "/images/services/slide-one.png"
+                }
+                alt={serviceData.title}
+                width={400}
+                height={300}
+                className="service-detail-img"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src =
+                    "/images/services/slide-one.png";
+                }}
+              />
+              <div className="service-detail-content">
+                <h1>{serviceData.title}</h1>
+                <p className="service-detail-price">{serviceData.price}</p>
+                <p className="service-detail-desc">{serviceData.description}</p>
+              </div>
             </div>
-          </div>
+
+            {/* Template sections (dynamic props support in future) */}
+            <ServiceDetailsAbout />
+            <ServiceProject />
+            <ServicePricing />
+            <ServiceFaq />
+            <Trial />
+          </>
         )}
         <style jsx>{`
           .service-detail-page {
