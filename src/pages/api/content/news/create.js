@@ -14,7 +14,7 @@ export default async function handler(req, res) {
     }
     
     // Get existing news data
-    let data = getData('news');
+    let data = await getData('news');
     
     // Initialize data if it doesn't exist
     if (!data) {
@@ -24,6 +24,12 @@ export default async function handler(req, res) {
       data.news = [];
     }
     
+    // Guard against duplicate slug
+    const slugExists = data.news.some((n) => n.slug === newsData.slug);
+    if (slugExists) {
+      return res.status(409).json({ message: 'A post with this slug already exists' });
+    }
+
     // Add ID if not provided
     if (!newsData.id) {
       newsData.id = Date.now();
@@ -39,7 +45,7 @@ export default async function handler(req, res) {
     data.news.unshift(newsData);
     
     // Save the updated data
-    const success = saveData('news', data);
+    const success = await saveData('news', data);
     
     if (!success) {
       return res.status(500).json({ message: 'Failed to save news data' });

@@ -100,16 +100,7 @@
     }
   }
 
-  .swiper-slide-active {
-    img {
-      opacity: 0.25;
-    }
-    .services__slider-single__content {
-      transform: scale(1);
-      opacity: 1;
-      visibility: visible;
-    }
-  }
+  // Removed .swiper-slide-active overrides to avoid persistent hover overlay
 }
 
 // about section

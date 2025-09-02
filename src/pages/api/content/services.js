@@ -204,18 +204,30 @@ const defaultServicesData = {
       "/images/sponsor/five.png",
     ],
   },
+  // Per-service detail content keyed by slug
+  details: {}
 };
 
 export default async function handler(req, res) {
   if (req.method === "GET") {
     try {
-      const { section } = req.query;
+      const { section, slug } = req.query;
       let data = await getData("services");
       if (!data || Object.keys(data).length === 0) {
         await saveData("services", defaultServicesData);
         data = { ...defaultServicesData };
       }
       if (section) {
+        // Handle dynamic service details
+        if (section === "details") {
+          const key = typeof slug === 'string' ? slug : '';
+          if (!key) {
+            // Return all details map if slug missing
+            return res.status(200).json(data.details || {});
+          }
+          const detail = (data.details && data.details[key]) || null;
+          return res.status(200).json(detail || null);
+        }
         if (section === "sponsors") {
           const aboutData = await getData("about");
           if (aboutData && aboutData.sponsors) {
@@ -245,10 +257,29 @@ export default async function handler(req, res) {
   }
   if (req.method === "PUT") {
     try {
-      const { section } = req.query;
+      const { section, slug } = req.query;
       const updatedData = req.body;
       let data = (await getData("services")) || {};
       if (section) {
+        if (section === "details") {
+          const key = typeof slug === 'string' ? slug : '';
+          if (!key) {
+            return res.status(400).json({ message: "Slug is required to update details" });
+          }
+          const current = data.details || {};
+          data = {
+            ...data,
+            details: {
+              ...current,
+              [key]: updatedData,
+            },
+          };
+          const success = await saveData("services", data);
+          if (!success) {
+            return res.status(500).json({ message: "Failed to save service details" });
+          }
+          return res.status(200).json({ message: "Service details updated successfully", data: data.details[key] });
+        }
         if (section === "pricing") {
           return res.status(403).json({
             message: "Pricing data can only be updated from the central pricing page",

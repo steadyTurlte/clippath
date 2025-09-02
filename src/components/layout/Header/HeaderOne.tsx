@@ -206,34 +206,65 @@ const HeaderOne = ({ openNav, handleNav, setOpenNav }: HeaderProps) => {
                         >
                           Services
                         </button>
-                        <ul
-                          className={`nav__dropdown ${isSubMenuOpen(
+                        <div
+                          className={`nav__dropdown mega-menu ${isSubMenuOpen(
                             "services"
                           )}`}
                         >
-                          <li>
-                            <Link
-                              className="nav__dropdown-item hide-nav"
-                              href="/services"
-                            >
-                              All Services
-                            </Link>
-                          </li>
-                          {services.map((service) => (
-                            <li key={service.id}>
-                              <Link
-                                className="nav__dropdown-item hide-nav"
-                                href={`/services/${encodeURIComponent(
-                                  service.title
-                                    .toLowerCase()
-                                    .replace(/\s+/g, "-")
-                                )}`}
-                              >
-                                {service.title}
-                              </Link>
-                            </li>
-                          ))}
-                        </ul>
+                          <div className="mega-menu__inner">
+                            <div className="mega-menu__single">
+                              <div className="mega-menu__single-head">
+                                <h5 className="h5">Popular services</h5>
+                              </div>
+                              <ul>
+                                <li className="mega-menu__single-item">
+                                  <Link className="hide-nav" href="/services">
+                                    <img
+                                      src="/images/services/slide-one.png"
+                                      alt="All services"
+                                      width={90}
+                                      height={44}
+                                    />
+                                    <span>All services</span>
+                                  </Link>
+                                </li>
+                                {services.map((service) => (
+                                  <li className="mega-menu__single-item" key={service.id}>
+                                    <Link
+                                      className="hide-nav"
+                                      href={`/services/${encodeURIComponent(
+                                        (service?.title || "")
+                                          .toLowerCase()
+                                          .replace(/\s+/g, "-")
+                                      )}`}
+                                    >
+                                      <img
+                                        src={service?.image || "/images/services/slide-two.png"}
+                                        alt={service?.title || "Service"}
+                                        width={90}
+                                        height={44}
+                                      />
+                                      <span>{service?.title}</span>
+                                    </Link>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                            <div className="mega-menu__single mega-menu__single--alt">
+                              <div className="mega-menu__single-head">
+                                <h5 className="h5">Before / After</h5>
+                              </div>
+                              <div className="mega-menu__single-img">
+                                <ReactCompareSlider
+                                  itemOne={<ReactCompareSliderImage src="/images/after/one.png" alt="after" />}
+                                  itemTwo={<ReactCompareSliderImage src="/images/after/two.png" alt="before" />}
+                                  position={50}
+                                  style={{ width: "100%", maxWidth: 500 }}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                       </li>
                       <li className="nav__menu-item nav__menu-item--dropdown">
                         <button

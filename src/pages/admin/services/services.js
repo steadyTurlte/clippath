@@ -16,6 +16,21 @@ const ServicesItemsEditor = () => {
   const [serviceRemoved, setServiceRemoved] = useState(false);
   const [error, setError] = useState(null);
 
+  // Details editor state
+  const [selectedIdx, setSelectedIdx] = useState(0);
+  const [detailsLoading, setDetailsLoading] = useState(false);
+  const [detailsSaving, setDetailsSaving] = useState(false);
+  const [detailsError, setDetailsError] = useState(null);
+  const [detailsJson, setDetailsJson] = useState('');
+
+  const slugify = (text = '') =>
+    text
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-');
+
   useEffect(() => {
     // Fetch the services data when the component mounts
     const fetchServicesData = async () => {
@@ -61,6 +76,36 @@ const ServicesItemsEditor = () => {
 
     fetchServicesData();
   }, []);
+
+  // Load details for selected service
+  useEffect(() => {
+    const loadDetails = async () => {
+      if (!servicesData || servicesData.length === 0) return;
+      setDetailsLoading(true);
+      setDetailsError(null);
+      try {
+        const svc = servicesData[selectedIdx] || {};
+        const slug = slugify(svc.title || '');
+        if (!slug) {
+          setDetailsJson('');
+          setDetailsLoading(false);
+          return;
+        }
+        const res = await fetch(`/api/content/services?section=details&slug=${slug}`);
+        if (res.ok) {
+          const json = await res.json();
+          setDetailsJson(json ? JSON.stringify(json, null, 2) : '{\n  "about": {},\n  "projects": [],\n  "pricingRanges": []\n}');
+        } else {
+          setDetailsJson('{\n  "about": {},\n  "projects": [],\n  "pricingRanges": []\n}');
+        }
+      } catch (e) {
+        setDetailsError('Failed to load service details');
+      } finally {
+        setDetailsLoading(false);
+      }
+    };
+    loadDetails();
+  }, [selectedIdx, servicesData]);
 
   const handleServiceChange = (index, field, value, publicId = null) => {
     const updatedServices = [...servicesData];
@@ -377,6 +422,87 @@ const ServicesItemsEditor = () => {
                 </div>
               </div>
             ))}
+          </div>
+
+          {/* Details Editor */}
+          <div className="admin-editor__section">
+            <div className="admin-editor__section-header">
+              <h2 className="admin-editor__section-title">Per-Service Details</h2>
+            </div>
+            <div className="admin-editor__field">
+              <label className="admin-editor__label">Select Service</label>
+              <select
+                className="admin-editor__select"
+                value={selectedIdx}
+                onChange={(e) => setSelectedIdx(Number(e.target.value))}
+              >
+                {servicesData.map((s, i) => (
+                  <option key={(s.id || i)} value={i}>
+                    {s.title || `Service ${i + 1}`} ({slugify(s.title || '')})
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="admin-editor__field">
+              <label className="admin-editor__label">Details JSON</label>
+              <textarea
+                className="admin-editor__textarea"
+                rows={12}
+                value={detailsJson}
+                onChange={(e) => setDetailsJson(e.target.value)}
+                placeholder='{"about":{}, "projects":[], "pricingRanges":[]}'
+              />
+              <p className="admin-editor__help-text">Edit the structured content for this service. Examples: about (text/images), projects (array of images/items), pricingRanges (array of tiers).</p>
+              {detailsError && (
+                <div className="admin-editor__error" style={{ marginTop: '8px' }}>
+                  <p>{detailsError}</p>
+                </div>
+              )}
+            </div>
+            <div className="admin-editor__actions" style={{ marginTop: '8px' }}>
+              <button
+                className="admin-editor__save-button"
+                onClick={async () => {
+                  try {
+                    setDetailsSaving(true);
+                    setDetailsError(null);
+                    const svc = servicesData[selectedIdx] || {};
+                    const slug = slugify(svc.title || '');
+                    if (!slug) {
+                      setDetailsError('Please provide a title for the selected service to derive a slug.');
+                      setDetailsSaving(false);
+                      return;
+                    }
+                    let payload;
+                    try {
+                      payload = detailsJson ? JSON.parse(detailsJson) : {};
+                    } catch (e) {
+                      setDetailsError('Invalid JSON. Please fix syntax errors.');
+                      setDetailsSaving(false);
+                      return;
+                    }
+                    const res = await fetch(`/api/content/services?section=details&slug=${slug}`, {
+                      method: 'PUT',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify(payload),
+                    });
+                    if (!res.ok) {
+                      setDetailsError('Failed to save details');
+                    } else {
+                      toast.success('Service details saved');
+                    }
+                  } catch (e) {
+                    setDetailsError('Failed to save details');
+                  } finally {
+                    setDetailsSaving(false);
+                  }
+                }}
+                disabled={detailsSaving}
+              >
+                {detailsSaving ? 'Saving...' : 'Save Details'}
+              </button>
+              {detailsLoading && <span style={{ marginLeft: 12, color: '#64748b' }}>Loading details…</span>}
+            </div>
           </div>
         </div>
       </div>
