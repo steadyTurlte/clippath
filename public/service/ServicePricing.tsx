@@ -66,7 +66,7 @@ const ServicePricing = () => {
                 </li>
               </ul>
               <hr />
-              <Link href="pricing" className="btn btn--secondary">
+              <Link href="/pricing" className="btn btn--secondary">
                 get started now
               </Link>
             </div>
@@ -104,7 +104,7 @@ const ServicePricing = () => {
                 </li>
               </ul>
               <hr />
-              <Link href="pricing" className="btn btn--secondary">
+              <Link href="/pricing" className="btn btn--secondary">
                 get started now
               </Link>
             </div>
@@ -142,7 +142,7 @@ const ServicePricing = () => {
                 </li>
               </ul>
               <hr />
-              <Link href="pricing" className="btn btn--secondary">
+              <Link href="/pricing" className="btn btn--secondary">
                 get started now
               </Link>
             </div>
@@ -180,7 +180,7 @@ const ServicePricing = () => {
                 </li>
               </ul>
               <hr />
-              <Link href="pricing" className="btn btn--secondary">
+              <Link href="/pricing" className="btn btn--secondary">
                 get started now
               </Link>
             </div>

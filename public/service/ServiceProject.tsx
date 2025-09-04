@@ -4,11 +4,19 @@ import Link from "next/link";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination } from "swiper/modules";
 import "swiper/swiper-bundle.css";
-import projectone from "public/images/project-one.png";
-import projecttwo from "public/images/project-two.png";
-import projectthree from "public/images/project-three.png";
 
-const ServiceProject = () => {
+interface ServiceProjectProps {
+  serviceData?: any;
+  projectsData?: any;
+}
+
+const ServiceProject = ({ serviceData, projectsData }: ServiceProjectProps) => {
+  // Use service-specific projects if available, otherwise fallback to default
+  const projects = projectsData?.projects || [
+    { id: 1, image: "/images/project-one.png", title: "Project 1" },
+    { id: 2, image: "/images/project-two.png", title: "Project 2" },
+    { id: 3, image: "/images/project-three.png", title: "Project 3" },
+  ];
   return (
     <section className="section project-three">
       <div className="container">
@@ -29,7 +37,7 @@ const ServiceProject = () => {
                 data-aos-duration="600"
                 data-aos-delay="100"
               >
-                beautiful clipping path projects
+                {serviceData?.title ? `${serviceData.title} Projects` : "Beautiful Projects"}
               </h2>
             </div>
           </div>
@@ -66,36 +74,33 @@ const ServiceProject = () => {
                 }}
                 className="project-three__slider"
               >
-                <SwiperSlide>
-                  <div className="project-three__slider-item">
-                    <Image src={projectone} alt="Image" />
-                  </div>
-                </SwiperSlide>
-                <SwiperSlide>
-                  <div className="project-three__slider-item">
-                    <Image src={projecttwo} alt="Image" />
-                  </div>
-                </SwiperSlide>
-                <SwiperSlide>
-                  <div className="project-three__slider-item">
-                    <Image src={projectthree} alt="Image" />
-                  </div>
-                </SwiperSlide>
-                <SwiperSlide>
-                  <div className="project-three__slider-item">
-                    <Image src={projectone} alt="Image" />
-                  </div>
-                </SwiperSlide>
-                <SwiperSlide>
-                  <div className="project-three__slider-item">
-                    <Image src={projecttwo} alt="Image" />
-                  </div>
-                </SwiperSlide>
-                <SwiperSlide>
-                  <div className="project-three__slider-item">
-                    <Image src={projectthree} alt="Image" />
-                  </div>
-                </SwiperSlide>
+                {projects.map((project: any, index: number) => (
+                  <SwiperSlide key={project.id || index}>
+                    <div className="project-three__slider-item">
+                      <Image 
+                        src={project.image || "/images/project-one.png"} 
+                        alt={project.title || "Project"} 
+                        width={400}
+                        height={300}
+                        style={{ objectFit: "cover" }}
+                      />
+                    </div>
+                  </SwiperSlide>
+                ))}
+                {/* Add duplicates for loop effect if we have less than 6 items */}
+                {projects.length < 6 && projects.map((project: any, index: number) => (
+                  <SwiperSlide key={`duplicate-${project.id || index}`}>
+                    <div className="project-three__slider-item">
+                      <Image 
+                        src={project.image || "/images/project-one.png"} 
+                        alt={project.title || "Project"} 
+                        width={400}
+                        height={300}
+                        style={{ objectFit: "cover" }}
+                      />
+                    </div>
+                  </SwiperSlide>
+                ))}
               </Swiper>
             </div>
           </div>
@@ -104,8 +109,8 @@ const ServiceProject = () => {
           <div className="col-12">
             <div className="section__cta">
               <Link
-                href="sign-in"
-                aria-label="create account"
+                href="/contact-us"
+                aria-label="get started"
                 className="btn btn--primary"
               >
                 get started

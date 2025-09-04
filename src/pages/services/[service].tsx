@@ -2,11 +2,17 @@ import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Layout from "@/components/layout/Layout";
+import CmnBanner from "@/components/layout/Banner/CmnBanner";
 import ServiceDetailsAbout from "../../../public/service/ServiceDetailsAbout";
 import ServiceProject from "../../../public/service/ServiceProject";
 import ServicePricing from "../../../public/service/ServicePricing";
 import ServiceFaq from "../../../public/service/ServiceFaq";
 import Trial from "../../../public/service/Trial";
+import QualitySec from "@/components/containers/home/QualitySec";
+import TestimonialSec from "@/components/containers/home/TestimonialSec";
+import SponsorSlider from "@/components/containers/home/SponsorSlider";
+import ContactSec from "@/components/containers/ContactSec";
+import PricingMain from "@/components/containers/pricing/PricingMain";
 
 const ServiceDetail = () => {
   const router = useRouter();
@@ -15,6 +21,12 @@ const ServiceDetail = () => {
   const [loading, setLoading] = useState(true);
   const [settings, setSettings] = useState<any>(null);
   const [detail, setDetail] = useState<any>(null);
+  const [pricingData, setPricingData] = useState<any>(null);
+  const [faqData, setFaqData] = useState<any>(null);
+  const [testimonialData, setTestimonialData] = useState<any>(null);
+  const [sponsorData, setSponsorData] = useState<any>(null);
+  const [projectsData, setProjectsData] = useState<any>(null);
+  const [contactInfo, setContactInfo] = useState<any>(null);
 
   const slugify = (text: string) =>
     (text || "")
@@ -25,15 +37,39 @@ const ServiceDetail = () => {
       .replace(/-+/g, "-");
 
   useEffect(() => {
-    const fetchSettings = async () => {
+    const fetchInitialData = async () => {
       try {
-        const res = await fetch("/api/content/settings");
-        if (res.ok) {
-          setSettings(await res.json());
+        // Fetch settings, pricing, testimonials, sponsors, FAQ and contact data in parallel
+        const [settingsRes, pricingRes, aboutRes, contactRes] = await Promise.all([
+          fetch("/api/content/settings"),
+          fetch("/api/content/pricing"),
+          fetch("/api/content/about"),
+          fetch("/api/content/contact-info")
+        ]);
+
+        if (settingsRes.ok) {
+          setSettings(await settingsRes.json());
         }
-      } catch {}
+        
+        if (pricingRes.ok) {
+          setPricingData(await pricingRes.json());
+        }
+
+        if (aboutRes.ok) {
+          const aboutData = await aboutRes.json();
+          setTestimonialData(aboutData.testimonials);
+          setSponsorData(aboutData.sponsors);
+          setFaqData(aboutData.faq);
+        }
+
+        if (contactRes.ok) {
+          setContactInfo(await contactRes.json());
+        }
+      } catch (error) {
+        console.error("Error fetching initial data:", error);
+      }
     };
-    fetchSettings();
+    fetchInitialData();
   }, []);
 
   useEffect(() => {
@@ -59,160 +95,98 @@ const ServiceDetail = () => {
 
   useEffect(() => {
     if (!service) return;
-    const fetchDetail = async () => {
+    const fetchServiceDetails = async () => {
       try {
-        const res = await fetch(`/api/content/services?section=details&slug=${service}`);
-        if (res.ok) {
-          setDetail(await res.json());
+        // Fetch service details and projects for this service
+        const [detailRes, projectsRes] = await Promise.all([
+          fetch(`/api/content/services?section=details&slug=${service}`),
+          fetch(`/api/content/portfolio?service=${service}`)
+        ]);
+        
+        if (detailRes.ok) {
+          setDetail(await detailRes.json());
         }
-      } catch {}
+        
+        if (projectsRes.ok) {
+          setProjectsData(await projectsRes.json());
+        }
+      } catch (error) {
+        console.error("Error fetching service details:", error);
+      }
     };
-    fetchDetail();
+    fetchServiceDetails();
   }, [service]);
+
+  if (loading) {
+    return (
+      <Layout settings={settings}>
+        <div className="service-detail-skeleton">
+          <div className="skeleton-banner" />
+          <div className="skeleton-content" />
+        </div>
+      </Layout>
+    );
+  }
+
+  if (!serviceData) {
+    return (
+      <Layout settings={settings}>
+        <CmnBanner title="Service Not Found" />
+        <div className="service-detail-error">
+          <h2>Service not found</h2>
+          <p>The service you&apos;re looking for doesn&apos;t exist.</p>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout settings={settings}>
-      <div className="container service-detail-page">
-        {loading ? (
-          <div className="service-detail-skeleton">
-            <div className="skeleton-img" />
-            <div className="skeleton-title" />
-            <div className="skeleton-price" />
-            <div className="skeleton-desc" />
-          </div>
-        ) : !serviceData ? (
-          <div className="service-detail-error">Service not found.</div>
-        ) : (
-          <>
-            <div className="service-detail-card">
-              <Image
-                src={
-                  typeof serviceData.image === "object" && serviceData.image?.url
-                    ? serviceData.image.url
-                    : serviceData.image || "/images/services/slide-one.png"
-                }
-                alt={serviceData.title}
-                width={400}
-                height={300}
-                className="service-detail-img"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src =
-                    "/images/services/slide-one.png";
-                }}
-              />
-              <div className="service-detail-content">
-                <h1>{serviceData.title}</h1>
-                <p className="service-detail-price">{serviceData.price}</p>
-                <p className="service-detail-desc">{serviceData.description}</p>
-              </div>
-            </div>
+      {/* Banner with service title */}
+      <CmnBanner title={serviceData.title} />
 
-            {/* Template sections (dynamic props support in future) */}
-            <ServiceDetailsAbout />
-            <ServiceProject />
-            <ServicePricing />
-            <ServiceFaq />
-            <Trial />
-          </>
-        )}
-        <style jsx>{`
-          .service-detail-page {
-            padding: 40px 0;
-          }
-          .service-detail-card {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
-            padding: 32px;
-            max-width: 600px;
-            margin: 0 auto;
-          }
-          .service-detail-img {
-            border-radius: 8px;
-            margin-bottom: 24px;
-          }
-          .service-detail-content h1 {
-            font-size: 2rem;
-            margin-bottom: 12px;
-          }
-          .service-detail-price {
-            color: #3b82f6;
-            font-weight: 600;
-            margin-bottom: 16px;
-          }
-          .service-detail-desc {
-            font-size: 1.1rem;
-            color: #333;
-          }
-          .service-detail-skeleton {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 32px;
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
-          }
-          .skeleton-img {
-            width: 400px;
-            height: 300px;
-            background: linear-gradient(
-              90deg,
-              #f3f3f3 25%,
-              #ececec 50%,
-              #f3f3f3 75%
-            );
-            border-radius: 8px;
-            margin-bottom: 24px;
-            animation: skeleton-loading 1.2s infinite linear;
-          }
-          .skeleton-title {
-            width: 60%;
-            height: 32px;
-            background: #ececec;
-            border-radius: 6px;
-            margin-bottom: 16px;
-            animation: skeleton-loading 1.2s infinite linear;
-          }
-          .skeleton-price {
-            width: 40%;
-            height: 24px;
-            background: #ececec;
-            border-radius: 6px;
-            margin-bottom: 16px;
-            animation: skeleton-loading 1.2s infinite linear;
-          }
-          .skeleton-desc {
-            width: 90%;
-            height: 60px;
-            background: #ececec;
-            border-radius: 6px;
-            animation: skeleton-loading 1.2s infinite linear;
-          }
-          @keyframes skeleton-loading {
-            0% {
-              background-position: -200px 0;
-            }
-            100% {
-              background-position: calc(200px + 100%) 0;
-            }
-          }
-          .service-detail-error {
-            color: #b91c1c;
-            background: #fee2e2;
-            padding: 24px;
-            border-radius: 8px;
-            text-align: center;
-            max-width: 600px;
-            margin: 0 auto;
-          }
-        `}</style>
-      </div>
+      {/* Service Details About Section - with actual service data */}
+      <ServiceDetailsAbout 
+        serviceData={serviceData}
+        serviceDetails={detail}
+      />
+
+      {/* Quality/How It Works Section */}
+      <QualitySec />
+
+      {/* Service Projects Section - shows projects related to this service */}
+      <ServiceProject 
+        serviceData={serviceData}
+        projectsData={projectsData}
+      />
+
+      {/* Pricing Section - uses general pricing */}
+      {pricingData && (
+        <PricingMain data={pricingData} />
+      )}
+
+      {/* Testimonials Section - reused from general testimonials */}
+      {testimonialData && (
+        <TestimonialSec data={testimonialData} />
+      )}
+
+      {/* FAQ Section - general FAQ for all services */}
+      {faqData && (
+        <ServiceFaq data={faqData} />
+      )}
+
+      {/* Contact Section - reused contact form */}
+      {contactInfo && (
+        <ContactSec contactInfo={contactInfo} mapData={{ embedUrl: "" }} />
+      )}
+
+      {/* Trial Section */}
+      <Trial />
+
+      {/* Logo Slider - reused sponsors */}
+      {sponsorData && (
+        <SponsorSlider data={sponsorData} />
+      )}
     </Layout>
   );
 };

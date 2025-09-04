@@ -83,6 +83,7 @@
 
       li {
         margin-bottom: 10px;
+
         &:nth-last-of-type(1) {
           margin-bottom: 0px;
         }
@@ -136,8 +137,10 @@
     justify-content: space-between;
     gap: 0px;
     width: 100%;
+
     ul {
       width: calc(50% - 12px);
+
       &:nth-of-type(1) {
         margin-right: 24px;
       }
@@ -149,6 +152,38 @@
     align-items: flex-start;
     justify-content: space-between;
     column-gap: 100px;
+  }
+
+  .mega-menu__services-grid {
+    width: 100%;
+    max-width: 800px;
+  }
+
+  .mega-menu__grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 12px;
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 10px;
+
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #4569e7;
+      border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background: #3b5bd8;
+    }
   }
 
   .mega-menu__single--alt {
@@ -171,9 +206,11 @@
 
   .mega-menu__single-item {
     margin-bottom: 15px;
+
     &:nth-last-of-type(1) {
       margin-bottom: 0px;
     }
+
     a {
       width: 100%;
       padding: 10px 24px 10px 10px;
@@ -185,6 +222,7 @@
       gap: 10px;
       position: relative;
       z-index: 1;
+
       &::before {
         content: "";
         position: absolute;
@@ -212,6 +250,7 @@
 
       &:hover {
         box-shadow: 0px 4px 60px -7px rgba(69, 105, 231, 0.1);
+
         &::before {
           width: 100%;
         }
@@ -255,6 +294,7 @@
 
     .nav__menu-link-child {
       position: relative;
+
       a {
         color: $tertiary-color !important;
         justify-content: space-between !important;
@@ -267,11 +307,13 @@
 
         &:hover {
           color: $tertiary-color !important;
+
           &::after {
             transform: rotate(-90deg) !important;
           }
         }
       }
+
       &:hover {
         .nav__dropdown-child {
           opacity: 1;
@@ -303,6 +345,7 @@
     border-radius: 5px;
     color: #2b1b9a;
     border: 0px solid transparent !important;
+
     &:hover {
       color: $white;
     }
@@ -311,6 +354,7 @@
   .social {
     margin-top: 40px;
     display: none;
+
     a {
       &:hover {
         color: $white;
@@ -340,6 +384,7 @@
     .cmn-button {
       &:nth-last-of-type(1) {
         border: 1px solid $primary-color;
+
         &:hover {
           border: 1px solid #cecece;
           background-color: transparent;
@@ -470,6 +515,7 @@
     align-items: center;
     gap: 40px;
     flex-direction: column;
+
     &::-webkit-scrollbar {
       width: 5px;
     }
@@ -500,6 +546,7 @@
 
   .offcanvas__search {
     width: 100%;
+
     form {
       display: flex;
       align-items: center;
@@ -511,6 +558,7 @@
         flex-grow: 1;
         padding: 10px 0px;
         color: $theme-color;
+
         &::placeholder {
           font-weight: 400;
           color: $theme-color;
@@ -522,6 +570,7 @@
         background-color: transparent;
         font-size: 20px;
         color: $theme-color;
+
         &:hover {
           color: $tertiary-color;
         }
@@ -545,6 +594,7 @@
       align-items: center;
       gap: 16px;
       margin-bottom: 24px;
+
       span {
         @include box(40px);
         border: 1px solid $tertiary-color;
@@ -555,6 +605,7 @@
         color: $theme-color;
         font-weight: 600;
         font-size: 16px;
+
         &:hover {
           color: $tertiary-color;
         }
@@ -568,10 +619,12 @@
     width: 100%;
     justify-content: flex-start;
     gap: 16px;
+
     a {
       @include box(40px);
       background-color: #f0efff;
       color: $tertiary-color;
+
       &:hover {
         background-color: $tertiary-color;
         color: $white;
@@ -682,6 +735,7 @@
         justify-content: center;
         color: $white;
         padding: 20px;
+
         &:hover {
           background-color: $theme-color;
         }
@@ -690,6 +744,7 @@
   }
 
   .nav__menu-item--dropdown {
+
     .nav__dropdown,
     .nav__dropdown-child {
       position: static;
@@ -750,13 +805,16 @@
     .nav__menu-link-child {
       a {
         color: $theme-color !important;
+
         &:hover {
           color: $theme-color !important;
+
           &::after {
             color: $theme-color !important;
             transform: rotate(-90deg) !important;
           }
         }
+
         &::after {
           color: $theme-color !important;
           transform: rotate(-90deg) !important;
@@ -795,6 +853,7 @@
     min-width: 100% !important;
     flex-direction: column;
     gap: 12px;
+
     ul {
       width: 100%;
       margin: 0px;
@@ -845,6 +904,7 @@
 
   .mega-menu__single-head {
     margin-bottom: 20px;
+
     .h5 {
       font-size: 20px;
     }
@@ -853,19 +913,18 @@
 
 .header-two-active {
   background-color: #f0efff;
+
   .nav {
     padding: 20px 0px;
   }
 }
 
 .header-three {
-  background-image: linear-gradient(
-    90deg,
-    #4569e7 0%,
-    #e74545 38.02%,
-    #ff880a 73.44%,
-    #ff0093 100%
-  );
+  background-image: linear-gradient(90deg,
+      #4569e7 0%,
+      #e74545 38.02%,
+      #ff880a 73.44%,
+      #ff0093 100%);
 
   .nav__content {
     gap: 16px;
@@ -874,6 +933,7 @@
   .nav__menu-link {
     color: $white;
     padding: 41px 18px;
+
     &:hover {
       color: $white;
     }
@@ -881,12 +941,14 @@
 
   .nav__menu-link--dropdown {
     color: $white;
+
     &::after {
       color: $white;
     }
 
     &:hover {
       color: $white;
+
       &::after {
         color: $white;
       }
@@ -921,6 +983,7 @@
     padding-left: 0px;
     background-color: transparent;
     border: 0px solid transparent;
+
     .current {
       text-transform: uppercase;
       font-size: 14px;
@@ -997,13 +1060,11 @@
 }
 
 .header-three-active {
-  background-image: linear-gradient(
-    90deg,
-    #4569e7 0%,
-    #e74545 38.02%,
-    #ff880a 73.44%,
-    #ff0093 100%
-  );
+  background-image: linear-gradient(90deg,
+      #4569e7 0%,
+      #e74545 38.02%,
+      #ff880a 73.44%,
+      #ff0093 100%);
 }
 
 .cmn-header {

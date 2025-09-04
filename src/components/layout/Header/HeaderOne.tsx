@@ -191,7 +191,7 @@ const HeaderOne = ({ openNav, handleNav, setOpenNav }: HeaderProps) => {
                       <li className="nav__menu-item">
                         <Link
                           className="nav__menu-link hide-nav"
-                          href="about-us"
+                          href="/about-us"
                         >
                           About Us
                         </Link>
@@ -212,24 +212,24 @@ const HeaderOne = ({ openNav, handleNav, setOpenNav }: HeaderProps) => {
                           )}`}
                         >
                           <div className="mega-menu__inner">
-                            <div className="mega-menu__single">
+                            <div className="mega-menu__single mega-menu__services-grid">
                               <div className="mega-menu__single-head">
-                                <h5 className="h5">Popular services</h5>
+                                <h5 className="h5">Our Services</h5>
                               </div>
-                              <ul>
-                                <li className="mega-menu__single-item">
+                              <div className="mega-menu__grid-container">
+                                <div className="mega-menu__single-item">
                                   <Link className="hide-nav" href="/services">
-                                    <img
+                                    <Image
                                       src="/images/services/slide-one.png"
                                       alt="All services"
-                                      width={90}
-                                      height={44}
+                                      width={50}
+                                      height={50}
                                     />
-                                    <span>All services</span>
+                                    <span>All Services</span>
                                   </Link>
-                                </li>
+                                </div>
                                 {services.map((service) => (
-                                  <li className="mega-menu__single-item" key={service.id}>
+                                  <div className="mega-menu__single-item" key={service.id}>
                                     <Link
                                       className="hide-nav"
                                       href={`/services/${encodeURIComponent(
@@ -238,29 +238,16 @@ const HeaderOne = ({ openNav, handleNav, setOpenNav }: HeaderProps) => {
                                           .replace(/\s+/g, "-")
                                       )}`}
                                     >
-                                      <img
+                                      <Image
                                         src={service?.image || "/images/services/slide-two.png"}
                                         alt={service?.title || "Service"}
-                                        width={90}
-                                        height={44}
+                                        width={50}
+                                        height={50}
                                       />
                                       <span>{service?.title}</span>
                                     </Link>
-                                  </li>
+                                  </div>
                                 ))}
-                              </ul>
-                            </div>
-                            <div className="mega-menu__single mega-menu__single--alt">
-                              <div className="mega-menu__single-head">
-                                <h5 className="h5">Before / After</h5>
-                              </div>
-                              <div className="mega-menu__single-img">
-                                <ReactCompareSlider
-                                  itemOne={<ReactCompareSliderImage src="/images/after/one.png" alt="after" />}
-                                  itemTwo={<ReactCompareSliderImage src="/images/after/two.png" alt="before" />}
-                                  position={50}
-                                  style={{ width: "100%", maxWidth: 500 }}
-                                />
                               </div>
                             </div>
                           </div>
@@ -282,7 +269,7 @@ const HeaderOne = ({ openNav, handleNav, setOpenNav }: HeaderProps) => {
                           <li>
                             <Link
                               className="nav__dropdown-item hide-nav"
-                              href="portfolio"
+                              href="/portfolio"
                             >
                               Portfolio
                             </Link>
@@ -290,7 +277,7 @@ const HeaderOne = ({ openNav, handleNav, setOpenNav }: HeaderProps) => {
                           <li>
                             <Link
                               className="nav__dropdown-item hide-nav"
-                              href="pricing"
+                              href="/pricing"
                             >
                               Pricing
                             </Link>
@@ -298,7 +285,7 @@ const HeaderOne = ({ openNav, handleNav, setOpenNav }: HeaderProps) => {
                           <li>
                             <Link
                               className="nav__dropdown-item hide-nav"
-                              href="teams"
+                              href="/teams"
                             >
                               Our Teams
                             </Link>
@@ -306,7 +293,7 @@ const HeaderOne = ({ openNav, handleNav, setOpenNav }: HeaderProps) => {
                           <li>
                             <Link
                               className="nav__dropdown-item hide-nav"
-                              href="get-quote"
+                              href="/get-quote"
                             >
                               Get A Quote
                             </Link>
@@ -329,7 +316,7 @@ const HeaderOne = ({ openNav, handleNav, setOpenNav }: HeaderProps) => {
                           <li>
                             <Link
                               className="nav__dropdown-item hide-nav"
-                              href="blog"
+                              href="/blog"
                             >
                               Blog
                             </Link>
@@ -337,7 +324,7 @@ const HeaderOne = ({ openNav, handleNav, setOpenNav }: HeaderProps) => {
                           <li>
                             <Link
                               className="nav__dropdown-item hide-nav"
-                              href="blog-single"
+                              href="/blog-single"
                             >
                               Blog Single
                             </Link>
@@ -347,13 +334,13 @@ const HeaderOne = ({ openNav, handleNav, setOpenNav }: HeaderProps) => {
                       <li className="nav__menu-item">
                         <Link
                           className="nav__menu-link hide-nav"
-                          href="contact-us"
+                          href="/contact-us"
                         >
                           Contact
                         </Link>
                       </li>
                       <li className="nav__menu-item d-block d-md-none">
-                        <Link href="get-quote" className="btn btn--secondary">
+                        <Link href="/get-quote" className="btn btn--secondary">
                           Free Trial
                         </Link>
                       </li>

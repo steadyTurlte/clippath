@@ -2,8 +2,41 @@ import React, { useState } from "react";
 import Image from "next/image";
 import Thumb from "public/images/faq-three-thumb.png";
 
-const ServiceFaq = () => {
+interface ServiceFaqProps {
+  data?: any;
+}
+
+const ServiceFaq = ({ data }: ServiceFaqProps) => {
   const [imgTab, setImgTab] = useState(0);
+  
+  // Use dynamic FAQ data if available, otherwise fallback to default
+  const faqItems = data?.faqs || [
+    {
+      id: 1,
+      question: "What is included in your photo editing services?",
+      answer: "Our comprehensive photo editing services include background removal, color correction, retouching, shadow creation, and much more to enhance your images professionally."
+    },
+    {
+      id: 2,
+      question: "How long does it take to complete an order?",
+      answer: "Turnaround time depends on the complexity and quantity of images. Most standard edits are completed within 24-48 hours, while complex projects may take 3-5 business days."
+    },
+    {
+      id: 3,
+      question: "What file formats do you accept?",
+      answer: "We accept all major image formats including JPEG, PNG, TIFF, PSD, and RAW files from various camera manufacturers."
+    },
+    {
+      id: 4,
+      question: "Do you offer bulk discounts?",
+      answer: "Yes, we offer competitive pricing for bulk orders. The more images you send, the better rates you'll receive. Contact us for custom pricing."
+    },
+    {
+      id: 5,
+      question: "Is there a revision policy?",
+      answer: "We offer unlimited revisions until you're completely satisfied with the results. Your satisfaction is our top priority."
+    }
+  ];
   return (
     <section className="section faq-two faq-three">
       <div className="container">
@@ -29,206 +62,45 @@ const ServiceFaq = () => {
                 </h2>
               </div>
               <div className="accordion" id="accordion">
-                <div
-                  className={
-                    "accordion-item " + (imgTab == 0 ? " faq-two-active" : " ")
-                  }
-                  data-aos-duration="600"
-                  data-aos-delay="100"
-                >
-                  <h5 className="accordion-header" id="headingOne">
-                    <button
-                      className={
-                        (imgTab == 0 ? "  " : " collapsed") +
-                        " accordion-button"
-                      }
-                      onClick={() => setImgTab(imgTab === 0 ? -1 : 0)}
-                      type="button"
-                      data-bs-toggle="collapse"
-                      data-bs-target="#collapseOne"
-                      aria-expanded="true"
-                      aria-controls="collapseOne"
-                    >
-                      What is a stock media platform?
-                    </button>
-                  </h5>
+                {faqItems.map((faq: any, index: number) => (
                   <div
-                    id="collapseOne"
-                    className={`accordion-collapse collapse${
-                      imgTab === 0 ? " show " : ""
-                    }`}
-                    aria-labelledby="headingOne"
-                    data-bs-parent="#accordion"
+                    key={faq.id || index}
+                    className={
+                      "accordion-item " + (imgTab == index ? " faq-two-active" : " ")
+                    }
+                    data-aos-duration="600"
+                    data-aos-delay="100"
                   >
-                    <div className="accordion-body">
-                      <p>
-                        Yes, the images are free, but the usage depends on the
-                        image license. Photographers can select 3 types of
-                        license to share their photos
-                      </p>
+                    <h5 className="accordion-header" id={`heading${index}`}>
+                      <button
+                        className={
+                          (imgTab == index ? "  " : " collapsed") +
+                          " accordion-button"
+                        }
+                        onClick={() => setImgTab(imgTab === index ? -1 : index)}
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target={`#collapse${index}`}
+                        aria-expanded={imgTab === index}
+                        aria-controls={`collapse${index}`}
+                      >
+                        {faq.question}
+                      </button>
+                    </h5>
+                    <div
+                      id={`collapse${index}`}
+                      className={`accordion-collapse collapse${
+                        imgTab === index ? " show " : ""
+                      }`}
+                      aria-labelledby={`heading${index}`}
+                      data-bs-parent="#accordion"
+                    >
+                      <div className="accordion-body">
+                        <p>{faq.answer}</p>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div
-                  className={
-                    "accordion-item " + (imgTab == 1 ? " faq-two-active" : " ")
-                  }
-                  data-aos-duration="600"
-                  data-aos-delay="100"
-                >
-                  <h5 className="accordion-header" id="headingTwo">
-                    <button
-                      className={
-                        (imgTab == 1 ? "  " : " collapsed") +
-                        " accordion-button"
-                      }
-                      onClick={() => setImgTab(imgTab === 1 ? -1 : 1)}
-                      type="button"
-                      data-bs-toggle="collapse"
-                      data-bs-target="#collapseTwo"
-                      aria-expanded="false"
-                      aria-controls="collapseTwo"
-                    >
-                      Can I upload other music than my own?
-                    </button>
-                  </h5>
-                  <div
-                    id="collapseTwo"
-                    className={`accordion-collapse collapse${
-                      imgTab === 1 ? " show " : ""
-                    }`}
-                    aria-labelledby="headingTwo"
-                    data-bs-parent="#accordion"
-                  >
-                    <div className="accordion-body">
-                      <p>
-                        Yes, the images are free, but the usage depends on the
-                        image license. Photographers can select 3 types of
-                        license to share their photos
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div
-                  className={
-                    "accordion-item " + (imgTab == 2 ? " faq-two-active" : " ")
-                  }
-                  data-aos-duration="600"
-                  data-aos-delay="100"
-                >
-                  <h5 className="accordion-header" id="headingThree">
-                    <button
-                      className={
-                        (imgTab == 2 ? "  " : " collapsed") +
-                        " accordion-button"
-                      }
-                      onClick={() => setImgTab(imgTab === 2 ? -1 : 2)}
-                      type="button"
-                      data-bs-toggle="collapse"
-                      data-bs-target="#collapseThree"
-                      aria-expanded="false"
-                      aria-controls="collapseThree"
-                    >
-                      What format are the files in?
-                    </button>
-                  </h5>
-                  <div
-                    id="collapseThree"
-                    className={`accordion-collapse collapse${
-                      imgTab === 2 ? " show " : ""
-                    }`}
-                    aria-labelledby="headingThree"
-                    data-bs-parent="#accordion"
-                  >
-                    <div className="accordion-body">
-                      <p>
-                        Yes, the images are free, but the usage depends on the
-                        image license. Photographers can select 3 types of
-                        license to share their photos
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div
-                  className={
-                    "accordion-item " + (imgTab == 3 ? " faq-two-active" : " ")
-                  }
-                  data-aos-duration="600"
-                  data-aos-delay="600"
-                >
-                  <h5 className="accordion-header" id="headingFour">
-                    <button
-                      className={
-                        (imgTab == 3 ? "  " : " collapsed") +
-                        " accordion-button"
-                      }
-                      onClick={() => setImgTab(imgTab === 3 ? -1 : 3)}
-                      type="button"
-                      data-bs-toggle="collapse"
-                      data-bs-target="#collapseFour"
-                      aria-expanded="false"
-                      aria-controls="collapseFour"
-                    >
-                      What is a stock media platform?
-                    </button>
-                  </h5>
-                  <div
-                    id="collapseFour"
-                    className={`accordion-collapse collapse${
-                      imgTab === 3 ? " show " : ""
-                    }`}
-                    aria-labelledby="headingFour"
-                    data-bs-parent="#accordion"
-                  >
-                    <div className="accordion-body">
-                      <p>
-                        Yes, the images are free, but the usage depends on the
-                        image license. Photographers can select 3 types of
-                        license to share their photos
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div
-                  className={
-                    "accordion-item " + (imgTab == 4 ? " faq-two-active" : " ")
-                  }
-                  data-aos-duration="600"
-                  data-aos-delay="100"
-                >
-                  <h5 className="accordion-header" id="headingFive">
-                    <button
-                      className={
-                        (imgTab == 4 ? "  " : " collapsed") +
-                        " accordion-button"
-                      }
-                      onClick={() => setImgTab(imgTab === 4 ? -1 : 4)}
-                      type="button"
-                      data-bs-toggle="collapse"
-                      data-bs-target="#collapseFive"
-                      aria-expanded="false"
-                      aria-controls="collapseFive"
-                    >
-                      Can I upload other music than my own?
-                    </button>
-                  </h5>
-                  <div
-                    id="collapseFive"
-                    className={`accordion-collapse collapse${
-                      imgTab === 4 ? " show " : ""
-                    }`}
-                    aria-labelledby="headingFive"
-                    data-bs-parent="#accordion"
-                  >
-                    <div className="accordion-body">
-                      <p>
-                        Yes, the images are free, but the usage depends on the
-                        image license. Photographers can select 3 types of
-                        license to share their photos
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
           </div>
