@@ -1,18 +1,16 @@
 import { useRouter } from "next/router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Layout from "@/components/layout/Layout";
 import CmnBanner from "@/components/layout/Banner/CmnBanner";
 import ServiceDetailsAbout from "../../../public/service/ServiceDetailsAbout";
 import ServiceProject from "../../../public/service/ServiceProject";
-import ServicePricing from "../../../public/service/ServicePricing";
 import ServiceFaq from "../../../public/service/ServiceFaq";
-import Trial from "../../../public/service/Trial";
-import QualitySec from "@/components/containers/home/QualitySec";
 import TestimonialSec from "@/components/containers/home/TestimonialSec";
 import SponsorSlider from "@/components/containers/home/SponsorSlider";
 import ContactSec from "@/components/containers/ContactSec";
 import PricingMain from "@/components/containers/pricing/PricingMain";
+import HowItWorks from "@/components/containers/HowItWorks";
 
 const ServiceDetail = () => {
   const router = useRouter();
@@ -27,6 +25,7 @@ const ServiceDetail = () => {
   const [sponsorData, setSponsorData] = useState<any>(null);
   const [projectsData, setProjectsData] = useState<any>(null);
   const [contactInfo, setContactInfo] = useState<any>(null);
+  const [howItWorksData, setHowItWorksData] = useState<any>(null);
 
   const slugify = (text: string) =>
     (text || "")
@@ -40,11 +39,12 @@ const ServiceDetail = () => {
     const fetchInitialData = async () => {
       try {
         // Fetch settings, pricing, testimonials, sponsors, FAQ and contact data in parallel
-        const [settingsRes, pricingRes, aboutRes, contactRes] = await Promise.all([
+        const [settingsRes, pricingRes, aboutRes, contactRes, howItWorksRes] = await Promise.all([
           fetch("/api/content/settings"),
           fetch("/api/content/pricing"),
           fetch("/api/content/about"),
-          fetch("/api/content/contact-info")
+          fetch("/api/content/contact-info"),
+          fetch("/api/content/how-it-works"),
         ]);
 
         if (settingsRes.ok) {
@@ -64,6 +64,10 @@ const ServiceDetail = () => {
 
         if (contactRes.ok) {
           setContactInfo(await contactRes.json());
+        }
+        
+        if(howItWorksRes.ok) {
+          setHowItWorksData(await howItWorksRes.json());
         }
       } catch (error) {
         console.error("Error fetching initial data:", error);
@@ -104,11 +108,13 @@ const ServiceDetail = () => {
         ]);
         
         if (detailRes.ok) {
-          setDetail(await detailRes.json());
+          const detailData = await detailRes.json();
+          setDetail(detailData);
         }
         
         if (projectsRes.ok) {
-          setProjectsData(await projectsRes.json());
+          const portfolioData = await projectsRes.json();
+          setProjectsData(portfolioData?.projects || portfolioData || []);
         }
       } catch (error) {
         console.error("Error fetching service details:", error);
@@ -145,45 +151,47 @@ const ServiceDetail = () => {
       {/* Banner with service title */}
       <CmnBanner title={serviceData.title} />
 
-      {/* Service Details About Section - with actual service data */}
+      {/* Service Details About Section - Hero with before/after slider and dynamic content */}
       <ServiceDetailsAbout 
         serviceData={serviceData}
         serviceDetails={detail}
       />
 
-      {/* Quality/How It Works Section */}
-      <QualitySec />
+      {/* How It Works Section - Common for all services */}
+      {howItWorksData && <HowItWorks data={howItWorksData} />}
 
-      {/* Service Projects Section - shows projects related to this service */}
+      {/* Service Projects Section - Specific to each service */}
       <ServiceProject 
         serviceData={serviceData}
-        projectsData={projectsData}
+        projectsData={Array.isArray(projectsData) ? projectsData : (detail?.projects || [])}
       />
 
-      {/* Pricing Section - uses general pricing */}
+      {/* Pricing Section - Same as main page */}
       {pricingData && (
         <PricingMain data={pricingData} />
       )}
 
-      {/* Testimonials Section - reused from general testimonials */}
+      {/* Client Testimonials Section - Common for all services */}
       {testimonialData && (
         <TestimonialSec data={testimonialData} />
       )}
 
-      {/* FAQ Section - general FAQ for all services */}
+      {/* FAQ Section - Common for all services */}
       {faqData && (
         <ServiceFaq data={faqData} />
       )}
 
-      {/* Contact Section - reused contact form */}
+      {/* Contact Us Section - Functional contact form */}
       {contactInfo && (
-        <ContactSec contactInfo={contactInfo} mapData={{ embedUrl: "" }} />
+        <ContactSec 
+          contactInfo={contactInfo} 
+          mapData={{ embedUrl: contactInfo.googleMapUrl || "" }}
+          title="Contact Us"
+          description="Ready to get started? Contact us today for a free quote and let us transform your images."
+        />
       )}
 
-      {/* Trial Section */}
-      <Trial />
-
-      {/* Logo Slider - reused sponsors */}
+      {/* Sponsors Logo Section - Common for all services */}
       {sponsorData && (
         <SponsorSlider data={sponsorData} />
       )}

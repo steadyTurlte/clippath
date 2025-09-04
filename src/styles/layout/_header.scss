@@ -160,8 +160,8 @@
   }
 
   .mega-menu__grid-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    display: flex;
+    flex-direction: column;
     gap: 12px;
     max-height: 400px;
     overflow-y: auto;

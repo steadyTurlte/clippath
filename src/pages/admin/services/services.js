@@ -11,17 +11,8 @@ const ServicesItemsEditor = () => {
   const [imagePublicIds, setImagePublicIds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [saveSuccess, setSaveSuccess] = useState(false);
-  const [serviceAdded, setServiceAdded] = useState(false);
-  const [serviceRemoved, setServiceRemoved] = useState(false);
   const [error, setError] = useState(null);
-
-  // Details editor state
-  const [selectedIdx, setSelectedIdx] = useState(0);
-  const [detailsLoading, setDetailsLoading] = useState(false);
-  const [detailsSaving, setDetailsSaving] = useState(false);
-  const [detailsError, setDetailsError] = useState(null);
-  const [detailsJson, setDetailsJson] = useState('');
+  const [expandedService, setExpandedService] = useState(null);
 
   const slugify = (text = '') =>
     text
@@ -37,35 +28,51 @@ const ServicesItemsEditor = () => {
       try {
         const response = await fetch('/api/content/services?section=services');
         const data = await response.json();
-        
+
         if (data && data.length > 0) {
           // Initialize services data and public IDs
           const initialServices = [];
           const initialPublicIds = [];
-          
+
           data.forEach(service => {
+            // Ensure service has proper structure
+            const serviceWithDefaults = {
+              ...service,
+              details: {
+                hero: {
+                  title: '',
+                  subtitle: '',
+                  description: '',
+                  beforeImage: { url: '', publicId: '' },
+                  afterImage: { url: '', publicId: '' }
+                },
+                projects: [],
+                ...service.details
+              }
+            };
+
             if (service.image && typeof service.image === 'object') {
               initialServices.push({
-                ...service,
+                ...serviceWithDefaults,
                 image: service.image.url || ''
               });
               initialPublicIds.push(service.image.publicId || '');
             } else {
               initialServices.push({
-                ...service,
+                ...serviceWithDefaults,
                 image: service.image || ''
               });
               initialPublicIds.push('');
             }
           });
-          
+
           setServicesData(initialServices);
           setImagePublicIds(initialPublicIds);
         } else {
           setServicesData([]);
           setImagePublicIds([]);
         }
-        
+
         setLoading(false);
       } catch (error) {
         console.error('Error fetching services data:', error);
@@ -77,36 +84,6 @@ const ServicesItemsEditor = () => {
     fetchServicesData();
   }, []);
 
-  // Load details for selected service
-  useEffect(() => {
-    const loadDetails = async () => {
-      if (!servicesData || servicesData.length === 0) return;
-      setDetailsLoading(true);
-      setDetailsError(null);
-      try {
-        const svc = servicesData[selectedIdx] || {};
-        const slug = slugify(svc.title || '');
-        if (!slug) {
-          setDetailsJson('');
-          setDetailsLoading(false);
-          return;
-        }
-        const res = await fetch(`/api/content/services?section=details&slug=${slug}`);
-        if (res.ok) {
-          const json = await res.json();
-          setDetailsJson(json ? JSON.stringify(json, null, 2) : '{\n  "about": {},\n  "projects": [],\n  "pricingRanges": []\n}');
-        } else {
-          setDetailsJson('{\n  "about": {},\n  "projects": [],\n  "pricingRanges": []\n}');
-        }
-      } catch (e) {
-        setDetailsError('Failed to load service details');
-      } finally {
-        setDetailsLoading(false);
-      }
-    };
-    loadDetails();
-  }, [selectedIdx, servicesData]);
-
   const handleServiceChange = (index, field, value, publicId = null) => {
     const updatedServices = [...servicesData];
     updatedServices[index] = {
@@ -115,7 +92,7 @@ const ServicesItemsEditor = () => {
     };
 
     setServicesData(updatedServices);
-    
+
     // Update public ID if provided
     if (publicId !== null && field === 'image') {
       const updatedPublicIds = [...imagePublicIds];
@@ -134,37 +111,37 @@ const ServicesItemsEditor = () => {
         price: '',
         description: '',
         link: 'service-details',
-        className: ''
+        className: '',
+        details: {
+          hero: {
+            title: '',
+            subtitle: '',
+            description: '',
+            beforeImage: { url: '', publicId: '' },
+            afterImage: { url: '', publicId: '' }
+          },
+          projects: [],
+        }
       }
     ]);
-    
+
     // Add an empty public ID for the new service
     setImagePublicIds([...imagePublicIds, '']);
 
-    setServiceAdded(true);
-
-    // Hide success message after 3 seconds
-    setTimeout(() => {
-      setServiceAdded(false);
-    }, 3000);
+    toast.success("Service added successfully!");
   };
 
   const handleRemoveService = (index) => {
     const updatedServices = [...servicesData];
     updatedServices.splice(index, 1);
-    
+
     const updatedPublicIds = [...imagePublicIds];
     updatedPublicIds.splice(index, 1);
 
     setServicesData(updatedServices);
     setImagePublicIds(updatedPublicIds);
 
-    setServiceRemoved(true);
-
-    // Hide success message after 3 seconds
-    setTimeout(() => {
-      setServiceRemoved(false);
-    }, 3000);
+    toast.success("Service removed successfully!");
   };
 
   const handleImageUpload = (index, imageUrl, publicId) => {
@@ -175,23 +152,82 @@ const ServicesItemsEditor = () => {
       image: imageUrl
     };
     setServicesData(updatedServices);
-    
+
     // Update the public ID
     const updatedPublicIds = [...imagePublicIds];
     updatedPublicIds[index] = publicId || '';
     setImagePublicIds(updatedPublicIds);
   };
 
+  const handleDetailChange = (serviceIndex, section, field, value) => {
+    const updatedServices = [...servicesData];
+    updatedServices[serviceIndex].details = {
+      ...updatedServices[serviceIndex].details,
+      [section]: {
+        ...updatedServices[serviceIndex].details[section],
+        [field]: value
+      }
+    };
+    setServicesData(updatedServices);
+  };
+
+  const handleProjectChange = (serviceIndex, projectIndex, field, value) => {
+    const updatedServices = [...servicesData];
+    const newProjects = [...updatedServices[serviceIndex].details.projects];
+    newProjects[projectIndex] = {
+      ...newProjects[projectIndex],
+      [field]: value
+    };
+    handleDetailChange(serviceIndex, 'projects', 'projects', newProjects);
+  };
+
+  const addProject = (serviceIndex) => {
+    const updatedServices = [...servicesData];
+
+    // Ensure details and projects exist
+    if (!updatedServices[serviceIndex].details) {
+      updatedServices[serviceIndex].details = {};
+    }
+
+    const currentProjects = updatedServices[serviceIndex].details.projects || [];
+    const newProjects = [...currentProjects, { title: '', image: { url: '', publicId: '' } }];
+
+    updatedServices[serviceIndex].details.projects = newProjects;
+    setServicesData(updatedServices);
+  };
+
+  const removeProject = (serviceIndex, projectIndex) => {
+    const updatedServices = [...servicesData];
+    const newProjects = updatedServices[serviceIndex].details.projects.filter((_, i) => i !== projectIndex);
+    handleDetailChange(serviceIndex, 'projects', 'projects', newProjects);
+  };
+
+  const handleProjectImageUpload = (serviceIndex, projectIndex, url, publicId) => {
+    const updatedServices = [...servicesData];
+    const newProjects = [...updatedServices[serviceIndex].details.projects];
+    newProjects[projectIndex].image = { url, publicId };
+    handleDetailChange(serviceIndex, 'projects', 'projects', newProjects);
+  };
+
+  const handleHeroImageUpload = (serviceIndex, imageType, url, publicId) => {
+    const updatedServices = [...servicesData];
+    if (!updatedServices[serviceIndex].details.hero) {
+      updatedServices[serviceIndex].details.hero = {};
+    }
+    updatedServices[serviceIndex].details.hero[imageType] = { url, publicId };
+    setServicesData(updatedServices);
+  };
+
+
   const handleSave = async () => {
     setSaving(true);
-    setSaveSuccess(false);
     setError(null);
 
     try {
       // Prepare data with images including public IDs
       const dataToSave = servicesData.map((service, index) => {
         const serviceData = { ...service };
-        
+
         // Only include image object if there's an image URL
         if (service.image) {
           serviceData.image = {
@@ -201,7 +237,7 @@ const ServicesItemsEditor = () => {
         } else {
           serviceData.image = '';
         }
-        
+
         return serviceData;
       });
 
@@ -214,18 +250,15 @@ const ServicesItemsEditor = () => {
       });
 
       if (response.ok) {
-        setSaveSuccess(true);
-
-        // Hide success message after 3 seconds
-        setTimeout(() => {
-          setSaveSuccess(false);
-        }, 3000);
+        toast.success("Services section saved successfully!");
       } else {
         setError('Failed to save Services section');
+        toast.error('Failed to save Services section');
       }
     } catch (error) {
       console.error('Error saving services data:', error);
       setError('Failed to save Services section');
+      toast.error('Failed to save Services section');
     } finally {
       setSaving(false);
     }
@@ -268,242 +301,246 @@ const ServicesItemsEditor = () => {
           </div>
         )}
 
-        {saveSuccess && (
-          <div className="admin-editor__success">
-            <p>Services section saved successfully!</p>
-          </div>
-        )}
-
-        {serviceAdded && (
-          <div className="admin-editor__success">
-            <p>Service added successfully!</p>
-          </div>
-        )}
-
-        {serviceRemoved && (
-          <div className="admin-editor__success">
-            <p>Service removed successfully!</p>
-          </div>
-        )}
-
         <div className="admin-editor__content">
-          <div className="admin-editor__section">
-            <div className="admin-editor__section-header">
-              <h2 className="admin-editor__section-title">Service Items</h2>
-              <button
-                type="button"
-                className="admin-editor__add-button"
-                onClick={handleAddService}
-              >
-                Add Service
-              </button>
-            </div>
+          {servicesData.map((service, index) => (
+            <div key={service.id || index} className="admin-editor__service-item">
+              <div className="admin-editor__service-header">
+                <h3 className="admin-editor__service-title">Service #{index + 1}</h3>
+                <button
+                  type="button"
+                  className="admin-editor__remove-button"
+                  onClick={() => handleRemoveService(index)}
+                >
+                  Remove
+                </button>
+              </div>
 
-            {servicesData.map((service, index) => (
-              <div key={service.id || index} className="admin-editor__service-item">
-                <div className="admin-editor__service-header">
-                  <h3 className="admin-editor__service-title">Service #{index + 1}</h3>
-                  <button
-                    type="button"
-                    className="admin-editor__remove-button"
-                    onClick={() => handleRemoveService(index)}
-                  >
-                    Remove
-                  </button>
-                </div>
-
-                <div className="admin-editor__service-grid">
-                  <div className="admin-editor__field">
-                    <label className="admin-editor__label">Title</label>
-                    <input
-                      type="text"
-                      className="admin-editor__input"
-                      value={service.title}
-                      onChange={(e) => handleServiceChange(index, 'title', e.target.value)}
-                      placeholder="Enter service title"
-                    />
-                  </div>
-
-                  <div className="admin-editor__field">
-                    <label className="admin-editor__label">Price</label>
-                    <input
-                      type="text"
-                      className="admin-editor__input"
-                      value={service.price}
-                      onChange={(e) => handleServiceChange(index, 'price', e.target.value)}
-                      placeholder="Enter price (e.g. $0.39 Only)"
-                    />
-                  </div>
-                </div>
-
+              <div className="admin-editor__service-grid">
                 <div className="admin-editor__field">
-                  <label className="admin-editor__label">Description</label>
-                  <textarea
-                    className="admin-editor__textarea"
-                    value={service.description}
-                    onChange={(e) => handleServiceChange(index, 'description', e.target.value)}
-                    placeholder="Enter service description"
-                    rows={3}
+                  <label className="admin-editor__label">Title</label>
+                  <input
+                    type="text"
+                    className="admin-editor__input"
+                    value={service.title}
+                    onChange={(e) => handleServiceChange(index, 'title', e.target.value)}
+                    placeholder="Enter service title"
                   />
                 </div>
 
-                <div className="admin-editor__service-grid">
-                  <div className="admin-editor__field">
-                    <label className="admin-editor__label">Link</label>
-                    <input
-                      type="text"
-                      className="admin-editor__input"
-                      value={service.link}
-                      onChange={(e) => handleServiceChange(index, 'link', e.target.value)}
-                      placeholder="Enter link (e.g. service-details)"
-                    />
-                  </div>
+                <div className="admin-editor__field">
+                  <label className="admin-editor__label">Price</label>
+                  <input
+                    type="text"
+                    className="admin-editor__input"
+                    value={service.price}
+                    onChange={(e) => handleServiceChange(index, 'price', e.target.value)}
+                    placeholder="Enter price (e.g. $0.39 Only)"
+                  />
+                </div>
+              </div>
 
-                  <div className="admin-editor__field">
-                    <label className="admin-editor__label">Class Name</label>
-                    <select
-                      className="admin-editor__select"
-                      value={service.className}
-                      onChange={(e) => handleServiceChange(index, 'className', e.target.value)}
-                    >
-                      <option value="">Select a class</option>
-                      <option value="on">Primary (on)</option>
-                      <option value="fi">Secondary (fi)</option>
-                      <option value="tw">Tertiary (tw)</option>
-                      <option value="th">Quaternary (th)</option>
-                      <option value="fo">Quinary (fo)</option>
-                    </select>
-                  </div>
+              <div className="admin-editor__field">
+                <label className="admin-editor__label">Description</label>
+                <textarea
+                  className="admin-editor__textarea"
+                  value={service.description}
+                  onChange={(e) => handleServiceChange(index, 'description', e.target.value)}
+                  placeholder="Enter service description"
+                  rows={3}
+                />
+              </div>
+
+              <div className="admin-editor__service-grid">
+                <div className="admin-editor__field">
+                  <label className="admin-editor__label">Link</label>
+                  <input
+                    type="text"
+                    className="admin-editor__input"
+                    value={service.link}
+                    onChange={(e) => handleServiceChange(index, 'link', e.target.value)}
+                    placeholder="This will be auto-generated from title"
+                    disabled
+                  />
                 </div>
 
                 <div className="admin-editor__field">
-                  <label className="admin-editor__label">Service Image</label>
-                  <div className="admin-editor__image-upload">
-                    <ImageUploader
-                      currentImage={service.image}
-                      onImageSelect={(file) => {
-                        const updatedServices = [...servicesData];
-                        updatedServices[index] = {
-                          ...updatedServices[index],
-                          image: URL.createObjectURL(file)
-                        };
-                        setServicesData(updatedServices);
-                      }}
-                      onImageUpload={(url, publicId) => handleImageUpload(index, url, publicId)}
-                      folder="services/items"
-                      label={`Service ${index + 1} Image`}
-                      recommendedSize="300x300px"
-                      className="admin-editor__image-uploader"
-                      oldPublicId={imagePublicIds[index] || ''}
-                      uploadOnSelect={true}
-                    />
-                    {service.image && (
-                      <div className="admin-editor__image-preview">
-                        <Image
-                          src={service.image} 
-                          alt={`Preview ${index}`} 
-                          width={200}
-                          height={200}
-                          className="admin-editor__preview-image"
-                          onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src = '/images/placeholder-image.png';
-                          }}
-                        />
-                      </div>
-                    )}
-                  </div>
-                  <p className="admin-editor__help-text">
-                    <strong>Recommended size:</strong> 400x300px
-                  </p>
-                  <p className="admin-editor__help-text">
-                    <strong>Image types:</strong> JPEG, PNG, WEBP
-                  </p>
+                  <label className="admin-editor__label">Class Name</label>
+                  <select
+                    className="admin-editor__select"
+                    value={service.className}
+                    onChange={(e) => handleServiceChange(index, 'className', e.target.value)}
+                  >
+                    <option value="">Select a class</option>
+                    <option value="on">Primary (on)</option>
+                    <option value="fi">Secondary (fi)</option>
+                    <option value="tw">Tertiary (tw)</option>
+                    <option value="th">Quaternary (th)</option>
+                    <option value="fo">Quinary (fo)</option>
+                  </select>
                 </div>
               </div>
-            ))}
-          </div>
 
-          {/* Details Editor */}
-          <div className="admin-editor__section">
-            <div className="admin-editor__section-header">
-              <h2 className="admin-editor__section-title">Per-Service Details</h2>
-            </div>
-            <div className="admin-editor__field">
-              <label className="admin-editor__label">Select Service</label>
-              <select
-                className="admin-editor__select"
-                value={selectedIdx}
-                onChange={(e) => setSelectedIdx(Number(e.target.value))}
-              >
-                {servicesData.map((s, i) => (
-                  <option key={(s.id || i)} value={i}>
-                    {s.title || `Service ${i + 1}`} ({slugify(s.title || '')})
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="admin-editor__field">
-              <label className="admin-editor__label">Details JSON</label>
-              <textarea
-                className="admin-editor__textarea"
-                rows={12}
-                value={detailsJson}
-                onChange={(e) => setDetailsJson(e.target.value)}
-                placeholder='{"about":{}, "projects":[], "pricingRanges":[]}'
-              />
-              <p className="admin-editor__help-text">Edit the structured content for this service. Examples: about (text/images), projects (array of images/items), pricingRanges (array of tiers).</p>
-              {detailsError && (
-                <div className="admin-editor__error" style={{ marginTop: '8px' }}>
-                  <p>{detailsError}</p>
+              <div className="admin-editor__field">
+                <label className="admin-editor__label">Service Image</label>
+                <div className="admin-editor__image-upload">
+                  <ImageUploader
+                    currentImage={service.image}
+                    onImageSelect={(file) => {
+                      const updatedServices = [...servicesData];
+                      updatedServices[index] = {
+                        ...updatedServices[index],
+                        image: URL.createObjectURL(file)
+                      };
+                      setServicesData(updatedServices);
+                    }}
+                    onImageUpload={(url, publicId) => handleImageUpload(index, url, publicId)}
+                    folder="services/items"
+                    label={`Service ${index + 1} Image`}
+                    recommendedSize="300x300px"
+                    className="admin-editor__image-uploader"
+                    oldPublicId={imagePublicIds[index] || ''}
+                    uploadOnSelect={true}
+                  />
+                  {service.image && (
+                    <div className="admin-editor__image-preview">
+                      <Image
+                        src={service.image}
+                        alt={`Preview ${index}`}
+                        width={200}
+                        height={200}
+                        className="admin-editor__preview-image"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = '/images/placeholder-image.png';
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+                <p className="admin-editor__help-text">
+                  <strong>Recommended size:</strong> 400x300px
+                </p>
+                <p className="admin-editor__help-text">
+                  <strong>Image types:</strong> JPEG, PNG, WEBP
+                </p>
+              </div>
+              <div className="admin-editor__field">
+                <button
+                  type="button"
+                  className="admin-editor__add-button"
+                  onClick={() => setExpandedService(expandedService === index ? null : index)}
+                >
+                  {expandedService === index ? 'Hide Details' : 'Show Details'}
+                </button>
+              </div>
+
+              {expandedService === index && (
+                <div className="admin-editor__service-details">
+                  <h4 className="admin-editor__section-title">Service Details</h4>
+
+                  {/* Hero Section */}
+                  <div className="admin-editor__subsection">
+                    <h5 className="admin-editor__subsection-title">Hero Section</h5>
+                    <div className="admin-editor__field">
+                      <label className="admin-editor__label">Hero Title</label>
+                      <input
+                        type="text"
+                        className="admin-editor__input"
+                        value={service.details?.hero?.title || ''}
+                        onChange={(e) => handleDetailChange(index, 'hero', 'title', e.target.value)}
+                        placeholder="Enter hero section title"
+                      />
+                    </div>
+                    <div className="admin-editor__field">
+                      <label className="admin-editor__label">Hero Subtitle</label>
+                      <input
+                        type="text"
+                        className="admin-editor__input"
+                        value={service.details?.hero?.subtitle || ''}
+                        onChange={(e) => handleDetailChange(index, 'hero', 'subtitle', e.target.value)}
+                        placeholder="Enter hero section subtitle"
+                      />
+                    </div>
+                    <div className="admin-editor__field">
+                      <label className="admin-editor__label">Hero Description</label>
+                      <textarea
+                        className="admin-editor__textarea"
+                        value={service.details?.hero?.description || ''}
+                        onChange={(e) => handleDetailChange(index, 'hero', 'description', e.target.value)}
+                        placeholder="Enter hero section description"
+                        rows={4}
+                      />
+                    </div>
+                    <div className="admin-editor__field">
+                      <label className="admin-editor__label">Before Image</label>
+                      <ImageUploader
+                        currentImage={service.details?.hero?.beforeImage?.url}
+                        onImageUpload={(url, publicId) => handleHeroImageUpload(index, 'beforeImage', url, publicId)}
+                        folder={`services/${slugify(service.title)}/hero`}
+                        oldPublicId={service.details?.hero?.beforeImage?.publicId}
+                        uploadOnSelect={true}
+                        label="Before Image"
+                      />
+                    </div>
+                    <div className="admin-editor__field">
+                      <label className="admin-editor__label">After Image</label>
+                      <ImageUploader
+                        currentImage={service.details?.hero?.afterImage?.url}
+                        onImageUpload={(url, publicId) => handleHeroImageUpload(index, 'afterImage', url, publicId)}
+                        folder={`services/${slugify(service.title)}/hero`}
+                        oldPublicId={service.details?.hero?.afterImage?.publicId}
+                        uploadOnSelect={true}
+                        label="After Image"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Projects Section */}
+                  <div className="admin-editor__subsection">
+                    <h5 className="admin-editor__subsection-title">Projects</h5>
+                    {(service.details?.projects || []).map((project, projectIndex) => (
+                      <div key={projectIndex} className="admin-editor__project-item">
+                        <h6>Project #{projectIndex + 1}</h6>
+                        <div className="admin-editor__field">
+                          <label className="admin-editor__label">Title</label>
+                          <input
+                            type="text"
+                            className="admin-editor__input"
+                            value={project.title}
+                            onChange={(e) => handleProjectChange(index, projectIndex, 'title', e.target.value)}
+                          />
+                        </div>
+                        <div className="admin-editor__field">
+                          <label className="admin-editor__label">Image</label>
+                          <ImageUploader
+                            currentImage={project.image?.url}
+                            onImageUpload={(url, publicId) => handleProjectImageUpload(index, projectIndex, url, publicId)}
+                            folder={`services/${slugify(service.title)}/projects`}
+                            oldPublicId={project.image?.publicId}
+                            uploadOnSelect={true}
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          className="admin-editor__remove-button"
+                          onClick={() => removeProject(index, projectIndex)}
+                        >
+                          Remove Project
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      className="admin-editor__add-button"
+                      onClick={() => addProject(index)}
+                    >
+                      Add Project
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
-            <div className="admin-editor__actions" style={{ marginTop: '8px' }}>
-              <button
-                className="admin-editor__save-button"
-                onClick={async () => {
-                  try {
-                    setDetailsSaving(true);
-                    setDetailsError(null);
-                    const svc = servicesData[selectedIdx] || {};
-                    const slug = slugify(svc.title || '');
-                    if (!slug) {
-                      setDetailsError('Please provide a title for the selected service to derive a slug.');
-                      setDetailsSaving(false);
-                      return;
-                    }
-                    let payload;
-                    try {
-                      payload = detailsJson ? JSON.parse(detailsJson) : {};
-                    } catch (e) {
-                      setDetailsError('Invalid JSON. Please fix syntax errors.');
-                      setDetailsSaving(false);
-                      return;
-                    }
-                    const res = await fetch(`/api/content/services?section=details&slug=${slug}`, {
-                      method: 'PUT',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify(payload),
-                    });
-                    if (!res.ok) {
-                      setDetailsError('Failed to save details');
-                    } else {
-                      toast.success('Service details saved');
-                    }
-                  } catch (e) {
-                    setDetailsError('Failed to save details');
-                  } finally {
-                    setDetailsSaving(false);
-                  }
-                }}
-                disabled={detailsSaving}
-              >
-                {detailsSaving ? 'Saving...' : 'Save Details'}
-              </button>
-              {detailsLoading && <span style={{ marginLeft: 12, color: '#64748b' }}>Loading details…</span>}
-            </div>
-          </div>
+          ))}
         </div>
       </div>
 
@@ -767,8 +804,79 @@ const ServicesItemsEditor = () => {
           font-size: 14px;
         }
 
+        .admin-editor__features-list {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          margin-top: 8px;
+        }
+
+        .admin-editor__feature-item {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .admin-editor__project-item {
+          background-color: #f1f5f9;
+          border-radius: 8px;
+          padding: 16px;
+          margin-bottom: 16px;
+        }
+
+        .admin-editor__project-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 12px;
+        }
+
+        .admin-editor__project-title {
+          font-size: 14px;
+          font-weight: 600;
+          color: #1e293b;
+          margin: 0;
+        }
+
+        .admin-editor__project-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 16px;
+        }
+
+        .admin-editor__service-details {
+            background-color: #fff;
+            border-top: 1px solid #e2e8f0;
+            margin-top: 20px;
+            padding-top: 20px;
+        }
+
+        .admin-editor__subsection {
+            margin-bottom: 24px;
+            padding: 16px;
+            border: 1px solid #f1f5f9;
+            border-radius: 8px;
+        }
+        
+        .admin-editor__subsection-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 16px;
+        }
+
+        .admin-editor__project-item {
+            padding: 16px;
+            border: 1px dashed #cbd5e1;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
         @media (max-width: 768px) {
           .admin-editor__service-grid {
+            grid-template-columns: 1fr;
+          }
+          .admin-editor__project-grid {
             grid-template-columns: 1fr;
           }
         }

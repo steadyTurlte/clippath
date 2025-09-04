@@ -65,9 +65,21 @@ const AdminLayout = ({ children }) => {
               </Link>
             </li>
             <li className="admin-sidebar__menu-item">
-              <Link href="/admin/services" className={router.pathname.startsWith('/admin/services') ? 'active' : ''}>
+              <Link href="/admin/services" className={router.pathname.startsWith('/admin/services') && !router.pathname.includes('how-it-works') && !router.pathname.includes('testimonials') ? 'active' : ''}>
                 <i className="fa-solid fa-cogs"></i>
                 <span>Services</span>
+              </Link>
+            </li>
+            <li className="admin-sidebar__menu-item admin-sidebar__submenu-item">
+              <Link href="/admin/services/how-it-works" className={router.pathname.startsWith('/admin/services/how-it-works') ? 'active' : ''}>
+                <i className="fa-solid fa-tasks"></i>
+                <span>↳ How It Works</span>
+              </Link>
+            </li>
+            <li className="admin-sidebar__menu-item admin-sidebar__submenu-item">
+              <Link href="/admin/services/testimonials" className={router.pathname.startsWith('/admin/services/testimonials') ? 'active' : ''}>
+                <i className="fa-solid fa-comments"></i>
+                <span>↳ Testimonials</span>
               </Link>
             </li>
 
@@ -288,6 +300,16 @@ const AdminLayout = ({ children }) => {
           font-size: 18px;
           position: relative;
           z-index: 1;
+        }
+
+        .admin-sidebar__submenu-item a {
+          margin-left: 20px;
+          padding-left: 40px;
+          font-size: 14px;
+        }
+
+        .admin-sidebar__submenu-item i {
+          font-size: 16px;
         }
 
         .admin-sidebar__footer {

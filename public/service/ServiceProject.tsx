@@ -12,11 +12,20 @@ interface ServiceProjectProps {
 
 const ServiceProject = ({ serviceData, projectsData }: ServiceProjectProps) => {
   // Use service-specific projects if available, otherwise fallback to default
-  const projects = projectsData?.projects || [
-    { id: 1, image: "/images/project-one.png", title: "Project 1" },
-    { id: 2, image: "/images/project-two.png", title: "Project 2" },
-    { id: 3, image: "/images/project-three.png", title: "Project 3" },
-  ];
+  let projects = [];
+  
+  if (Array.isArray(projectsData)) {
+    projects = projectsData;
+  } else if (projectsData?.projects && Array.isArray(projectsData.projects)) {
+    projects = projectsData.projects;
+  } else {
+    // Default fallback projects
+    projects = [
+      { id: 1, image: "/images/project-one.png", title: "Project 1" },
+      { id: 2, image: "/images/project-two.png", title: "Project 2" },
+      { id: 3, image: "/images/project-three.png", title: "Project 3" },
+    ];
+  }
   return (
     <section className="section project-three">
       <div className="container">

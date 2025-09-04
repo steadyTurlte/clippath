@@ -1,385 +1,170 @@
 import React, { useState, useEffect } from 'react';
-import Head from 'next/head';
-import Link from 'next/link';
-import Image from 'next/image';
-import AdminLayout from '@/components/admin/AdminLayout';
-import ImageUploader from '@/components/admin/common/ImageUploader';
 import { toast } from 'react-toastify';
+import AdminLayout from '@/components/admin/AdminLayout';
+import Head from 'next/head';
+import ImageUploader from '@/components/admin/common/ImageUploader';
 
-const ServicesTestimonialsEditor = () => {
-  const [testimonialsData, setTestimonialsData] = useState({
-    subtitle: '',
-    title: '',
-    items: []
-  });
-  const [imagePublicIds, setImagePublicIds] = useState([]);
+const TestimonialsEditor = () => {
+  const [testimonials, setTestimonials] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [saveSuccess, setSaveSuccess] = useState(false);
-  const [testimonialAdded, setTestimonialAdded] = useState(false);
-  const [testimonialRemoved, setTestimonialRemoved] = useState(false);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Fetch the testimonials data when the component mounts
-    const fetchTestimonialsData = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch('/api/content/services?section=testimonials');
-        const data = await response.json();
-        
-        // Initialize image public IDs
-        if (data.items && data.items.length > 0) {
-          const initialPublicIds = data.items.map(item => {
-            if (item.image && typeof item.image === 'object') {
-              return item.image.publicId || '';
-            }
-            return '';
-          });
-          setImagePublicIds(initialPublicIds);
-          
-          // Convert items to use image URL directly for backward compatibility
-          const updatedItems = data.items.map(item => ({
-            ...item,
-            image: item.image && typeof item.image === 'object' ? item.image.url : item.image || ''
-          }));
-          
-          setTestimonialsData({
-            ...data,
-            items: updatedItems
-          });
+        const res = await fetch('/api/content/testimonials');
+        if (res.ok) {
+          const data = await res.json();
+          setTestimonials(Array.isArray(data) ? data : data.items || []);
         } else {
-          setTestimonialsData({
-            ...data,
-            items: data.items || []
-          });
+          toast.error('Failed to load testimonials');
         }
-        
-        setLoading(false);
       } catch (error) {
-        console.error('Error fetching testimonials data:', error);
-        setError('Failed to load testimonials data');
-        setLoading(false);
+        toast.error('An error occurred while fetching data');
       }
+      setLoading(false);
     };
-
-    fetchTestimonialsData();
+    fetchData();
   }, []);
-
-  const handleChange = (field, value) => {
-    setTestimonialsData({
-      ...testimonialsData,
-      [field]: value
-    });
-  };
-
-  const handleTestimonialChange = (index, field, value, publicId = null) => {
-    const updatedItems = [...testimonialsData.items];
-    updatedItems[index] = {
-      ...updatedItems[index],
-      [field]: value
-    };
-
-    setTestimonialsData({
-      ...testimonialsData,
-      items: updatedItems
-    });
-    
-    // Update public ID if provided
-    if (publicId !== null && field === 'image') {
-      const updatedPublicIds = [...imagePublicIds];
-      updatedPublicIds[index] = publicId;
-      setImagePublicIds(updatedPublicIds);
-    }
-  };
-
-  const handleAddTestimonial = () => {
-    setTestimonialsData({
-      ...testimonialsData,
-      items: [
-        ...testimonialsData.items,
-        {
-          id: Date.now(),
-          name: '',
-          position: '',
-          image: '',
-          rating: 5,
-          text: ''
-        }
-      ]
-    });
-    
-    // Add an empty public ID for the new testimonial
-    setImagePublicIds([...imagePublicIds, '']);
-
-    setTestimonialAdded(true);
-
-    // Hide success message after 3 seconds
-    setTimeout(() => {
-      setTestimonialAdded(false);
-    }, 3000);
-  };
-
-  const handleRemoveTestimonial = (index) => {
-    const updatedItems = [...testimonialsData.items];
-    updatedItems.splice(index, 1);
-    
-    const updatedPublicIds = [...imagePublicIds];
-    updatedPublicIds.splice(index, 1);
-
-    setTestimonialsData({
-      ...testimonialsData,
-      items: updatedItems
-    });
-    
-    setImagePublicIds(updatedPublicIds);
-
-    setTestimonialRemoved(true);
-
-    // Hide success message after 3 seconds
-    setTimeout(() => {
-      setTestimonialRemoved(false);
-    }, 3000);
-  };
-
-  const handleImageUpload = (index, imageUrl, publicId) => {
-    handleTestimonialChange(index, 'image', imageUrl, publicId);
-  };
 
   const handleSave = async () => {
     setSaving(true);
-    setSaveSuccess(false);
-    setError(null);
-
     try {
-      // Prepare data with images including public IDs
-      const dataToSave = {
-        ...testimonialsData,
-        items: testimonialsData.items.map((item, index) => ({
-          ...item,
-          image: {
-            url: item.image,
-            publicId: imagePublicIds[index] || ''
-          }
-        }))
-      };
-
-      const response = await fetch('/api/content/services?section=testimonials', {
+      const res = await fetch('/api/content/testimonials', {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(dataToSave)
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: testimonials }),
       });
-
-      if (response.ok) {
-        setSaveSuccess(true);
-
-        // Hide success message after 3 seconds
-        setTimeout(() => {
-          setSaveSuccess(false);
-        }, 3000);
+      if (res.ok) {
+        toast.success('Testimonials saved successfully!');
       } else {
-        setError('Failed to save Testimonials section');
+        toast.error('Failed to save testimonials');
       }
     } catch (error) {
-      console.error('Error saving testimonials data:', error);
-      setError('Failed to save Testimonials section');
-    } finally {
-      setSaving(false);
+      toast.error('An error occurred while saving');
     }
+    setSaving(false);
   };
 
-  if (loading) {
-    return (
-      <AdminLayout>
-        <div className="admin-editor__loading">Loading...</div>
-      </AdminLayout>
-    );
+  const handleTestimonialChange = (index, field, value) => {
+    const newTestimonials = [...testimonials];
+    newTestimonials[index][field] = value;
+    setTestimonials(newTestimonials);
+  };
+
+  const addTestimonial = () => {
+    setTestimonials([...testimonials, {
+      id: Date.now(),
+      name: '',
+      role: '',
+      company: '',
+      content: '',
+      rating: 5,
+      image: { url: '', publicId: '' }
+    }]);
+  };
+
+  const removeTestimonial = (index) => {
+    setTestimonials(testimonials.filter((_, i) => i !== index));
+  };
+
+  const handleImageUpload = (index, url, publicId) => {
+    const newTestimonials = [...testimonials];
+    newTestimonials[index].image = { url, publicId };
+    setTestimonials(newTestimonials);
   }
+
+  if (loading) return <AdminLayout>Loading...</AdminLayout>;
 
   return (
     <AdminLayout>
       <Head>
-        <title>Edit Testimonials Section | Photodit Admin</title>
+        <title>Testimonials Editor</title>
       </Head>
-
       <div className="admin-editor">
         <div className="admin-editor__header">
-          <h1 className="admin-editor__title">Edit Testimonials Section</h1>
-          <div className="admin-editor__actions">
-            <Link href="/admin/services" className="admin-editor__back-button">
-              Back to Services
-            </Link>
-            <button
-              className="admin-editor__save-button"
-              onClick={handleSave}
-              disabled={saving}
-            >
-              {saving ? 'Saving...' : 'Save Changes'}
-            </button>
-          </div>
+          <h1 className="admin-editor__title">Client Testimonials</h1>
+          <button onClick={handleSave} disabled={saving} className="admin-editor__save-button">
+            {saving ? 'Saving...' : 'Save'}
+          </button>
         </div>
-
-        {error && (
-          <div className="admin-editor__error">
-            <p>{error}</p>
-          </div>
-        )}
-
-        {saveSuccess && (
-          <div className="admin-editor__success">
-            <p>Testimonials section saved successfully!</p>
-          </div>
-        )}
-
-        {testimonialAdded && (
-          <div className="admin-editor__success">
-            <p>Testimonial added successfully!</p>
-          </div>
-        )}
-
-        {testimonialRemoved && (
-          <div className="admin-editor__success">
-            <p>Testimonial removed successfully!</p>
-          </div>
-        )}
-
         <div className="admin-editor__content">
-          <div className="admin-editor__section">
-            <h2 className="admin-editor__section-title">Testimonials Section Header</h2>
-            <div className="admin-editor__field">
-              <label htmlFor="subtitle" className="admin-editor__label">Subtitle</label>
-              <input
-                type="text"
-                id="subtitle"
-                className="admin-editor__input"
-                value={testimonialsData.subtitle}
-                onChange={(e) => handleChange('subtitle', e.target.value)}
-                placeholder="Enter subtitle"
-              />
-            </div>
-
-            <div className="admin-editor__field">
-              <label htmlFor="title" className="admin-editor__label">Title</label>
-              <input
-                type="text"
-                id="title"
-                className="admin-editor__input"
-                value={testimonialsData.title}
-                onChange={(e) => handleChange('title', e.target.value)}
-                placeholder="Enter title"
-              />
-            </div>
-          </div>
-
-          <div className="admin-editor__section">
-            <div className="admin-editor__section-header">
-              <h2 className="admin-editor__section-title">Testimonial Items</h2>
-              <button
-                type="button"
-                className="admin-editor__add-button"
-                onClick={handleAddTestimonial}
-              >
-                Add Testimonial
-              </button>
-            </div>
-
-            {testimonialsData.items.map((testimonial, index) => (
-              <div key={testimonial.id || index} className="admin-editor__testimonial-item">
-                <div className="admin-editor__testimonial-header">
-                  <h3 className="admin-editor__testimonial-title">Testimonial #{index + 1}</h3>
-                  <button
-                    type="button"
-                    className="admin-editor__remove-button"
-                    onClick={() => handleRemoveTestimonial(index)}
-                  >
-                    Remove
-                  </button>
-                </div>
-
-                <div className="admin-editor__testimonial-grid">
-                  <div className="admin-editor__field">
-                    <label className="admin-editor__label">Name</label>
-                    <input
-                      type="text"
-                      className="admin-editor__input"
-                      value={testimonial.name}
-                      onChange={(e) => handleTestimonialChange(index, 'name', e.target.value)}
-                      placeholder="Enter name"
-                    />
-                  </div>
-
-                  <div className="admin-editor__field">
-                    <label className="admin-editor__label">Position</label>
-                    <input
-                      type="text"
-                      className="admin-editor__input"
-                      value={testimonial.position}
-                      onChange={(e) => handleTestimonialChange(index, 'position', e.target.value)}
-                      placeholder="Enter position"
-                    />
-                  </div>
-                </div>
-
-                <div className="admin-editor__field">
-                  <label className="admin-editor__label">Rating (1-5)</label>
-                  <input
-                    type="number"
-                    min="1"
-                    max="5"
-                    className="admin-editor__input"
-                    value={testimonial.rating}
-                    onChange={(e) => handleTestimonialChange(index, 'rating', parseInt(e.target.value, 10))}
-                  />
-                </div>
-
-                <div className="admin-editor__field">
-                  <label className="admin-editor__label">Testimonial Text</label>
-                  <textarea
-                    className="admin-editor__textarea"
-                    value={testimonial.text}
-                    onChange={(e) => handleTestimonialChange(index, 'text', e.target.value)}
-                    placeholder="Enter testimonial text"
-                    rows={4}
-                  />
-                </div>
-
-                <div className="admin-editor__field">
-                  <label className="admin-editor__label">Profile Image</label>
-                  <div className="admin-editor__image-upload-wrapper">
-                    <ImageUploader
-                      currentImage={testimonial.image}
-                      onImageUpload={(url, publicId) => handleImageUpload(index, url, publicId)}
-                      folder="services/testimonials"
-                      width={100}
-                      height={100}
-                      className="admin-editor__image-uploader"
-                      recommendedSize="100x100px"
-                    />
-                  </div>
-                  <div className="admin-editor__image-help">
-                    <p className="admin-editor__help-text">
-                      <strong>Recommended size:</strong> 100x100px (square)
-                    </p>
-                    <p className="admin-editor__help-text">
-                      <strong>Image types:</strong> JPEG, PNG, WEBP
-                    </p>
-                  </div>
-                </div>
+          {testimonials.map((testimonial, index) => (
+            <div key={index} className="admin-editor__repeater-item-container">
+              <h4>Testimonial #{index + 1}</h4>
+              <div className="admin-editor__field">
+                <label className="admin-editor__label">Name</label>
+                <input
+                  type="text"
+                  value={testimonial.name}
+                  onChange={e => handleTestimonialChange(index, 'name', e.target.value)}
+                  className="admin-editor__input"
+                  placeholder="Enter client name"
+                />
               </div>
-            ))}
-          </div>
+              <div className="admin-editor__field">
+                <label className="admin-editor__label">Role/Position</label>
+                <input
+                  type="text"
+                  value={testimonial.role || testimonial.position}
+                  onChange={e => handleTestimonialChange(index, 'role', e.target.value)}
+                  className="admin-editor__input"
+                  placeholder="Enter job title"
+                />
+              </div>
+              <div className="admin-editor__field">
+                <label className="admin-editor__label">Company</label>
+                <input
+                  type="text"
+                  value={testimonial.company}
+                  onChange={e => handleTestimonialChange(index, 'company', e.target.value)}
+                  className="admin-editor__input"
+                  placeholder="Enter company name"
+                />
+              </div>
+              <div className="admin-editor__field">
+                <label className="admin-editor__label">Testimonial Content</label>
+                <textarea
+                  value={testimonial.content || testimonial.text}
+                  onChange={e => handleTestimonialChange(index, 'content', e.target.value)}
+                  className="admin-editor__textarea"
+                  rows="4"
+                  placeholder="Enter testimonial content"
+                />
+              </div>
+              <div className="admin-editor__field">
+                <label className="admin-editor__label">Rating</label>
+                <select
+                  value={testimonial.rating || 5}
+                  onChange={e => handleTestimonialChange(index, 'rating', parseInt(e.target.value))}
+                  className="admin-editor__input"
+                >
+                  <option value={5}>5 Stars</option>
+                  <option value={4}>4 Stars</option>
+                  <option value={3}>3 Stars</option>
+                  <option value={2}>2 Stars</option>
+                  <option value={1}>1 Star</option>
+                </select>
+              </div>
+              <div className="admin-editor__field">
+                <label className="admin-editor__label">Author Image</label>
+                <ImageUploader
+                  onImageUpload={(url, publicId) => handleImageUpload(index, url, publicId)}
+                  folder={`testimonials`}
+                  currentImage={testimonial.image?.url}
+                  oldPublicId={testimonial.image?.publicId}
+                />
+              </div>
+              <button onClick={() => removeTestimonial(index)} className="admin-editor__remove-button">Remove</button>
+            </div>
+          ))}
+          <button onClick={addTestimonial} className="admin-editor__add-button">Add Testimonial</button>
         </div>
       </div>
 
       <style jsx>{`
-        .admin-editor__loading {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          height: 200px;
-          font-size: 18px;
-          color: #64748b;
+        .admin-editor {
+          max-width: 800px;
         }
 
         .admin-editor__header {
@@ -393,24 +178,6 @@ const ServicesTestimonialsEditor = () => {
           font-size: 24px;
           font-weight: 600;
           color: #1e293b;
-        }
-
-        .admin-editor__actions {
-          display: flex;
-          gap: 12px;
-        }
-
-        .admin-editor__back-button {
-          padding: 8px 16px;
-          background-color: #f1f5f9;
-          color: #1e293b;
-          border: none;
-          border-radius: 4px;
-          cursor: pointer;
-          text-decoration: none;
-          font-size: 14px;
-          display: inline-flex;
-          align-items: center;
         }
 
         .admin-editor__save-button {
@@ -428,64 +195,6 @@ const ServicesTestimonialsEditor = () => {
           cursor: not-allowed;
         }
 
-        .admin-editor__error,
-        .admin-editor__success,
-        .admin-editor__upload-success {
-          padding: 16px 20px;
-          border-radius: 8px;
-          margin-bottom: 24px;
-          display: flex;
-          align-items: center;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-          animation: slideIn 0.3s ease-out;
-        }
-
-        @keyframes slideIn {
-          from {
-            opacity: 0;
-            transform: translateY(-10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .admin-editor__error {
-          background-color: #fee2e2;
-          color: #b91c1c;
-          border-left: 4px solid #ef4444;
-        }
-
-        .admin-editor__success,
-        .admin-editor__upload-success {
-          background-color: #dcfce7;
-          color: #166534;
-          border-left: 4px solid #22c55e;
-        }
-
-        .admin-editor__upload-success {
-          padding: 8px 12px;
-          margin-top: 8px;
-          font-size: 14px;
-        }
-
-        .admin-editor__error p,
-        .admin-editor__success p,
-        .admin-editor__upload-success p {
-          margin: 0;
-          font-weight: 500;
-        }
-
-        .admin-editor__error p::before {
-          content: '❌ ';
-        }
-
-        .admin-editor__success p::before,
-        .admin-editor__upload-success p::before {
-          content: '✅ ';
-        }
-
         .admin-editor__content {
           background-color: white;
           border-radius: 8px;
@@ -493,23 +202,18 @@ const ServicesTestimonialsEditor = () => {
           padding: 24px;
         }
 
-        .admin-editor__section {
-          margin-bottom: 24px;
+        .admin-editor__repeater-item-container {
+          background-color: #f8fafc;
+          border-radius: 8px;
+          padding: 20px;
+          margin-bottom: 20px;
+          border: 1px solid #e2e8f0;
         }
 
-        .admin-editor__section-title {
-          font-size: 18px;
+        .admin-editor__repeater-item-container h4 {
+          font-size: 16px;
           font-weight: 600;
           color: #1e293b;
-          margin-bottom: 16px;
-          padding-bottom: 8px;
-          border-bottom: 1px solid #e2e8f0;
-        }
-
-        .admin-editor__section-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
           margin-bottom: 16px;
           padding-bottom: 8px;
           border-bottom: 1px solid #e2e8f0;
@@ -534,65 +238,34 @@ const ServicesTestimonialsEditor = () => {
           border: 1px solid #e2e8f0;
           border-radius: 4px;
           font-size: 14px;
+          transition: border-color 0.2s;
+        }
+
+        .admin-editor__input:focus,
+        .admin-editor__textarea:focus {
+          outline: none;
+          border-color: #4569e7;
+          box-shadow: 0 0 0 3px rgba(69, 105, 231, 0.1);
         }
 
         .admin-editor__textarea {
           resize: vertical;
-        }
-
-        .admin-editor__image-preview {
-          margin-bottom: 16px;
-          max-width: 100px;
-          background-color: #f8fafc;
-          border: 1px solid #e2e8f0;
-          border-radius: 50%;
-          overflow: hidden;
-        }
-
-        .admin-editor__image-upload-wrapper {
-          margin-bottom: 16px;
-        }
-        
-        .admin-editor__image-uploader {
-          width: 100%;
-          max-width: 200px;
-        }
-
-        .admin-editor__testimonial-item {
-          background-color: #f8fafc;
-          border-radius: 8px;
-          padding: 20px;
-          margin-bottom: 20px;
-        }
-
-        .admin-editor__testimonial-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 16px;
-        }
-
-        .admin-editor__testimonial-title {
-          font-size: 16px;
-          font-weight: 600;
-          color: #1e293b;
-          margin: 0;
-        }
-
-        .admin-editor__testimonial-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 16px;
+          min-height: 100px;
         }
 
         .admin-editor__add-button {
-          padding: 6px 12px;
+          padding: 8px 16px;
           background-color: #10b981;
           color: white;
           border: none;
           border-radius: 4px;
           cursor: pointer;
           font-size: 14px;
+          margin-top: 8px;
+        }
+
+        .admin-editor__add-button:hover {
+          background-color: #059669;
         }
 
         .admin-editor__remove-button {
@@ -603,16 +276,15 @@ const ServicesTestimonialsEditor = () => {
           border-radius: 4px;
           cursor: pointer;
           font-size: 14px;
+          margin-top: 8px;
         }
 
-        @media (max-width: 768px) {
-          .admin-editor__testimonial-grid {
-            grid-template-columns: 1fr;
-          }
+        .admin-editor__remove-button:hover {
+          background-color: #dc2626;
         }
       `}</style>
     </AdminLayout>
   );
 };
 
-export default ServicesTestimonialsEditor;
+export default TestimonialsEditor;

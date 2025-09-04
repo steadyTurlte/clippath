@@ -12,6 +12,13 @@ interface ServiceDetailsAboutProps {
 }
 
 const ServiceDetailsAbout = ({ serviceData, serviceDetails }: ServiceDetailsAboutProps) => {
+  // Get before/after images from service details or use defaults
+  const beforeImage = serviceDetails?.hero?.beforeImage?.url || "/images/services/before.png";
+  const afterImage = serviceDetails?.hero?.afterImage?.url || "/images/services/after.png";
+  const heroTitle = serviceDetails?.hero?.title || serviceData?.title;
+  const heroSubtitle = serviceDetails?.hero?.subtitle || serviceData?.title;
+  const heroDescription = serviceDetails?.hero?.description || serviceData?.description;
+
   return (
     <section className="section bg-white about-section service-de-thumb-alt">
       <div className="container">
@@ -23,39 +30,22 @@ const ServiceDetailsAbout = ({ serviceData, serviceDetails }: ServiceDetailsAbou
               data-aos-duration="600"
               data-aos-delay="100"
             >
-              {serviceData?.image ? (
-                <div className="service-image-container">
-                  <Image
-                    src={
-                      typeof serviceData.image === "object" && serviceData.image?.url
-                        ? serviceData.image.url
-                        : serviceData.image || "/images/services/slide-one.png"
-                    }
-                    alt={serviceData.title || "Service"}
-                    width={500}
-                    height={400}
-                    className="service-main-image"
-                    style={{ objectFit: "cover", borderRadius: "10px" }}
-                  />
-                </div>
-              ) : (
-                <div className="rangu">
-                  <ReactCompareSlider
-                    itemOne={
-                      <ReactCompareSliderImage
-                        src="/images/services/before.png"
-                        alt="Before"
-                      />
-                    }
-                    itemTwo={
-                      <ReactCompareSliderImage
-                        src="/images/services/after.png"
-                        alt="After"
-                      />
-                    }
-                  />
-                </div>
-              )}
+              <div className="rangu">
+                <ReactCompareSlider
+                  itemOne={
+                    <ReactCompareSliderImage
+                      src={beforeImage}
+                      alt="Before"
+                    />
+                  }
+                  itemTwo={
+                    <ReactCompareSliderImage
+                      src={afterImage}
+                      alt="After"
+                    />
+                  }
+                />
+              </div>
             </div>
           </div>
           <div className="col-12 col-lg-7 col-xl-6">
@@ -66,7 +56,7 @@ const ServiceDetailsAbout = ({ serviceData, serviceDetails }: ServiceDetailsAbou
                 data-aos-duration="600"
                 data-aos-delay="100"
               >
-                {serviceData?.title || "Professional Service"}
+                {heroSubtitle || "Professional Service"}
               </p>
               <h2
                 className="h2 title "
@@ -74,7 +64,7 @@ const ServiceDetailsAbout = ({ serviceData, serviceDetails }: ServiceDetailsAbou
                 data-aos-duration="600"
                 data-aos-delay="100"
               >
-                {serviceDetails?.title || serviceData?.title || "Professional Photo Editing Service"}
+                {heroTitle || "Professional Photo Editing Service"}
               </h2>
               <div
                 className="paragraph "
@@ -83,12 +73,7 @@ const ServiceDetailsAbout = ({ serviceData, serviceDetails }: ServiceDetailsAbou
                 data-aos-delay="100"
               >
                 <p className="fw-5">
-                  {serviceDetails?.shortDescription || serviceData?.description || 
-                   "Professional photo editing services tailored to your specific needs."}
-                </p>
-                <p>
-                  {serviceDetails?.longDescription || 
-                   "Our team of expert editors ensures that every image is processed with precision and care, delivering high-quality results that exceed your expectations."}
+                  {heroDescription || "Professional photo editing services tailored to your specific needs."}
                 </p>
                 {serviceData?.price && (
                   <div className="service-price">
@@ -98,7 +83,7 @@ const ServiceDetailsAbout = ({ serviceData, serviceDetails }: ServiceDetailsAbou
                 )}
               </div>
               <div className="cta__group justify-content-start">
-                <Link href="/contact-us" className="btn btn--primary">
+                <Link href="/get-quote" className="btn btn--primary">
                   Get Started
                 </Link>
               </div>

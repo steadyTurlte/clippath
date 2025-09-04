@@ -57,6 +57,16 @@ const AdminServices = () => {
             </div>
           </Link>
 
+          <Link href="/admin/services/how-it-works" className="admin-services__section-card">
+            <div className="admin-services__section-card-icon">
+              <i className="fa-solid fa-tasks"></i>
+            </div>
+            <div className="admin-services__section-card-content">
+              <h3 className="admin-services__section-card-title">How It Works</h3>
+              <p className="admin-services__section-card-description">Edit the how it works section</p>
+            </div>
+          </Link>
+
           <Link href="/admin/services/pricing" className="admin-services__section-card">
             <div className="admin-services__section-card-icon">
               <i className="fa-solid fa-tag"></i>

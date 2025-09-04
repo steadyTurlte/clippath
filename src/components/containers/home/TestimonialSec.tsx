@@ -1,249 +1,97 @@
-import React, { useState } from "react";
+import React from "react";
 import Image from "next/image";
-import ImageWithFallback from "@/components/admin/ImageWithFallback";
+import Link from "next/link";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay, Navigation } from "swiper/modules";
+import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import "swiper/swiper-bundle.css";
-import authorone from "public/images/testimonial/author-one.png";
-import authortwo from "public/images/testimonial/author-two.png";
-import authorthree from "public/images/testimonial/author-three.png";
-import mc from "public/images/mc.png";
+import ImageWithFallback from "@/components/admin/ImageWithFallback";
 
-interface TestimonialSecProps {
-  data?: {
+interface TestimonialData {
     subtitle?: string;
     title?: string;
-    decorativeImage?: string;
     items?: {
-      id: number;
-      name: string;
-      position: string;
-      image: string;
-      text: string;
+        name: string;
+        position: string;
+        text: string;
+        image?: {
+            url: string;
+            publicId: string;
+        }
     }[];
-  };
+}
+
+interface TestimonialSecProps {
+    data: TestimonialData;
 }
 
 const TestimonialSec = ({ data }: TestimonialSecProps) => {
-  // Helper function to get image URL from various formats
-  const getImageUrl = (imageData: any) => {
-    if (!imageData) return "/images/testimonial/author-one.png";
-
-    // If it's a string, return it directly
-    if (typeof imageData === "string") return imageData;
-
-    // If it's an imported image object with src property
-    if (typeof imageData === "object" && imageData.src) return imageData.src;
-
-    // If it's an object with url property (from API)
-    if (typeof imageData === "object" && imageData.url) return imageData.url;
-
-    // Fallback
-    return "/images/testimonial/author-one.png";
-  };
-
-  // Default data
-  const defaultData = {
-    subtitle: "customer testimonial",
-    title: "They love us. You will too.",
-    decorativeImage: "/images/mc.png",
-    items: [
-      {
-        id: 1,
-        name: "Delores Olivo",
-        position: "Senior Technology Editor",
-        image: authorone,
-        rating: 5,
-        text: "Welcome to our digital agency We specialize in helping business most like yours succeed online. From website design and development to digital marketing agency",
-      },
-      {
-        id: 2,
-        name: "Endru Kolins",
-        position: "CEO",
-        image: authortwo,
-        rating: 5,
-        text: "Welcome to our digital agency We specialize in helping business most like yours succeed online. From website design and development to digital marketing agency",
-      },
-      {
-        id: 3,
-        name: "Delores Olivo",
-        position: "Content & Marketing Coordinator",
-        image: authorthree,
-        rating: 5,
-        text: "Welcome to our digital agency We specialize in helping business most like yours succeed online. From website design and development to digital marketing agency",
-      },
-    ],
-  };
-
-  // Merge with default data
-  const testimonialData = {
-    ...defaultData,
-    ...data,
-    items: data?.items || defaultData.items,
-  };
-  const colors = ["#4569e7", "#e74545", "#181818"];
-  const [currentColorIndex, setCurrentColorIndex] = useState(0);
-
-  const handleSlideChange = () => {
-    const nextColorIndex = (currentColorIndex + 1) % colors.length;
-    setCurrentColorIndex(nextColorIndex);
-  };
-
-  const currentBackgroundColor = colors[currentColorIndex];
+  if (!data || !data.items || data.items.length === 0) {
+    return null;
+  }
 
   return (
-    <section
-      className="section testimonial"
-      style={{ backgroundColor: currentBackgroundColor }}
-    >
+    <section className="testimonial-two section">
       <div className="container">
-        <div className="row gaper">
-          <div className="col-12 col-xl-4">
-            <div className="section__content testimonial__content">
-              <p
-                className="h6 sub-title "
-                data-aos="fade-up"
-                data-aos-duration="600"
-                data-aos-delay="100"
-              >
-                {testimonialData.subtitle}
-              </p>
-              <h2
-                className="h2 title "
-                data-aos="fade-up"
-                data-aos-duration="600"
-                data-aos-delay="100"
-              >
-                {testimonialData.title}
-              </h2>
-              <div
-                className="paragraph "
-                data-aos="fade-up"
-                data-aos-duration="600"
-                data-aos-delay="100"
-              >
-                <p>
-                  Because a quick product shoot can easily turn into a week or
-                  more of editing and formatting your images. Let us look after
-                  the edits,
-                </p>
-              </div>
-              <div className="testimonial__content-cta section__content-cta">
-                <button
-                  aria-label="previous item"
-                  className="slide-btn prev-testimonial"
-                >
-                  <i className="icon-arrow-left"></i>
-                </button>
-                <button
-                  aria-label="next item"
-                  className="slide-btn next-testimonial"
-                >
-                  <i className="icon-arrow-right"></i>
-                </button>
-              </div>
+        <div className="row">
+          <div className="col-12">
+            <div className="section__header--alt">
+                <span className="sub-title">{data.subtitle || "CLIENT'S TESTIMONIAL"}</span>
+                <h2 className="title">{data.title || "SOME OF OUR RESPECTED HAPPY CLIENTS SAYS"}</h2>
             </div>
           </div>
-          <div className="col-12 col-xl-8">
-            <div className="testimonial__slider-wrapper">
-              <Swiper
+        </div>
+        <div className="row align-items-center">
+          <div className="col-lg-5">
+             <div className="testimonial-two__thumb">
+                <ImageWithFallback src="/images/testimonial/thumb.png" alt="testimonial" width={420} height={540}/>
+             </div>
+          </div>
+          <div className="col-lg-7">
+            <Swiper
+                modules={[Autoplay, Navigation, Pagination]}
+                loop={true}
                 slidesPerView={1}
                 spaceBetween={30}
-                slidesPerGroup={1}
-                speed={1200}
-                loop={true}
-                roundLengths={true}
-                centeredSlides={false}
-                centeredSlidesBounds={false}
-                modules={[Autoplay, Navigation]}
-                navigation={{
-                  nextEl: ".next-testimonial",
-                  prevEl: ".prev-testimonial",
-                }}
                 autoplay={{
-                  delay: 3000,
-                  disableOnInteraction: false,
-                  pauseOnMouseEnter: true,
+                    delay: 3000,
+                    disableOnInteraction: false,
                 }}
-                breakpoints={{
-                  1800: {
-                    slidesPerView: 4,
-                  },
-                  1440: {
-                    slidesPerView: 3,
-                  },
-                  1200: {
-                    slidesPerView: 2,
-                  },
-                  768: {
-                    slidesPerView: 1.8,
-                  },
+                pagination={{
+                    el: ".testimonial-pagination",
+                    clickable: true,
                 }}
-                className="testimonial__slider"
-                onSlideChange={handleSlideChange}
-                style={{ height: "auto" }}
-                autoHeight={false}
-              >
-                {testimonialData.items.map((item, index) => (
-                  <SwiperSlide key={item.id || index}>
-                    <div className="testimonial__slider-item">
-                      <div className="quote">
-                        <i className="icon-quote"></i>
-                      </div>
-                      <div className="content" style={{ flex: 1 }}>
-                        <q className="h4">{item.text}</q>
-                      </div>
-                      <hr />
-                      <div className="item__meta">
-                        <div className="meta__thumb">
-                          <ImageWithFallback
-                            src={getImageUrl(item.image)}
-                            alt={item.name}
-                            width={60}
-                            height={60}
-                            fallbackSrc="/images/testimonial/author-one.png"
-                          />
-                        </div>
-                        <div className="meta__content">
-                          <p className="h5">{item.name}</p>
-                          <p>{item.position}</p>
-                        </div>
-                      </div>
+                className="testimonial-two__slider"
+            >
+              {data.items.map((testimonial, index) => (
+                <SwiperSlide key={index}>
+                  <div className="testimonial-two__slider-item">
+                    <div className="quote">
+                        <i className="fa-solid fa-quote-right"></i>
                     </div>
-                  </SwiperSlide>
-                ))}
-
-                {/* Duplicate items to ensure enough slides for the loop */}
-                {testimonialData.items.map((item, index) => (
-                  <SwiperSlide key={`dup-${item.id || index}`}>
-                    <div className="testimonial__slider-item">
-                      <div className="quote">
-                        <i className="icon-quote"></i>
-                      </div>
-                      <div className="content" style={{ flex: 1 }}>
-                        <q className="h4">{item.text}</q>
-                      </div>
-                      <hr />
-                      <div className="item__meta">
-                        <div className="meta__thumb">
-                          <ImageWithFallback
-                            src={getImageUrl(item.image)}
-                            alt={item.name}
-                            width={60}
-                            height={60}
-                            fallbackSrc="/images/testimonial/author-one.png"
-                          />
+                    <div className="testimonial-content">
+                        <p className="text">
+                           {testimonial.text}
+                        </p>
+                        <div className="author-meta">
+                            <div className="author-thumb">
+                                <ImageWithFallback 
+                                    src={testimonial.image?.url || "/images/testimonial/author-one.png"} 
+                                    alt={testimonial.name} 
+                                    width={78} 
+                                    height={78} 
+                                />
+                            </div>
+                            <div className="author-info">
+                                <h5 className="author-name">{testimonial.name}</h5>
+                                <p className="author-position">{testimonial.position}</p>
+                            </div>
                         </div>
-                        <div className="meta__content">
-                          <p className="h5">{item.name}</p>
-                          <p>{item.position}</p>
-                        </div>
-                      </div>
                     </div>
-                  </SwiperSlide>
-                ))}
-              </Swiper>
-            </div>
+                  </div>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+            <div className="testimonial-pagination"></div>
           </div>
         </div>
       </div>
