@@ -217,14 +217,8 @@ const HeaderOne = ({ openNav, handleNav, setOpenNav }: HeaderProps) => {
                                 <h5 className="h5">Our Services</h5>
                               </div>
                               <div className="mega-menu__grid-container">
-                                <div className="mega-menu__single-item">
+                                <div className="mega-menu__single-item mega-menu__single-item--no-icon">
                                   <Link className="hide-nav" href="/services">
-                                    <Image
-                                      src="/images/services/slide-one.png"
-                                      alt="All services"
-                                      width={50}
-                                      height={50}
-                                    />
                                     <span>All Services</span>
                                   </Link>
                                 </div>
@@ -239,7 +233,11 @@ const HeaderOne = ({ openNav, handleNav, setOpenNav }: HeaderProps) => {
                                       )}`}
                                     >
                                       <Image
-                                        src={service?.image || "/images/services/slide-two.png"}
+                                        src={
+                                          typeof service.image === "object" && service.image?.url
+                                            ? service.image.url
+                                            : service.image || "/images/services/slide-two.png"
+                                        }
                                         alt={service?.title || "Service"}
                                         width={50}
                                         height={50}

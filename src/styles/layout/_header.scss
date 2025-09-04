@@ -267,6 +267,17 @@
     }
   }
 
+  .mega-menu__single-item--no-icon {
+    a {
+      padding-left: 20px;
+
+      span {
+        font-weight: 700;
+        color: #4569e7;
+      }
+    }
+  }
+
   .nav__menu-link--dropdown {
     position: relative;
 

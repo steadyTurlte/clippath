@@ -82,6 +82,12 @@ const AdminLayout = ({ children }) => {
                 <span>↳ Testimonials</span>
               </Link>
             </li>
+            <li className="admin-sidebar__menu-item admin-sidebar__submenu-item">
+              <Link href="/admin/services/faq" className={router.pathname.startsWith('/admin/services/faq') ? 'active' : ''}>
+                <i className="fa-solid fa-question-circle"></i>
+                <span>↳ FAQ</span>
+              </Link>
+            </li>
 
             <li className="admin-sidebar__menu-item">
               <Link href="/admin/portfolio" className={router.pathname.startsWith('/admin/portfolio') ? 'active' : ''}>

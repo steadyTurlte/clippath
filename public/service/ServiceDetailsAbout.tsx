@@ -12,12 +12,29 @@ interface ServiceDetailsAboutProps {
 }
 
 const ServiceDetailsAbout = ({ serviceData, serviceDetails }: ServiceDetailsAboutProps) => {
+  // Debug logging
+  console.log('ServiceDetailsAbout - serviceDetails:', serviceDetails);
+  console.log('ServiceDetailsAbout - hero data:', serviceDetails?.hero);
+  
   // Get before/after images from service details or use defaults
   const beforeImage = serviceDetails?.hero?.beforeImage?.url || "/images/services/before.png";
   const afterImage = serviceDetails?.hero?.afterImage?.url || "/images/services/after.png";
-  const heroTitle = serviceDetails?.hero?.title || serviceData?.title;
-  const heroSubtitle = serviceDetails?.hero?.subtitle || serviceData?.title;
-  const heroDescription = serviceDetails?.hero?.description || serviceData?.description;
+  
+  console.log('Before image:', beforeImage);
+  console.log('After image:', afterImage);
+  
+  // Use hero content from admin panel if available, otherwise fallback to service data
+  const heroTitle = (serviceDetails?.hero?.title && serviceDetails.hero.title.trim()) 
+    ? serviceDetails.hero.title 
+    : serviceData?.title || "Professional Photo Editing Service";
+    
+  const heroSubtitle = (serviceDetails?.hero?.subtitle && serviceDetails.hero.subtitle.trim()) 
+    ? serviceDetails.hero.subtitle 
+    : serviceData?.title || "Professional Service";
+    
+  const heroDescription = (serviceDetails?.hero?.description && serviceDetails.hero.description.trim()) 
+    ? serviceDetails.hero.description 
+    : serviceData?.description || "Professional photo editing services tailored to your specific needs.";
 
   return (
     <section className="section bg-white about-section service-de-thumb-alt">
@@ -56,7 +73,7 @@ const ServiceDetailsAbout = ({ serviceData, serviceDetails }: ServiceDetailsAbou
                 data-aos-duration="600"
                 data-aos-delay="100"
               >
-                {heroSubtitle || "Professional Service"}
+                {heroSubtitle}
               </p>
               <h2
                 className="h2 title "
@@ -64,7 +81,7 @@ const ServiceDetailsAbout = ({ serviceData, serviceDetails }: ServiceDetailsAbou
                 data-aos-duration="600"
                 data-aos-delay="100"
               >
-                {heroTitle || "Professional Photo Editing Service"}
+                {heroTitle}
               </h2>
               <div
                 className="paragraph "
@@ -73,7 +90,7 @@ const ServiceDetailsAbout = ({ serviceData, serviceDetails }: ServiceDetailsAbou
                 data-aos-delay="100"
               >
                 <p className="fw-5">
-                  {heroDescription || "Professional photo editing services tailored to your specific needs."}
+                  {heroDescription}
                 </p>
                 {serviceData?.price && (
                   <div className="service-price">

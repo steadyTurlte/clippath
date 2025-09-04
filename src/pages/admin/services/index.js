@@ -87,6 +87,16 @@ const AdminServices = () => {
             </div>
           </Link>
 
+          <Link href="/admin/services/faq" className="admin-services__section-card">
+            <div className="admin-services__section-card-icon">
+              <i className="fa-solid fa-question-circle"></i>
+            </div>
+            <div className="admin-services__section-card-content">
+              <h3 className="admin-services__section-card-title">FAQ</h3>
+              <p className="admin-services__section-card-description">Edit frequently asked questions</p>
+            </div>
+          </Link>
+
           <Link href="/admin/services/sponsors" className="admin-services__section-card">
             <div className="admin-services__section-card-icon">
               <i className="fa-solid fa-handshake"></i>

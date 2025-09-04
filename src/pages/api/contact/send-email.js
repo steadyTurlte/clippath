@@ -56,6 +56,10 @@ export default async function handler(req, res) {
     console.log('Message:', message);
     console.log('Admin Email:', adminEmail);
 
+    // Get email settings
+    const settings = await getData('settings') || {};
+    const emailSettings = settings.email || {};
+
     // Get email configuration from settings with fallback to environment variables
     const emailHost = emailSettings.emailHost || process.env.EMAIL_HOST || 'smtp.gmail.com';
     const emailPort = parseInt(emailSettings.emailPort || process.env.EMAIL_PORT || 587);

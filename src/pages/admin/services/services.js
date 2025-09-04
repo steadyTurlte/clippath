@@ -498,7 +498,7 @@ const ServicesItemsEditor = () => {
                   {/* Projects Section */}
                   <div className="admin-editor__subsection">
                     <h5 className="admin-editor__subsection-title">Projects</h5>
-                    {(service.details?.projects || []).map((project, projectIndex) => (
+                    {Array.isArray(service.details?.projects) ? service.details.projects.map((project, projectIndex) => (
                       <div key={projectIndex} className="admin-editor__project-item">
                         <h6>Project #{projectIndex + 1}</h6>
                         <div className="admin-editor__field">
@@ -528,7 +528,7 @@ const ServicesItemsEditor = () => {
                           Remove Project
                         </button>
                       </div>
-                    ))}
+                    )) : null}
                     <button
                       type="button"
                       className="admin-editor__add-button"

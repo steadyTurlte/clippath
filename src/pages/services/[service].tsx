@@ -39,12 +39,13 @@ const ServiceDetail = () => {
     const fetchInitialData = async () => {
       try {
         // Fetch settings, pricing, testimonials, sponsors, FAQ and contact data in parallel
-        const [settingsRes, pricingRes, aboutRes, contactRes, howItWorksRes] = await Promise.all([
+        const [settingsRes, pricingRes, aboutRes, contactRes, howItWorksRes, testimonialsRes] = await Promise.all([
           fetch("/api/content/settings"),
           fetch("/api/content/pricing"),
           fetch("/api/content/about"),
           fetch("/api/content/contact-info"),
           fetch("/api/content/how-it-works"),
+          fetch("/api/content/testimonials"),
         ]);
 
         if (settingsRes.ok) {
@@ -57,9 +58,13 @@ const ServiceDetail = () => {
 
         if (aboutRes.ok) {
           const aboutData = await aboutRes.json();
-          setTestimonialData(aboutData.testimonials);
           setSponsorData(aboutData.sponsors);
           setFaqData(aboutData.faq);
+        }
+
+        if (testimonialsRes.ok) {
+          const testimonialsData = await testimonialsRes.json();
+          setTestimonialData(Array.isArray(testimonialsData) ? testimonialsData : testimonialsData.items || []);
         }
 
         if (contactRes.ok) {
@@ -126,10 +131,42 @@ const ServiceDetail = () => {
   if (loading) {
     return (
       <Layout settings={settings}>
-        <div className="service-detail-skeleton">
-          <div className="skeleton-banner" />
-          <div className="skeleton-content" />
+        <div className="service-detail-loader">
+          <div className="loader-container">
+            <div className="loader-spinner"></div>
+            <p>Loading service details...</p>
+          </div>
         </div>
+        <style jsx>{`
+          .service-detail-loader {
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f8fafc;
+          }
+          .loader-container {
+            text-align: center;
+          }
+          .loader-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid #e2e8f0;
+            border-top: 4px solid #4569e7;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+          }
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+          .loader-container p {
+            color: #64748b;
+            font-size: 16px;
+            margin: 0;
+          }
+        `}</style>
       </Layout>
     );
   }
@@ -167,25 +204,19 @@ const ServiceDetail = () => {
       />
 
       {/* Pricing Section - Same as main page */}
-      {pricingData && (
-        <PricingMain data={pricingData} />
-      )}
+      <PricingMain data={pricingData || { main: { plans: [] } }} />
 
       {/* Client Testimonials Section - Common for all services */}
-      {testimonialData && (
-        <TestimonialSec data={testimonialData} />
-      )}
+      <TestimonialSec data={testimonialData || []} />
 
       {/* FAQ Section - Common for all services */}
-      {faqData && (
-        <ServiceFaq data={faqData} />
-      )}
+      <ServiceFaq data={faqData || { faqs: [] }} />
 
       {/* Contact Us Section - Functional contact form */}
       {contactInfo && (
         <ContactSec 
           contactInfo={contactInfo} 
-          mapData={{ embedUrl: contactInfo.googleMapUrl || "" }}
+          mapData={{ embedUrl: "" }}
           title="Contact Us"
           description="Ready to get started? Contact us today for a free quote and let us transform your images."
         />
