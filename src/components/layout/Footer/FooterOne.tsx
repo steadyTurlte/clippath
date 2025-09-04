@@ -116,22 +116,22 @@ const FooterOne = () => {
               <div className="footer__list">
                 <ul>
                   <li>
-                    <Link href="about-us">
+                    <Link href="/about-us">
                       <i className="fa-solid fa-angle-right"></i>About Us
                     </Link>
                   </li>
                   <li>
-                    <Link href="contact-us">
+                    <Link href="/contact-us">
                       <i className="fa-solid fa-angle-right"></i>Careers
                     </Link>
                   </li>
                   <li>
-                    <Link href="blog">
+                    <Link href="/blog">
                       <i className="fa-solid fa-angle-right"></i>News & Blog
                     </Link>
                   </li>
                   <li>
-                    <Link href="contact-us">
+                    <Link href="/contact-us">
                       <i className="fa-solid fa-angle-right"></i>Contact Us
                     </Link>
                   </li>
@@ -193,23 +193,23 @@ const FooterOne = () => {
                   <div className="footer__nav">
                     <ul>
                       <li>
-                        <Link href="about-us">
+                        <Link href="/about-us">
                           <i className="fa-solid fa-angle-right"></i>Terms &
                           Conditions
                         </Link>
                       </li>
                       <li>
-                        <Link href="contact-us">
+                        <Link href="/contact-us">
                           <i className="fa-solid fa-angle-right"></i>Free Trial
                         </Link>
                       </li>
                       <li>
-                        <Link href="pricing">
+                        <Link href="/pricing">
                           <i className="fa-solid fa-angle-right"></i>Payment
                         </Link>
                       </li>
                       <li>
-                        <Link href="contact-us">
+                        <Link href="/contact-us">
                           <i className="fa-solid fa-angle-right"></i>Contact Us
                         </Link>
                       </li>
