@@ -1,0 +1,11 @@
+<Layout header={1} footer={1}>
+      <CmnBanner title="Service Details" />
+      <ServiceDetailsAbout />
+      <WorkSec />
+      <ServiceProject />
+      <ServicePricing />
+      <TestimonialTwo />
+      <ServiceFaq />
+      <Trial />
+      <SponsorSlider />
+    </Layout>

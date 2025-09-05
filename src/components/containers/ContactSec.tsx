@@ -24,9 +24,11 @@ interface MapData {
 interface ContactSecProps {
   contactInfo: ContactInfo;
   mapData: MapData;
+  title?: string;
+  description?: string;
 }
 
-const ContactSec = ({ contactInfo, mapData }: ContactSecProps) => {
+const ContactSec = ({ contactInfo, mapData, title, description }: ContactSecProps) => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -135,8 +137,8 @@ const ContactSec = ({ contactInfo, mapData }: ContactSecProps) => {
   const email = contactInfo.email;
   const mapUrl = contactInfo.googleMapUrl;
 
-  const contactTitle = "Have something in mind? Let's talk.";
-  const contactDescription =
+  const contactTitle = title || "Contact Us";
+  const contactDescription = description ||
     "We're here to answer any questions you may have about our services. Reach out to us and we'll respond as soon as we can.";
   const contactImage = Arrow;
 

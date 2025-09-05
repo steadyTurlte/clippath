@@ -1,0 +1,133 @@
+ <li className="nav__menu-item nav__menu-item--dropdown">
+                        <button
+                          aria-label="dropdown menu container"
+                          className={`nav__menu-link nav__menu-link--dropdown ${isSubMenuButton(
+                            "services"
+                          )}`}
+                          onClick={() => handleSubmenu("services")}
+                        >
+                          Services
+                        </button>
+                        <div
+                          className={`nav__dropdown mega-menu ${isSubMenuOpen(
+                            "services"
+                          )}`}
+                        >
+                          <div className="mega-menu__inner">
+                            <div className="mega-menu__single">
+                              <div className="mega-menu__single-head">
+                                <h5 className="h5">Main Services</h5>
+                              </div>
+                              <div className="mega-menu__single-item">
+                                <Link href="service-details">
+                                  <Image priority src={sOne} alt="Services" />
+                                  <span>Clipping path services</span>
+                                </Link>
+                              </div>
+                              <div className="mega-menu__single-item">
+                                <Link href="service-details">
+                                  <Image priority src={sTwo} alt="Services" />
+                                  <span>product color schem</span>
+                                </Link>
+                              </div>
+                              <div className="mega-menu__single-item">
+                                <Link href="service-details">
+                                  <Image priority src={sThree} alt="Services" />
+                                  <span>photo retouch</span>
+                                </Link>
+                              </div>
+                              <div className="mega-menu__single-item">
+                                <Link href="service-details">
+                                  <Image priority src={sFour} alt="Services" />
+                                  <span>Clipping path services</span>
+                                </Link>
+                              </div>
+                              <div className="mega-menu__single-item">
+                                <Link href="service-details">
+                                  <Image priority src={sFive} alt="Services" />
+                                  <span>photo colorize</span>
+                                </Link>
+                              </div>
+                              <div className="mega-menu__single-item">
+                                <Link href="service-details">
+                                  <Image priority src={sSix} alt="Services" />
+                                  <span>Clipping path services</span>
+                                </Link>
+                              </div>
+                            </div>
+                            <div className="mega-menu__single mega-menu__single-img">
+                              <div className="mega-menu__single-head">
+                                <h5 className="h5">Photo editing</h5>
+                              </div>
+                              <div className="mega-menu__single-item">
+                                <Link href="service-details">
+                                  <Image
+                                    priority
+                                    src={iconone}
+                                    alt="Services"
+                                  />
+                                  <span>convert any format</span>
+                                </Link>
+                              </div>
+                              <div className="mega-menu__single-item">
+                                <Link href="service-details">
+                                  <Image
+                                    priority
+                                    src={icontwo}
+                                    alt="Services"
+                                  />
+                                  <span>photo enlarge</span>
+                                </Link>
+                              </div>
+                              <div className="mega-menu__single-item">
+                                <Link href="service-details">
+                                  <Image
+                                    priority
+                                    src={iconthree}
+                                    alt="Services"
+                                  />
+                                  <span>image compress</span>
+                                </Link>
+                              </div>
+                              <div className="mega-menu__single-item">
+                                <Link href="service-details">
+                                  <Image
+                                    priority
+                                    src={iconfour}
+                                    alt="Services"
+                                  />
+                                  <span>image crop</span>
+                                </Link>
+                              </div>
+                              <div className="mega-menu__single-item">
+                                <Link href="service-details">
+                                  <Image
+                                    priority
+                                    src={iconfive}
+                                    alt="Services"
+                                  />
+                                  <span>Special tools</span>
+                                </Link>
+                              </div>
+                            </div>
+                            <div className="mega-menu__single mega-menu__single--alt">
+                              <div className="rangu">
+                                <ReactCompareSlider
+                                  itemOne={
+                                    <ReactCompareSliderImage
+                                      src="/images/services/before.png"
+                                      alt="Image one"
+                                    />
+                                  }
+                                  itemTwo={
+                                    <ReactCompareSliderImage
+                                      src="/images/services/after.png"
+                                      alt="Image two"
+                                    />
+                                  }
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </li>

@@ -191,7 +191,7 @@ const HeaderOne = ({ openNav, handleNav, setOpenNav }: HeaderProps) => {
                       <li className="nav__menu-item">
                         <Link
                           className="nav__menu-link hide-nav"
-                          href="about-us"
+                          href="/about-us"
                         >
                           About Us
                         </Link>
@@ -206,34 +206,50 @@ const HeaderOne = ({ openNav, handleNav, setOpenNav }: HeaderProps) => {
                         >
                           Services
                         </button>
-                        <ul
-                          className={`nav__dropdown ${isSubMenuOpen(
+                        <div
+                          className={`nav__dropdown mega-menu ${isSubMenuOpen(
                             "services"
                           )}`}
                         >
-                          <li>
-                            <Link
-                              className="nav__dropdown-item hide-nav"
-                              href="/services"
-                            >
-                              All Services
-                            </Link>
-                          </li>
-                          {services.map((service) => (
-                            <li key={service.id}>
-                              <Link
-                                className="nav__dropdown-item hide-nav"
-                                href={`/services/${encodeURIComponent(
-                                  service.title
-                                    .toLowerCase()
-                                    .replace(/\s+/g, "-")
-                                )}`}
-                              >
-                                {service.title}
-                              </Link>
-                            </li>
-                          ))}
-                        </ul>
+                          <div className="mega-menu__inner">
+                            <div className="mega-menu__single mega-menu__services-grid">
+                              <div className="mega-menu__single-head">
+                                <h5 className="h5">Our Services</h5>
+                              </div>
+                              <div className="mega-menu__grid-container">
+                                <div className="mega-menu__single-item mega-menu__single-item--no-icon">
+                                  <Link className="hide-nav" href="/services">
+                                    <span>All Services</span>
+                                  </Link>
+                                </div>
+                                {services.map((service) => (
+                                  <div className="mega-menu__single-item" key={service.id}>
+                                    <Link
+                                      className="hide-nav"
+                                      href={`/services/${encodeURIComponent(
+                                        (service?.title || "")
+                                          .toLowerCase()
+                                          .replace(/\s+/g, "-")
+                                      )}`}
+                                    >
+                                      <Image
+                                        src={
+                                          typeof service.image === "object" && service.image?.url
+                                            ? service.image.url
+                                            : service.image || "/images/services/slide-two.png"
+                                        }
+                                        alt={service?.title || "Service"}
+                                        width={50}
+                                        height={50}
+                                      />
+                                      <span>{service?.title}</span>
+                                    </Link>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                       </li>
                       <li className="nav__menu-item nav__menu-item--dropdown">
                         <button
@@ -251,7 +267,7 @@ const HeaderOne = ({ openNav, handleNav, setOpenNav }: HeaderProps) => {
                           <li>
                             <Link
                               className="nav__dropdown-item hide-nav"
-                              href="portfolio"
+                              href="/portfolio"
                             >
                               Portfolio
                             </Link>
@@ -259,7 +275,7 @@ const HeaderOne = ({ openNav, handleNav, setOpenNav }: HeaderProps) => {
                           <li>
                             <Link
                               className="nav__dropdown-item hide-nav"
-                              href="pricing"
+                              href="/pricing"
                             >
                               Pricing
                             </Link>
@@ -267,7 +283,7 @@ const HeaderOne = ({ openNav, handleNav, setOpenNav }: HeaderProps) => {
                           <li>
                             <Link
                               className="nav__dropdown-item hide-nav"
-                              href="teams"
+                              href="/teams"
                             >
                               Our Teams
                             </Link>
@@ -275,7 +291,7 @@ const HeaderOne = ({ openNav, handleNav, setOpenNav }: HeaderProps) => {
                           <li>
                             <Link
                               className="nav__dropdown-item hide-nav"
-                              href="get-quote"
+                              href="/get-quote"
                             >
                               Get A Quote
                             </Link>
@@ -298,7 +314,7 @@ const HeaderOne = ({ openNav, handleNav, setOpenNav }: HeaderProps) => {
                           <li>
                             <Link
                               className="nav__dropdown-item hide-nav"
-                              href="blog"
+                              href="/blog"
                             >
                               Blog
                             </Link>
@@ -306,7 +322,7 @@ const HeaderOne = ({ openNav, handleNav, setOpenNav }: HeaderProps) => {
                           <li>
                             <Link
                               className="nav__dropdown-item hide-nav"
-                              href="blog-single"
+                              href="/blog-single"
                             >
                               Blog Single
                             </Link>
@@ -316,13 +332,13 @@ const HeaderOne = ({ openNav, handleNav, setOpenNav }: HeaderProps) => {
                       <li className="nav__menu-item">
                         <Link
                           className="nav__menu-link hide-nav"
-                          href="contact-us"
+                          href="/contact-us"
                         >
                           Contact
                         </Link>
                       </li>
                       <li className="nav__menu-item d-block d-md-none">
-                        <Link href="get-quote" className="btn btn--secondary">
+                        <Link href="/get-quote" className="btn btn--secondary">
                           Free Trial
                         </Link>
                       </li>
