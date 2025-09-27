@@ -541,6 +541,18 @@ const ServicesItemsEditor = () => {
               )}
             </div>
           ))}
+
+          {/* Add New Service Button */}
+          <div className="admin-editor__add-service-section">
+            <button
+              type="button"
+              className="admin-editor__add-service-button"
+              onClick={handleAddService}
+            >
+              <i className="fa-solid fa-plus"></i>
+              Add New Service
+            </button>
+          </div>
         </div>
       </div>
 
@@ -870,6 +882,38 @@ const ServicesItemsEditor = () => {
             border: 1px dashed #cbd5e1;
             border-radius: 8px;
             margin-bottom: 16px;
+        }
+
+        .admin-editor__add-service-section {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .admin-editor__add-service-button {
+            padding: 12px 24px;
+            background-color: #10b981;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .admin-editor__add-service-button:hover {
+            background-color: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .admin-editor__add-service-button i {
+            font-size: 18px;
         }
 
         @media (max-width: 768px) {

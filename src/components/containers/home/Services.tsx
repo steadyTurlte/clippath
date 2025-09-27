@@ -131,7 +131,7 @@ const Services = ({ data }: ServicesProps) => {
           speed={1200}
           loop={true}
           roundLengths={true}
-          centeredSlides={true}
+          centeredSlides={false}
           modules={[Autoplay, Pagination]}
           pagination={{
             el: ".services-pagination",
