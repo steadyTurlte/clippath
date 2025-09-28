@@ -50,7 +50,7 @@ const CTA = ({ data }: CTAProps) => {
                       <p>{ctaData.description}</p>
                     </div>
                     <div className="cta__group ">
-                      <Link href="/get-quote" className="btn btn--secondary">
+                      <Link href="/get-quote" className="btn btn--secondary text-dark">
                         Free Trial<i className="fa-solid fa-paper-plane"></i>
                       </Link>
                     </div>
