@@ -6,7 +6,7 @@ import {
   ReactCompareSlider,
   ReactCompareSliderImage,
 } from "react-compare-slider";
-import Logo from "public/images/logo.png";
+import Logo from "public/images/logo/new-logo.png";
 
 interface HeaderProps {
   openNav: boolean;
@@ -154,7 +154,7 @@ const HeaderOne = ({ openNav, handleNav, setOpenNav }: HeaderProps) => {
                 <div className="nav__content">
                   <div className="nav__logo">
                     <Link href="/">
-                      <Image priority src={logoSrc} alt="Logo" />
+                      <Image priority src={logoSrc} alt="Logo" width={180} />
                     </Link>
                     <button
                       aria-label="open sidebar"

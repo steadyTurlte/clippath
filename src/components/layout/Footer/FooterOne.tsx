@@ -1,7 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import LogoLight from "public/images/logo-light.png";
+import LogoLight from "public/images/logo/new-logo.png";
 import { useEffect, useState } from "react";
 
 const FooterOne = () => {
@@ -39,7 +39,7 @@ const FooterOne = () => {
             <div className="footer__single ">
               <div className="logo">
                 <Link href="/">
-                  <Image src={LogoLight} alt="Image" />
+                  <Image src={LogoLight} alt="Image" width={200} />
                 </Link>
               </div>
               <div className="content">
