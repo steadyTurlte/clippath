@@ -83,33 +83,47 @@ const ServiceProject = ({ serviceData, projectsData }: ServiceProjectProps) => {
                 }}
                 className="project-three__slider"
               >
-                {projects.map((project: any, index: number) => (
-                  <SwiperSlide key={project.id || index}>
-                    <div className="project-three__slider-item">
-                      <Image 
-                        src={project.image || "/images/project-one.png"} 
-                        alt={project.title || "Project"} 
-                        width={400}
-                        height={300}
-                        style={{ objectFit: "cover" }}
-                      />
-                    </div>
-                  </SwiperSlide>
-                ))}
+                {projects.map((project: any, index: number) => {
+                  // Handle both string and object formats for image
+                  const imageUrl = typeof project.image === 'object' && project.image?.url 
+                    ? project.image.url 
+                    : (project.image || "/images/project-one.png");
+                  
+                  return (
+                    <SwiperSlide key={project.id || index}>
+                      <div className="project-three__slider-item">
+                        <Image 
+                          src={imageUrl} 
+                          alt={project.title || "Project"} 
+                          width={400}
+                          height={300}
+                          style={{ objectFit: "cover" }}
+                        />
+                      </div>
+                    </SwiperSlide>
+                  );
+                })}
                 {/* Add duplicates for loop effect if we have less than 6 items */}
-                {projects.length < 6 && projects.map((project: any, index: number) => (
-                  <SwiperSlide key={`duplicate-${project.id || index}`}>
-                    <div className="project-three__slider-item">
-                      <Image 
-                        src={project.image || "/images/project-one.png"} 
-                        alt={project.title || "Project"} 
-                        width={400}
-                        height={300}
-                        style={{ objectFit: "cover" }}
-                      />
-                    </div>
-                  </SwiperSlide>
-                ))}
+                {projects.length < 6 && projects.map((project: any, index: number) => {
+                  // Handle both string and object formats for image
+                  const imageUrl = typeof project.image === 'object' && project.image?.url 
+                    ? project.image.url 
+                    : (project.image || "/images/project-one.png");
+                  
+                  return (
+                    <SwiperSlide key={`duplicate-${project.id || index}`}>
+                      <div className="project-three__slider-item">
+                        <Image 
+                          src={imageUrl} 
+                          alt={project.title || "Project"} 
+                          width={400}
+                          height={300}
+                          style={{ objectFit: "cover" }}
+                        />
+                      </div>
+                    </SwiperSlide>
+                  );
+                })}
               </Swiper>
             </div>
           </div>

@@ -205,7 +205,11 @@ const defaultServicesData = {
     ],
   },
   // Per-service detail content keyed by slug
-  details: {}
+  details: {},
+  // Service details page banner (applies to all service detail pages)
+  detailsBanner: {
+    image: ""
+  }
 };
 
 export default async function handler(req, res) {
@@ -218,6 +222,14 @@ export default async function handler(req, res) {
         data = { ...defaultServicesData };
       }
       if (section) {
+        // Handle service details banner
+        if (section === "detailsBanner") {
+          if (!data.detailsBanner && defaultServicesData.detailsBanner) {
+            data.detailsBanner = defaultServicesData.detailsBanner;
+            await saveData("services", data);
+          }
+          return res.status(200).json(data.detailsBanner || defaultServicesData.detailsBanner);
+        }
         // Handle dynamic service details
         if (section === "details") {
           const key = typeof slug === 'string' ? slug : '';
@@ -261,6 +273,17 @@ export default async function handler(req, res) {
       const updatedData = req.body;
       let data = (await getData("services")) || {};
       if (section) {
+        if (section === "detailsBanner") {
+          data = {
+            ...data,
+            detailsBanner: updatedData,
+          };
+          const success = await saveData("services", data);
+          if (!success) {
+            return res.status(500).json({ message: "Failed to save service details banner" });
+          }
+          return res.status(200).json({ message: "Service details banner updated successfully", data: data.detailsBanner });
+        }
         if (section === "details") {
           const key = typeof slug === 'string' ? slug : '';
           if (!key) {

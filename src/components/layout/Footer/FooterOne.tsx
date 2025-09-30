@@ -5,7 +5,7 @@ import LogoLight from "public/images/logo/new-logo.png";
 import { useEffect, useState } from "react";
 
 const FooterOne = () => {
-  const [contactInfo, setContactInfo] = useState({
+  const [contactInfo, setContactInfo] = useState<any>({
     email: "info@photodit.com",
     phone: "+1 (732) 798-0976",
     address: "785 15h Street, Office 478 Berlin",
@@ -16,6 +16,7 @@ const FooterOne = () => {
       instagram: "https://instagram.com",
       linkedin: "https://linkedin.com",
       youtube: "https://youtube.com",
+      whatsapp: "",
     },
   });
 
@@ -101,6 +102,17 @@ const FooterOne = () => {
                       target="_blank"
                     >
                       <i className="fa-brands fa-linkedin-in"></i>
+                    </Link>
+                  </li>
+                )}
+                {contactInfo.socialLinks?.whatsapp && (
+                  <li>
+                    <Link
+                      href={`https://wa.me/${contactInfo.socialLinks.whatsapp.replace(/[^0-9]/g, '')}`}
+                      aria-label="WhatsApp"
+                      target="_blank"
+                    >
+                      <i className="fa-brands fa-whatsapp"></i>
                     </Link>
                   </li>
                 )}

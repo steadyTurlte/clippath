@@ -34,11 +34,11 @@ const ServicesItemsEditor = () => {
           const initialServices = [];
           const initialPublicIds = [];
 
-          data.forEach(service => {
-            // Ensure service has proper structure
-            const serviceWithDefaults = {
-              ...service,
-              details: {
+          // Fetch details for each service
+          const servicesWithDetails = await Promise.all(
+            data.map(async (service) => {
+              const slug = slugify(service.title);
+              let serviceDetails = {
                 hero: {
                   title: '',
                   subtitle: '',
@@ -46,20 +46,47 @@ const ServicesItemsEditor = () => {
                   beforeImage: { url: '', publicId: '' },
                   afterImage: { url: '', publicId: '' }
                 },
-                projects: [],
-                ...service.details
-              }
-            };
+                projects: []
+              };
 
+              // Fetch service details from the API
+              if (slug) {
+                try {
+                  const detailsResponse = await fetch(`/api/content/services?section=details&slug=${encodeURIComponent(slug)}`);
+                  if (detailsResponse.ok) {
+                    const detailsData = await detailsResponse.json();
+                    if (detailsData) {
+                      serviceDetails = {
+                        hero: {
+                          ...serviceDetails.hero,
+                          ...detailsData.hero
+                        },
+                        projects: Array.isArray(detailsData.projects) ? detailsData.projects : []
+                      };
+                    }
+                  }
+                } catch (err) {
+                  console.error(`Error fetching details for ${service.title}:`, err);
+                }
+              }
+
+              return {
+                ...service,
+                details: serviceDetails
+              };
+            })
+          );
+
+          servicesWithDetails.forEach(service => {
             if (service.image && typeof service.image === 'object') {
               initialServices.push({
-                ...serviceWithDefaults,
+                ...service,
                 image: service.image.url || ''
               });
               initialPublicIds.push(service.image.publicId || '');
             } else {
               initialServices.push({
-                ...serviceWithDefaults,
+                ...service,
                 image: service.image || ''
               });
               initialPublicIds.push('');
@@ -189,7 +216,12 @@ const ServicesItemsEditor = () => {
       updatedServices[serviceIndex].details = {};
     }
 
-    const currentProjects = updatedServices[serviceIndex].details.projects || [];
+    // Ensure projects is always an array
+    let currentProjects = updatedServices[serviceIndex].details.projects;
+    if (!Array.isArray(currentProjects)) {
+      currentProjects = [];
+    }
+
     const newProjects = [...currentProjects, { title: '', image: { url: '', publicId: '' } }];
 
     updatedServices[serviceIndex].details.projects = newProjects;
@@ -238,9 +270,12 @@ const ServicesItemsEditor = () => {
           serviceData.image = '';
         }
 
-        return serviceData;
+        // Remove details from main service data as they're saved separately
+        const { details, ...mainServiceData } = serviceData;
+        return mainServiceData;
       });
 
+      // Save main services data
       const response = await fetch('/api/content/services?section=services', {
         method: 'PUT',
         headers: {
@@ -249,12 +284,29 @@ const ServicesItemsEditor = () => {
         body: JSON.stringify(dataToSave)
       });
 
-      if (response.ok) {
-        toast.success("Services section saved successfully!");
-      } else {
-        setError('Failed to save Services section');
-        toast.error('Failed to save Services section');
+      if (!response.ok) {
+        throw new Error('Failed to save services');
       }
+
+      // Save service details for each service
+      const detailsSavePromises = servicesData.map(async (service) => {
+        const slug = slugify(service.title);
+        if (service.details && slug) {
+          const detailsResponse = await fetch(`/api/content/services?section=details&slug=${encodeURIComponent(slug)}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(service.details)
+          });
+          return detailsResponse.ok;
+        }
+        return true;
+      });
+
+      await Promise.all(detailsSavePromises);
+
+      toast.success("Services and details saved successfully!");
     } catch (error) {
       console.error('Error saving services data:', error);
       setError('Failed to save Services section');

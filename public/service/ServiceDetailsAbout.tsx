@@ -1,6 +1,8 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import {
   ReactCompareSlider,
   ReactCompareSliderImage,
@@ -84,14 +86,16 @@ const ServiceDetailsAbout = ({ serviceData, serviceDetails }: ServiceDetailsAbou
                 {heroTitle}
               </h2>
               <div
-                className="paragraph "
+                className="paragraph service-description-content"
                 data-aos="fade-up"
                 data-aos-duration="600"
                 data-aos-delay="100"
               >
-                <p className="fw-5">
-                  {heroDescription}
-                </p>
+                <div className="fw-5 rich-text-content">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {heroDescription}
+                  </ReactMarkdown>
+                </div>
                 {serviceData?.price && (
                   <div className="service-price">
                     <span className="price-label">Starting from: </span>
@@ -99,6 +103,65 @@ const ServiceDetailsAbout = ({ serviceData, serviceDetails }: ServiceDetailsAbou
                   </div>
                 )}
               </div>
+              <style jsx global>{`
+                .service-description-content .rich-text-content {
+                  text-transform: none !important;
+                }
+                .service-description-content .rich-text-content h1,
+                .service-description-content .rich-text-content h2,
+                .service-description-content .rich-text-content h3,
+                .service-description-content .rich-text-content h4,
+                .service-description-content .rich-text-content h5,
+                .service-description-content .rich-text-content h6 {
+                  margin-top: 1.5rem;
+                  margin-bottom: 0.75rem;
+                  font-weight: 600;
+                }
+                .service-description-content .rich-text-content p {
+                  margin-bottom: 1rem;
+                  text-transform: none;
+                }
+                .service-description-content .rich-text-content ul,
+                .service-description-content .rich-text-content ol {
+                  margin-left: 1.5rem;
+                  margin-bottom: 1rem;
+                }
+                .service-description-content .rich-text-content li {
+                  margin-bottom: 0.5rem;
+                  text-transform: none;
+                }
+                .service-description-content .rich-text-content strong {
+                  font-weight: 700;
+                }
+                .service-description-content .rich-text-content em {
+                  font-style: italic;
+                }
+                .service-description-content .rich-text-content blockquote {
+                  border-left: 4px solid #4569e7;
+                  padding-left: 1rem;
+                  margin: 1rem 0;
+                  font-style: italic;
+                  color: #555;
+                }
+                .service-description-content .rich-text-content code {
+                  background-color: #f4f4f4;
+                  padding: 0.2rem 0.4rem;
+                  border-radius: 3px;
+                  font-family: monospace;
+                  font-size: 0.9em;
+                }
+                .service-description-content .rich-text-content pre {
+                  background-color: #f4f4f4;
+                  padding: 1rem;
+                  border-radius: 5px;
+                  overflow-x: auto;
+                  margin: 1rem 0;
+                }
+                .service-description-content .rich-text-content pre code {
+                  background-color: transparent;
+                  padding: 0;
+                }
+              `}</style>
               <div className="cta__group justify-content-start">
                 <Link href="/get-quote" className="btn btn--primary">
                   Get Started
