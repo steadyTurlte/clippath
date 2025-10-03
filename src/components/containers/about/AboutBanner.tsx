@@ -38,18 +38,17 @@ const AboutBanner = ({ data }: AboutBannerProps) => {
 
   return (
     <>
-      {/* Banner Image Section - Only if image exists */}
+      {/* Full Width Banner Image at Top */}
       {bannerData.image && (
         <section 
-          className="about-banner-image" 
           style={{
+            width: '100%',
+            height: '400px',
             backgroundImage: `url(${bannerData.image})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
-            height: '450px',
-            position: 'relative',
-            width: '100%'
+            position: 'relative'
           }}
         >
           <div style={{
@@ -63,63 +62,27 @@ const AboutBanner = ({ data }: AboutBannerProps) => {
         </section>
       )}
 
-      {/* Title and Breadcrumbs Section - Completely separate below banner */}
-      <section className="about-banner-content section" style={{
-        paddingTop: '80px',
-        paddingBottom: '80px',
-        backgroundColor: '#ffffff'
-      }}>
+      {/* Text Content Section Below Banner */}
+      <section style={{ padding: '80px 0', backgroundColor: '#f8f9fa' }}>
         <div className="container">
-          <div className="row align-items-center">
-            <div className="col-12 col-lg-7">
+          <div className="row">
+            <div className="col-12">
               <h1
-                className="h1 title"
                 data-aos="fade-up"
                 data-aos-duration="600"
-                data-aos-delay="100"
-                style={{ 
-                  marginBottom: '20px'
+                style={{
+                  fontSize: '2.5rem',
+                  fontWeight: '700',
+                  color: '#1e293b',
+                  textAlign: 'center',
+                  margin: '0',
+                  padding: '0 20px'
                 }}
               >
                 {bannerData.title}
               </h1>
             </div>
-            <div className="col-12 col-lg-5">
-              <nav aria-label="breadcrumb">
-                <ol
-                  className="breadcrumb justify-content-lg-end"
-                  data-aos="fade-up"
-                  data-aos-duration="600"
-                  data-aos-delay="150"
-                >
-                  {bannerData.breadcrumbs.map((breadcrumb, index) => (
-                    index === bannerData.breadcrumbs.length - 1 ? (
-                      <li
-                        key={index}
-                        className="breadcrumb-item active"
-                        aria-current="page"
-                      >
-                        {breadcrumb.text}
-                      </li>
-                    ) : (
-                      <li key={index} className="breadcrumb-item">
-                        <Link href={breadcrumb.link}>
-                          {breadcrumb.text}
-                        </Link>
-                      </li>
-                    )
-                  ))}
-                </ol>
-              </nav>
-            </div>
           </div>
-        </div>
-        <div className="left-triangle">
-          <div className="triangle"></div>
-        </div>
-        <div className="right-triangle">
-          <div className="triangle"></div>
-          <div className="right-alt"></div>
         </div>
       </section>
     </>

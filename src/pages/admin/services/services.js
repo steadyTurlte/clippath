@@ -15,9 +15,10 @@ const ServicesItemsEditor = () => {
   const [expandedService, setExpandedService] = useState(null);
 
   const slugify = (text = '') =>
-    text
+    (text || '')
       .toLowerCase()
       .trim()
+      .replace(/&/g, 'and') // Replace & with "and" before removing other special chars
       .replace(/[^a-z0-9\s-]/g, '')
       .replace(/\s+/g, '-')
       .replace(/-+/g, '-');
@@ -205,7 +206,12 @@ const ServicesItemsEditor = () => {
       ...newProjects[projectIndex],
       [field]: value
     };
-    handleDetailChange(serviceIndex, 'projects', 'projects', newProjects);
+    // Update projects directly without using handleDetailChange
+    updatedServices[serviceIndex].details = {
+      ...updatedServices[serviceIndex].details,
+      projects: newProjects
+    };
+    setServicesData(updatedServices);
   };
 
   const addProject = (serviceIndex) => {
@@ -231,14 +237,24 @@ const ServicesItemsEditor = () => {
   const removeProject = (serviceIndex, projectIndex) => {
     const updatedServices = [...servicesData];
     const newProjects = updatedServices[serviceIndex].details.projects.filter((_, i) => i !== projectIndex);
-    handleDetailChange(serviceIndex, 'projects', 'projects', newProjects);
+    // Update projects directly without using handleDetailChange
+    updatedServices[serviceIndex].details = {
+      ...updatedServices[serviceIndex].details,
+      projects: newProjects
+    };
+    setServicesData(updatedServices);
   };
 
   const handleProjectImageUpload = (serviceIndex, projectIndex, url, publicId) => {
     const updatedServices = [...servicesData];
     const newProjects = [...updatedServices[serviceIndex].details.projects];
     newProjects[projectIndex].image = { url, publicId };
-    handleDetailChange(serviceIndex, 'projects', 'projects', newProjects);
+    // Update projects directly without using handleDetailChange
+    updatedServices[serviceIndex].details = {
+      ...updatedServices[serviceIndex].details,
+      projects: newProjects
+    };
+    setServicesData(updatedServices);
   };
 
   const handleHeroImageUpload = (serviceIndex, imageType, url, publicId) => {
@@ -480,14 +496,20 @@ const ServicesItemsEditor = () => {
                 <button
                   type="button"
                   className="admin-editor__add-button"
-                  onClick={() => setExpandedService(expandedService === index ? null : index)}
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent event bubbling
+                    setExpandedService(expandedService === index ? null : index);
+                  }}
                 >
                   {expandedService === index ? 'Hide Details' : 'Show Details'}
                 </button>
               </div>
 
               {expandedService === index && (
-                <div className="admin-editor__service-details">
+                <div
+                  className="admin-editor__service-details"
+                  onClick={(e) => e.stopPropagation()} // Prevent event bubbling
+                >
                   <h4 className="admin-editor__section-title">Service Details</h4>
 
                   {/* Hero Section */}
