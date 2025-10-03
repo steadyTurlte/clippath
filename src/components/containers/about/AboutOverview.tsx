@@ -13,6 +13,9 @@ interface AboutOverviewProps {
 }
 
 const AboutOverview = ({ data }: AboutOverviewProps) => {
+  // Return null if no data
+  if (!data) return null;
+
   // Helper function to extract image URL from various formats
   const getImageUrl = (imageData: any, fallback: any) => {
     if (!imageData) return fallback;
@@ -34,57 +37,65 @@ const AboutOverview = ({ data }: AboutOverviewProps) => {
     ...data,
     images: data.images || [],
   };
+
+  const image1 = getImageUrl(overviewData.images[0], One);
+  const image2 = getImageUrl(overviewData.images[1], Two);
+
   return (
-    <section className="about-overview section pt-0">
+    <section className="about-overview section">
       <div className="container">
-        <div className="row gaper">
-          <div className="col-12 col-lg-6">
-            <h2
-              className="h2 title "
-              data-aos="fade-up"
-              data-aos-duration="600"
-              data-aos-delay="100"
-            >
-              {overviewData.title}
-            </h2>
+        <div className="row align-items-center">
+          {/* Images Column */}
+          <div className="col-lg-6 mb-4 mb-lg-0">
+            <div className="overview-images">
+              <div className="row g-3">
+                <div className="col-6">
+                  <ImageWithFallback
+                    src={image1}
+                    alt="Overview Image 1"
+                    width={300}
+                    height={400}
+                    className="img-fluid rounded shadow-sm"
+                    fallbackSrc={typeof One === 'string' ? One : One.src}
+                  />
+                </div>
+                <div className="col-6">
+                  <ImageWithFallback
+                    src={image2}
+                    alt="Overview Image 2"
+                    width={300}
+                    height={400}
+                    className="img-fluid rounded shadow-sm"
+                    fallbackSrc={typeof Two === 'string' ? Two : Two.src}
+                  />
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="col-12 col-lg-6">
-            <div
-              className="paragraph "
-              data-aos="fade-up"
-              data-aos-duration="600"
-              data-aos-delay="100"
-            >
-              <p>{overviewData.description}</p>
-              <p className="h6">Our Mission</p>
-              <p>{overviewData.mission}</p>
+
+          {/* Content Column */}
+          <div className="col-lg-6">
+            <div className="overview-content ps-lg-4">
+              {overviewData.title && (
+                <h2 className="title mb-4">{overviewData.title}</h2>
+              )}
+              
+              {overviewData.description && (
+                <p className="mb-4">
+                  {overviewData.description}
+                </p>
+              )}
+
+              {overviewData.mission && (
+                <div className="mission-statement mt-4">
+                  <h4 className="sub-title mb-3">Our Mission</h4>
+                  <p>{overviewData.mission}</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
-      <style jsx>{`
-        .about-overview {
-          color: #fff;
-        }
-        .about-overview .title,
-        .about-overview .h2,
-        .about-overview .h6 {
-          color: #fff;
-          text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7),
-            0 1px 3px rgba(0, 0, 0, 0.9), 1px 1px 0 rgba(0, 0, 0, 0.8),
-            -1px -1px 0 rgba(0, 0, 0, 0.8), 1px -1px 0 rgba(0, 0, 0, 0.8),
-            -1px 1px 0 rgba(0, 0, 0, 0.8);
-          font-weight: 600;
-        }
-        .about-overview .paragraph p {
-          color: #fff;
-          text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8),
-            0 1px 2px rgba(0, 0, 0, 0.9), 1px 1px 0 rgba(0, 0, 0, 0.7),
-            -1px -1px 0 rgba(0, 0, 0, 0.7), 1px -1px 0 rgba(0, 0, 0, 0.7),
-            -1px 1px 0 rgba(0, 0, 0, 0.7);
-          font-weight: 500;
-        }
-      `}</style>
     </section>
   );
 };
