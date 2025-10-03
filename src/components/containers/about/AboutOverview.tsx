@@ -42,7 +42,7 @@ const AboutOverview = ({ data }: AboutOverviewProps) => {
   const image2 = getImageUrl(overviewData.images[1], Two);
 
   return (
-    <section className="about-overview section">
+    <section className="about-overview section" style={{ top: 0, marginBottom: 0 }}>
       <div className="container">
         <div className="row align-items-center">
           {/* Images Column */}
