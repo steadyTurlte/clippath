@@ -14,7 +14,9 @@ const ContactInfoEditor = () => {
       facebook: '',
       twitter: '',
       instagram: '',
-      linkedin: ''
+      linkedin: '',
+      youtube: '',
+      whatsapp: ''
     }
   });
   const [loading, setLoading] = useState(true);
@@ -286,6 +288,37 @@ const ContactInfoEditor = () => {
                   onChange={(e) => handleSocialLinkChange('linkedin', e.target.value)}
                   placeholder="Enter LinkedIn URL"
                 />
+              </div>
+
+              <div className="admin-page__field">
+                <label htmlFor="youtube" className="admin-page__label">
+                  <i className="fa-brands fa-youtube"></i> YouTube
+                </label>
+                <input
+                  type="text"
+                  id="youtube"
+                  className="admin-page__input"
+                  value={contactInfo.socialLinks?.youtube || ''}
+                  onChange={(e) => handleSocialLinkChange('youtube', e.target.value)}
+                  placeholder="Enter YouTube URL"
+                />
+              </div>
+
+              <div className="admin-page__field">
+                <label htmlFor="whatsapp" className="admin-page__label">
+                  <i className="fa-brands fa-whatsapp"></i> WhatsApp
+                </label>
+                <input
+                  type="text"
+                  id="whatsapp"
+                  className="admin-page__input"
+                  value={contactInfo.socialLinks?.whatsapp || ''}
+                  onChange={(e) => handleSocialLinkChange('whatsapp', e.target.value)}
+                  placeholder="Enter WhatsApp number (e.g., +1234567890)"
+                />
+                <p className="admin-page__help-text">
+                  Enter the full WhatsApp number with country code (e.g., +1234567890)
+                </p>
               </div>
             </div>
           </div>

@@ -38,7 +38,7 @@ const AboutBanner = ({ data }: AboutBannerProps) => {
 
   return (
     <>
-      {/* Banner Image Section */}
+      {/* Banner Image Section - Only if image exists */}
       {bannerData.image && (
         <section 
           className="about-banner-image" 
@@ -47,8 +47,9 @@ const AboutBanner = ({ data }: AboutBannerProps) => {
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
-            height: '400px',
-            position: 'relative'
+            height: '450px',
+            position: 'relative',
+            width: '100%'
           }}
         >
           <div style={{
@@ -57,49 +58,39 @@ const AboutBanner = ({ data }: AboutBannerProps) => {
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.3)'
+            backgroundColor: 'rgba(0, 0, 0, 0.4)'
           }}></div>
         </section>
       )}
 
-      {/* Title and Breadcrumbs Section */}
-      <section className="about-banner-content" style={{
-        padding: '60px 0',
-        background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
-        borderBottom: '3px solid #007bff'
+      {/* Title and Breadcrumbs Section - Completely separate below banner */}
+      <section className="about-banner-content section" style={{
+        paddingTop: '80px',
+        paddingBottom: '80px',
+        backgroundColor: '#ffffff'
       }}>
         <div className="container">
-          <div className="row gaper align-items-center">
-            <div className="col-12 col-lg-8 text-center text-lg-start">
+          <div className="row align-items-center">
+            <div className="col-12 col-lg-7">
               <h1
-                className="title"
+                className="h1 title"
                 data-aos="fade-up"
                 data-aos-duration="600"
                 data-aos-delay="100"
                 style={{ 
-                  fontSize: '3rem',
-                  fontWeight: '700',
-                  color: '#1a1a2e',
-                  marginBottom: '0',
-                  textTransform: 'capitalize',
-                  letterSpacing: '1px'
+                  marginBottom: '20px'
                 }}
               >
                 {bannerData.title}
               </h1>
             </div>
-            <div className="col-12 col-lg-4">
+            <div className="col-12 col-lg-5">
               <nav aria-label="breadcrumb">
                 <ol
-                  className="breadcrumb justify-content-center justify-content-lg-end"
+                  className="breadcrumb justify-content-lg-end"
                   data-aos="fade-up"
                   data-aos-duration="600"
                   data-aos-delay="150"
-                  style={{ 
-                    backgroundColor: 'transparent',
-                    padding: '0',
-                    marginBottom: '0'
-                  }}
                 >
                   {bannerData.breadcrumbs.map((breadcrumb, index) => (
                     index === bannerData.breadcrumbs.length - 1 ? (
@@ -107,28 +98,12 @@ const AboutBanner = ({ data }: AboutBannerProps) => {
                         key={index}
                         className="breadcrumb-item active"
                         aria-current="page"
-                        style={{ 
-                          color: '#007bff',
-                          fontWeight: '600',
-                          fontSize: '1.1rem'
-                        }}
                       >
                         {breadcrumb.text}
                       </li>
                     ) : (
                       <li key={index} className="breadcrumb-item">
-                        <Link
-                          href={breadcrumb.link}
-                          style={{ 
-                            color: '#555',
-                            textDecoration: 'none',
-                            fontWeight: '500',
-                            fontSize: '1.1rem',
-                            transition: 'color 0.3s ease'
-                          }}
-                          onMouseEnter={(e) => e.currentTarget.style.color = '#007bff'}
-                          onMouseLeave={(e) => e.currentTarget.style.color = '#555'}
-                        >
+                        <Link href={breadcrumb.link}>
                           {breadcrumb.text}
                         </Link>
                       </li>
@@ -138,6 +113,13 @@ const AboutBanner = ({ data }: AboutBannerProps) => {
               </nav>
             </div>
           </div>
+        </div>
+        <div className="left-triangle">
+          <div className="triangle"></div>
+        </div>
+        <div className="right-triangle">
+          <div className="triangle"></div>
+          <div className="right-alt"></div>
         </div>
       </section>
     </>
