@@ -83,33 +83,117 @@ const ServiceProject = ({ serviceData, projectsData }: ServiceProjectProps) => {
                 }}
                 className="project-three__slider"
               >
-                {projects.map((project: any, index: number) => (
-                  <SwiperSlide key={project.id || index}>
-                    <div className="project-three__slider-item">
-                      <Image 
-                        src={project.image || "/images/project-one.png"} 
-                        alt={project.title || "Project"} 
-                        width={400}
-                        height={300}
-                        style={{ objectFit: "cover" }}
-                      />
-                    </div>
-                  </SwiperSlide>
-                ))}
+                {projects.map((project: any, index: number) => {
+                  // Handle both string and object formats for image
+                  const imageUrl = typeof project.image === 'object' && project.image?.url 
+                    ? project.image.url 
+                    : (project.image || "/images/project-one.png");
+                  
+                  return (
+                    <SwiperSlide key={project.id || index}>
+                      <div className="project-three__slider-item" style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        borderRadius: '10px',
+                        overflow: 'hidden',
+                        boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+                        backgroundColor: '#ffffff'
+                      }}>
+                        <div style={{
+                          width: '100%',
+                          height: '300px',
+                          overflow: 'hidden',
+                          display: 'flex',
+                          alignItems: 'flex-start'
+                        }}>
+                          <Image 
+                            src={imageUrl} 
+                            alt={project.title || "Project"} 
+                            width={500}
+                            height={300}
+                            style={{ 
+                              width: '100%',
+                              height: 'auto',
+                              display: 'block'
+                            }}
+                          />
+                        </div>
+                        {project.title && (
+                          <div style={{
+                            padding: '15px 20px',
+                            backgroundColor: '#ffffff'
+                          }}>
+                            <h4 style={{
+                              margin: 0,
+                              fontSize: '1.1rem',
+                              fontWeight: '600',
+                              color: '#1e293b',
+                              textAlign: 'center'
+                            }}>
+                              {project.title}
+                            </h4>
+                          </div>
+                        )}
+                      </div>
+                    </SwiperSlide>
+                  );
+                })}
                 {/* Add duplicates for loop effect if we have less than 6 items */}
-                {projects.length < 6 && projects.map((project: any, index: number) => (
-                  <SwiperSlide key={`duplicate-${project.id || index}`}>
-                    <div className="project-three__slider-item">
-                      <Image 
-                        src={project.image || "/images/project-one.png"} 
-                        alt={project.title || "Project"} 
-                        width={400}
-                        height={300}
-                        style={{ objectFit: "cover" }}
-                      />
-                    </div>
-                  </SwiperSlide>
-                ))}
+                {projects.length < 6 && projects.map((project: any, index: number) => {
+                  // Handle both string and object formats for image
+                  const imageUrl = typeof project.image === 'object' && project.image?.url 
+                    ? project.image.url 
+                    : (project.image || "/images/project-one.png");
+                  
+                  return (
+                    <SwiperSlide key={`duplicate-${project.id || index}`}>
+                      <div className="project-three__slider-item" style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        borderRadius: '10px',
+                        overflow: 'hidden',
+                        boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+                        backgroundColor: '#ffffff'
+                      }}>
+                        <div style={{
+                          width: '100%',
+                          height: '300px',
+                          overflow: 'hidden',
+                          display: 'flex',
+                          alignItems: 'flex-start'
+                        }}>
+                          <Image 
+                            src={imageUrl} 
+                            alt={project.title || "Project"} 
+                            width={500}
+                            height={300}
+                            style={{ 
+                              width: '100%',
+                              height: 'auto',
+                              display: 'block'
+                            }}
+                          />
+                        </div>
+                        {project.title && (
+                          <div style={{
+                            padding: '15px 20px',
+                            backgroundColor: '#ffffff'
+                          }}>
+                            <h4 style={{
+                              margin: 0,
+                              fontSize: '1.1rem',
+                              fontWeight: '600',
+                              color: '#1e293b',
+                              textAlign: 'center'
+                            }}>
+                              {project.title}
+                            </h4>
+                          </div>
+                        )}
+                      </div>
+                    </SwiperSlide>
+                  );
+                })}
               </Swiper>
             </div>
           </div>

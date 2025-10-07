@@ -25,11 +25,11 @@ export const fetchPageData = (page) => {
 
 /**
  * Fetch settings data
- * @returns {Object} - The settings data
+ * @returns {Promise<Object>} - The settings data
  */
-export const fetchSettings = () => {
+export const fetchSettings = async () => {
   try {
-    const settings = getData('settings') || {};
+    const settings = await getData('settings') || {};
     return settings;
   } catch (error) {
     console.error('Error fetching settings data:', error);

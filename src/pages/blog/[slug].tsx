@@ -400,7 +400,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const { slug } = context.params as { slug: string };
 
   // Fetch settings data
-  const settings = fetchSettings();
+  const settings = await fetchSettings();
 
   // Fetch blog settings
   const blogSettings = (await getData("blog-settings") || {

@@ -81,9 +81,10 @@ interface ServicesProps {
 
 const Services = ({ data }: ServicesProps) => {
   const slugify = (text: string) =>
-    text
+    (text || "")
       .toLowerCase()
       .trim()
+      .replace(/&/g, "and") // Replace & with "and" before removing other special chars
       .replace(/[^a-z0-9\s-]/g, "")
       .replace(/\s+/g, "-")
       .replace(/-+/g, "-");
@@ -131,7 +132,7 @@ const Services = ({ data }: ServicesProps) => {
           speed={1200}
           loop={true}
           roundLengths={true}
-          centeredSlides={true}
+          centeredSlides={false}
           modules={[Autoplay, Pagination]}
           pagination={{
             el: ".services-pagination",

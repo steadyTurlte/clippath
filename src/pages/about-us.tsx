@@ -28,7 +28,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
       }/api/content/services`
     );
     const servicesData = await services.json();
-    const testimonials = servicesData.testimonials;
+    const testimonials = servicesData.testimonials || null;
 
     // Fetch settings data
     const settingsResponse = await fetch(
@@ -60,10 +60,10 @@ export const getServerSideProps: GetServerSideProps = async () => {
     // Return default empty data to prevent rendering errors
     return {
       props: {
-        aboutData: {},
-        testimonials: {},
-        settings: {},
-        portfolio: {},
+        aboutData: null,
+        testimonials: null,
+        settings: null,
+        portfolio: null,
       },
     };
   }

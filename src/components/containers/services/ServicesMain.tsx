@@ -24,6 +24,16 @@ interface ServicesMainProps {
 }
 
 const ServicesMain = ({ data, services = [] }: ServicesMainProps) => {
+  // Slugify function matching the service detail page
+  const slugify = (text: string) =>
+    (text || "")
+      .toLowerCase()
+      .trim()
+      .replace(/&/g, "and") // Replace & with "and" before removing other special chars
+      .replace(/[^a-z0-9\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-");
+
   // Helper function to get image URL from various formats
   const getImageUrl = (imageData: any) => {
     if (!imageData) return "/images/services/slide-one.png";
@@ -104,9 +114,7 @@ const ServicesMain = ({ data, services = [] }: ServicesMainProps) => {
                     </p>
                   </div>
                   <Link
-                    href={`/services/${encodeURIComponent(
-                      service.title.toLowerCase().replace(/\s+/g, "-")
-                    )}`}
+                    href={`/services/${slugify(service.title)}`}
                     className="service-card__link"
                   >
                     Learn More <i className="fa-solid fa-arrow-right"></i>

@@ -40,13 +40,8 @@ const TestimonialSec = ({ data }: TestimonialSecProps) => {
             </div>
           </div>
         </div>
-        <div className="row align-items-center">
-          <div className="col-lg-5">
-             <div className="testimonial-two__thumb">
-                <ImageWithFallback src="/images/testimonial/thumb.png" alt="testimonial" width={420} height={540}/>
-             </div>
-          </div>
-          <div className="col-lg-7">
+        <div className="row justify-content-center">
+          <div className="col-lg-10 col-xl-8">
             <Swiper
                 modules={[Autoplay, Navigation, Pagination]}
                 loop={true}

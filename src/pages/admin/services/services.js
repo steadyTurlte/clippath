@@ -15,9 +15,10 @@ const ServicesItemsEditor = () => {
   const [expandedService, setExpandedService] = useState(null);
 
   const slugify = (text = '') =>
-    text
+    (text || '')
       .toLowerCase()
       .trim()
+      .replace(/&/g, 'and') // Replace & with "and" before removing other special chars
       .replace(/[^a-z0-9\s-]/g, '')
       .replace(/\s+/g, '-')
       .replace(/-+/g, '-');
@@ -34,11 +35,11 @@ const ServicesItemsEditor = () => {
           const initialServices = [];
           const initialPublicIds = [];
 
-          data.forEach(service => {
-            // Ensure service has proper structure
-            const serviceWithDefaults = {
-              ...service,
-              details: {
+          // Fetch details for each service
+          const servicesWithDetails = await Promise.all(
+            data.map(async (service) => {
+              const slug = slugify(service.title);
+              let serviceDetails = {
                 hero: {
                   title: '',
                   subtitle: '',
@@ -46,20 +47,47 @@ const ServicesItemsEditor = () => {
                   beforeImage: { url: '', publicId: '' },
                   afterImage: { url: '', publicId: '' }
                 },
-                projects: [],
-                ...service.details
-              }
-            };
+                projects: []
+              };
 
+              // Fetch service details from the API
+              if (slug) {
+                try {
+                  const detailsResponse = await fetch(`/api/content/services?section=details&slug=${encodeURIComponent(slug)}`);
+                  if (detailsResponse.ok) {
+                    const detailsData = await detailsResponse.json();
+                    if (detailsData) {
+                      serviceDetails = {
+                        hero: {
+                          ...serviceDetails.hero,
+                          ...detailsData.hero
+                        },
+                        projects: Array.isArray(detailsData.projects) ? detailsData.projects : []
+                      };
+                    }
+                  }
+                } catch (err) {
+                  console.error(`Error fetching details for ${service.title}:`, err);
+                }
+              }
+
+              return {
+                ...service,
+                details: serviceDetails
+              };
+            })
+          );
+
+          servicesWithDetails.forEach(service => {
             if (service.image && typeof service.image === 'object') {
               initialServices.push({
-                ...serviceWithDefaults,
+                ...service,
                 image: service.image.url || ''
               });
               initialPublicIds.push(service.image.publicId || '');
             } else {
               initialServices.push({
-                ...serviceWithDefaults,
+                ...service,
                 image: service.image || ''
               });
               initialPublicIds.push('');
@@ -178,7 +206,12 @@ const ServicesItemsEditor = () => {
       ...newProjects[projectIndex],
       [field]: value
     };
-    handleDetailChange(serviceIndex, 'projects', 'projects', newProjects);
+    // Update projects directly without using handleDetailChange
+    updatedServices[serviceIndex].details = {
+      ...updatedServices[serviceIndex].details,
+      projects: newProjects
+    };
+    setServicesData(updatedServices);
   };
 
   const addProject = (serviceIndex) => {
@@ -189,7 +222,12 @@ const ServicesItemsEditor = () => {
       updatedServices[serviceIndex].details = {};
     }
 
-    const currentProjects = updatedServices[serviceIndex].details.projects || [];
+    // Ensure projects is always an array
+    let currentProjects = updatedServices[serviceIndex].details.projects;
+    if (!Array.isArray(currentProjects)) {
+      currentProjects = [];
+    }
+
     const newProjects = [...currentProjects, { title: '', image: { url: '', publicId: '' } }];
 
     updatedServices[serviceIndex].details.projects = newProjects;
@@ -199,14 +237,24 @@ const ServicesItemsEditor = () => {
   const removeProject = (serviceIndex, projectIndex) => {
     const updatedServices = [...servicesData];
     const newProjects = updatedServices[serviceIndex].details.projects.filter((_, i) => i !== projectIndex);
-    handleDetailChange(serviceIndex, 'projects', 'projects', newProjects);
+    // Update projects directly without using handleDetailChange
+    updatedServices[serviceIndex].details = {
+      ...updatedServices[serviceIndex].details,
+      projects: newProjects
+    };
+    setServicesData(updatedServices);
   };
 
   const handleProjectImageUpload = (serviceIndex, projectIndex, url, publicId) => {
     const updatedServices = [...servicesData];
     const newProjects = [...updatedServices[serviceIndex].details.projects];
     newProjects[projectIndex].image = { url, publicId };
-    handleDetailChange(serviceIndex, 'projects', 'projects', newProjects);
+    // Update projects directly without using handleDetailChange
+    updatedServices[serviceIndex].details = {
+      ...updatedServices[serviceIndex].details,
+      projects: newProjects
+    };
+    setServicesData(updatedServices);
   };
 
   const handleHeroImageUpload = (serviceIndex, imageType, url, publicId) => {
@@ -238,9 +286,12 @@ const ServicesItemsEditor = () => {
           serviceData.image = '';
         }
 
-        return serviceData;
+        // Remove details from main service data as they're saved separately
+        const { details, ...mainServiceData } = serviceData;
+        return mainServiceData;
       });
 
+      // Save main services data
       const response = await fetch('/api/content/services?section=services', {
         method: 'PUT',
         headers: {
@@ -249,12 +300,29 @@ const ServicesItemsEditor = () => {
         body: JSON.stringify(dataToSave)
       });
 
-      if (response.ok) {
-        toast.success("Services section saved successfully!");
-      } else {
-        setError('Failed to save Services section');
-        toast.error('Failed to save Services section');
+      if (!response.ok) {
+        throw new Error('Failed to save services');
       }
+
+      // Save service details for each service
+      const detailsSavePromises = servicesData.map(async (service) => {
+        const slug = slugify(service.title);
+        if (service.details && slug) {
+          const detailsResponse = await fetch(`/api/content/services?section=details&slug=${encodeURIComponent(slug)}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(service.details)
+          });
+          return detailsResponse.ok;
+        }
+        return true;
+      });
+
+      await Promise.all(detailsSavePromises);
+
+      toast.success("Services and details saved successfully!");
     } catch (error) {
       console.error('Error saving services data:', error);
       setError('Failed to save Services section');
@@ -428,14 +496,20 @@ const ServicesItemsEditor = () => {
                 <button
                   type="button"
                   className="admin-editor__add-button"
-                  onClick={() => setExpandedService(expandedService === index ? null : index)}
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent event bubbling
+                    setExpandedService(expandedService === index ? null : index);
+                  }}
                 >
                   {expandedService === index ? 'Hide Details' : 'Show Details'}
                 </button>
               </div>
 
               {expandedService === index && (
-                <div className="admin-editor__service-details">
+                <div
+                  className="admin-editor__service-details"
+                  onClick={(e) => e.stopPropagation()} // Prevent event bubbling
+                >
                   <h4 className="admin-editor__section-title">Service Details</h4>
 
                   {/* Hero Section */}
@@ -541,6 +615,18 @@ const ServicesItemsEditor = () => {
               )}
             </div>
           ))}
+
+          {/* Add New Service Button */}
+          <div className="admin-editor__add-service-section">
+            <button
+              type="button"
+              className="admin-editor__add-service-button"
+              onClick={handleAddService}
+            >
+              <i className="fa-solid fa-plus"></i>
+              Add New Service
+            </button>
+          </div>
         </div>
       </div>
 
@@ -870,6 +956,38 @@ const ServicesItemsEditor = () => {
             border: 1px dashed #cbd5e1;
             border-radius: 8px;
             margin-bottom: 16px;
+        }
+
+        .admin-editor__add-service-section {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .admin-editor__add-service-button {
+            padding: 12px 24px;
+            background-color: #10b981;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .admin-editor__add-service-button:hover {
+            background-color: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .admin-editor__add-service-button i {
+            font-size: 18px;
         }
 
         @media (max-width: 768px) {

@@ -3,7 +3,7 @@ import React from 'react';
 const SocialSettings = ({ data, onChange, preview }) => {
   const handleChange = (field, value) => {
     if (!onChange) return;
-    
+
     onChange({
       ...data,
       [field]: value
@@ -50,7 +50,7 @@ const SocialSettings = ({ data, onChange, preview }) => {
           placeholder="Enter the Facebook URL"
         />
       </div>
-      
+
       <div className="form-group">
         <label htmlFor="twitter">Twitter</label>
         <input
@@ -62,7 +62,7 @@ const SocialSettings = ({ data, onChange, preview }) => {
           placeholder="Enter the Twitter URL"
         />
       </div>
-      
+
       <div className="form-group">
         <label htmlFor="instagram">Instagram</label>
         <input
@@ -74,7 +74,7 @@ const SocialSettings = ({ data, onChange, preview }) => {
           placeholder="Enter the Instagram URL"
         />
       </div>
-      
+
       <div className="form-group">
         <label htmlFor="linkedin">LinkedIn</label>
         <input
@@ -86,7 +86,7 @@ const SocialSettings = ({ data, onChange, preview }) => {
           placeholder="Enter the LinkedIn URL"
         />
       </div>
-      
+
       <div className="form-group">
         <label htmlFor="youtube">YouTube</label>
         <input
@@ -98,7 +98,22 @@ const SocialSettings = ({ data, onChange, preview }) => {
           placeholder="Enter the YouTube URL"
         />
       </div>
-      
+
+      <div className="form-group">
+        <label htmlFor="whatsapp">WhatsApp</label>
+        <input
+          type="text"
+          id="whatsapp"
+          value={data.whatsapp || ''}
+          onChange={(e) => handleChange('whatsapp', e.target.value)}
+          className="form-control"
+          placeholder="Enter WhatsApp number (e.g., +1234567890)"
+        />
+        <small className="form-text">
+          Enter the full WhatsApp number with country code (e.g., +1234567890)
+        </small>
+      </div>
+
       <style jsx>{`
         .social-settings {
           display: flex;

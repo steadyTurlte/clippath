@@ -26,11 +26,13 @@ const ServiceDetail = () => {
   const [projectsData, setProjectsData] = useState<any>(null);
   const [contactInfo, setContactInfo] = useState<any>(null);
   const [howItWorksData, setHowItWorksData] = useState<any>(null);
+  const [detailsBanner, setDetailsBanner] = useState<any>(null);
 
   const slugify = (text: string) =>
     (text || "")
       .toLowerCase()
       .trim()
+      .replace(/&/g, "and") // Replace & with "and" before removing other special chars
       .replace(/[^a-z0-9\s-]/g, "")
       .replace(/\s+/g, "-")
       .replace(/-+/g, "-");
@@ -38,14 +40,15 @@ const ServiceDetail = () => {
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        // Fetch settings, pricing, testimonials, sponsors, FAQ and contact data in parallel
-        const [settingsRes, pricingRes, aboutRes, contactRes, howItWorksRes, testimonialsRes] = await Promise.all([
+        // Fetch settings, pricing, testimonials, sponsors, FAQ, contact data and details banner in parallel
+        const [settingsRes, pricingRes, aboutRes, contactRes, howItWorksRes, testimonialsRes, detailsBannerRes] = await Promise.all([
           fetch("/api/content/settings"),
           fetch("/api/content/pricing"),
           fetch("/api/content/about"),
           fetch("/api/content/contact-info"),
           fetch("/api/content/how-it-works"),
           fetch("/api/content/testimonials"),
+          fetch("/api/content/services?section=detailsBanner"),
         ]);
 
         if (settingsRes.ok) {
@@ -74,6 +77,10 @@ const ServiceDetail = () => {
         if(howItWorksRes.ok) {
           setHowItWorksData(await howItWorksRes.json());
         }
+        
+        if(detailsBannerRes.ok) {
+          setDetailsBanner(await detailsBannerRes.json());
+        }
       } catch (error) {
         console.error("Error fetching initial data:", error);
       }
@@ -88,8 +95,10 @@ const ServiceDetail = () => {
         const res = await fetch("/api/content/services?section=services");
         if (res.ok) {
           const data = await res.json();
+          // Decode the URL-encoded service parameter
+          const decodedService = decodeURIComponent(service as string);
           const found = Array.isArray(data)
-            ? data.find((s) => slugify(s.title) === service)
+            ? data.find((s) => slugify(s.title) === decodedService || slugify(s.title) === service)
             : null;
           setServiceData(found);
         }
@@ -106,10 +115,12 @@ const ServiceDetail = () => {
     if (!service) return;
     const fetchServiceDetails = async () => {
       try {
+        // Decode the URL-encoded service parameter
+        const decodedService = decodeURIComponent(service as string);
         // Fetch service details and projects for this service
         const [detailRes, projectsRes] = await Promise.all([
-          fetch(`/api/content/services?section=details&slug=${service}`),
-          fetch(`/api/content/portfolio?service=${service}`)
+          fetch(`/api/content/services?section=details&slug=${encodeURIComponent(decodedService)}`),
+          fetch(`/api/content/portfolio?service=${encodeURIComponent(decodedService)}`)
         ]);
         
         if (detailRes.ok) {
@@ -185,8 +196,11 @@ const ServiceDetail = () => {
 
   return (
     <Layout settings={settings}>
-      {/* Banner with service title */}
-      <CmnBanner title={serviceData.title} />
+      {/* Banner with service title and banner image if available */}
+      <CmnBanner 
+        title={serviceData.title} 
+        image={detailsBanner?.image || undefined}
+      />
 
       {/* Service Details About Section - Hero with before/after slider and dynamic content */}
       <ServiceDetailsAbout 

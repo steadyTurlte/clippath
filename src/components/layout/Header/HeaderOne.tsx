@@ -6,7 +6,7 @@ import {
   ReactCompareSlider,
   ReactCompareSliderImage,
 } from "react-compare-slider";
-import Logo from "public/images/logo.png";
+import Logo from "public/images/logo/new-logo.png";
 
 interface HeaderProps {
   openNav: boolean;
@@ -22,6 +22,16 @@ interface ContactInfo {
 }
 
 const HeaderOne = ({ openNav, handleNav, setOpenNav }: HeaderProps) => {
+  // Slugify function matching the service detail page
+  const slugify = (text: string) =>
+    (text || "")
+      .toLowerCase()
+      .trim()
+      .replace(/&/g, "and") // Replace & with "and" before removing other special chars
+      .replace(/[^a-z0-9\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-");
+
   // Services for navbar dropdown
   const [services, setServices] = useState<any[]>([]);
   useEffect(() => {
@@ -154,7 +164,7 @@ const HeaderOne = ({ openNav, handleNav, setOpenNav }: HeaderProps) => {
                 <div className="nav__content">
                   <div className="nav__logo">
                     <Link href="/">
-                      <Image priority src={logoSrc} alt="Logo" />
+                      <Image priority src={logoSrc} alt="Logo" width={180} />
                     </Link>
                     <button
                       aria-label="open sidebar"
@@ -226,11 +236,7 @@ const HeaderOne = ({ openNav, handleNav, setOpenNav }: HeaderProps) => {
                                   <div className="mega-menu__single-item" key={service.id}>
                                     <Link
                                       className="hide-nav"
-                                      href={`/services/${encodeURIComponent(
-                                        (service?.title || "")
-                                          .toLowerCase()
-                                          .replace(/\s+/g, "-")
-                                      )}`}
+                                      href={`/services/${slugify(service?.title || "")}`}
                                     >
                                       <Image
                                         src={
