@@ -30,6 +30,7 @@
     "react-dom": "18.2.0",
     "react-markdown": "^10.1.0",
     "react-odometerjs": "^3.1.0",
+    "react-quill": "^2.0.0",
     "react-slick": "^0.29.0",
     "react-toastify": "^11.0.5",
     "remark-gfm": "^4.0.1",

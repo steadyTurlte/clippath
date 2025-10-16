@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import AdminLayout from '@/components/admin/AdminLayout';
 import ImageUploader from '@/components/admin/common/ImageUploader';
+import RichTextEditor from '@/components/admin/common/RichTextEditor';
 import { toast } from 'react-toastify';
 
 const ServicesItemsEditor = () => {
@@ -537,12 +538,10 @@ const ServicesItemsEditor = () => {
                     </div>
                     <div className="admin-editor__field">
                       <label className="admin-editor__label">Hero Description</label>
-                      <textarea
-                        className="admin-editor__textarea"
+                      <RichTextEditor
                         value={service.details?.hero?.description || ''}
-                        onChange={(e) => handleDetailChange(index, 'hero', 'description', e.target.value)}
-                        placeholder="Enter hero section description"
-                        rows={4}
+                        onChange={(val) => handleDetailChange(index, 'hero', 'description', val)}
+                        placeholder="Write rich description..."
                       />
                     </div>
                     <div className="admin-editor__field">
