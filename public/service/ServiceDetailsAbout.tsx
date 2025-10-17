@@ -91,11 +91,10 @@ const ServiceDetailsAbout = ({ serviceData, serviceDetails }: ServiceDetailsAbou
                 data-aos-duration="600"
                 data-aos-delay="100"
               >
-                <div className="fw-5 rich-text-content">
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                    {heroDescription}
-                  </ReactMarkdown>
-                </div>
+                <div 
+                  className="fw-5 rich-text-content"
+                  dangerouslySetInnerHTML={{ __html: heroDescription }}
+                />
                 {serviceData?.price && (
                   <div className="service-price">
                     <span className="price-label">Starting from: </span>
