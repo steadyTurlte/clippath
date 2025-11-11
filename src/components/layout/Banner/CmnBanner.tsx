@@ -7,92 +7,129 @@ interface BreadcrumbItem {
 }
 
 interface CmnBannerProps {
-  title: string;
+  title?: string;
   image?: string;
   breadcrumbs?: BreadcrumbItem[];
+  hideContent?: boolean;
+  overlayOpacity?: number;
 }
 
-const CmnBanner = ({ title, image, breadcrumbs }: CmnBannerProps) => {
+const CmnBanner = ({
+  title = "",
+  image,
+  breadcrumbs,
+  hideContent = false,
+  overlayOpacity = 0.5,
+}: CmnBannerProps) => {
   // Use default breadcrumbs if none are provided
-  const defaultBreadcrumbs = [
-    { text: "Home", link: "/" },
-    { text: title, link: "" }
-  ];
+  const defaultBreadcrumbs =
+    title && title.trim().length
+      ? [
+          { text: "Home", link: "/" },
+          { text: title, link: "" },
+        ]
+      : [{ text: "Home", link: "/" }];
 
   const displayBreadcrumbs = breadcrumbs || defaultBreadcrumbs;
 
   // Create a style object for the background image if one exists
-  const bannerStyle = image ? {
-    backgroundImage: `url(${image})`,
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    backgroundRepeat: 'no-repeat',
-    position: 'relative' as 'relative'
-  } : {};
+  const bannerStyle = image
+    ? {
+        backgroundImage: `url(${image})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        position: "relative" as "relative",
+      }
+    : {};
+
+  const sectionStyle = hideContent
+    ? {
+        ...bannerStyle,
+        padding: "0",
+        minHeight: image ? "320px" : undefined,
+      }
+    : bannerStyle;
+
+  const showOverlay = image && !hideContent && overlayOpacity > 0;
+
+  const overlayStyles = showOverlay
+    ? {
+        position: "absolute" as const,
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: `rgba(0, 0, 0, ${overlayOpacity})`,
+        zIndex: 1,
+      }
+    : undefined;
+
+  const sectionClassName = `cmn-banner section${
+    hideContent ? " cmn-banner--image-only" : ""
+  }`;
 
   return (
-    <section className="cmn-banner section" style={bannerStyle}>
+    <section className={sectionClassName} style={sectionStyle}>
       {/* Add an overlay if there's a background image */}
-      {image && (
-        <div className="banner-overlay" style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          zIndex: 1
-        }}></div>
-      )}
-      <div className="container" style={{ position: 'relative', zIndex: 2 }}>
-        <div className="row gaper align-items-center">
-          <div className="col-12 col-md-8">
-            <h2
-              className="h2 title"
-              style={{ color: image ? '#ffffff' : 'inherit' }}
-            >
-              {title}
-            </h2>
-          </div>
-          <div className="col-12 col-md-4">
-            <nav aria-label="breadcrumb">
-              <ol
-                className="breadcrumb justify-content-md-end"
-                data-aos="fade-up"
-                data-aos-duration="600"
-                data-aos-delay="100"
+      {showOverlay && <div className="banner-overlay" style={overlayStyles}></div>}
+      {!hideContent && (
+        <div className="container" style={{ position: "relative", zIndex: 2 }}>
+          <div className="row gaper align-items-center">
+            <div className="col-12 col-md-8">
+              <h2
+                className="h2 title"
+                style={{ color: image ? "#ffffff" : "inherit" }}
               >
-                {displayBreadcrumbs.map((item, index) => (
-                  <li
-                    key={index}
-                    className={`breadcrumb-item ${!item.link ? 'active' : ''}`}
-                    aria-current={!item.link ? 'page' : undefined}
-                    style={{ color: image ? '#ffffff' : 'inherit' }}
-                  >
-                    {item.link && item.link !== "" ? (
-                      <Link
-                        href={item.link}
-                        style={{ color: image ? '#ffffff' : 'inherit' }}
-                      >
-                        {item.text}
-                      </Link>
-                    ) : (
-                      item.text
-                    )}
-                  </li>
-                ))}
-              </ol>
-            </nav>
+                {title}
+              </h2>
+            </div>
+            <div className="col-12 col-md-4">
+              <nav aria-label="breadcrumb">
+                <ol
+                  className="breadcrumb justify-content-md-end"
+                  data-aos="fade-up"
+                  data-aos-duration="600"
+                  data-aos-delay="100"
+                >
+                  {displayBreadcrumbs.map((item, index) => (
+                    <li
+                      key={index}
+                      className={`breadcrumb-item ${
+                        !item.link ? "active" : ""
+                      }`}
+                      aria-current={!item.link ? "page" : undefined}
+                      style={{ color: image ? "#ffffff" : "inherit" }}
+                    >
+                      {item.link && item.link !== "" ? (
+                        <Link
+                          href={item.link}
+                          style={{ color: image ? "#ffffff" : "inherit" }}
+                        >
+                          {item.text}
+                        </Link>
+                      ) : (
+                        item.text
+                      )}
+                    </li>
+                  ))}
+                </ol>
+              </nav>
+            </div>
           </div>
         </div>
-      </div>
-      <div className="left-triangle">
-        <div className="triangle"></div>
-      </div>
-      <div className="right-triangle">
-        <div className="triangle"></div>
-        <div className="right-alt"></div>
-      </div>
+      )}
+      {!hideContent && (
+        <>
+          <div className="left-triangle">
+            <div className="triangle"></div>
+          </div>
+          <div className="right-triangle">
+            <div className="triangle"></div>
+            <div className="right-alt"></div>
+          </div>
+        </>
+      )}
     </section>
   );
 };

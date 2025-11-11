@@ -2,7 +2,6 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Layout from "@/components/layout/Layout";
-import CmnBanner from "@/components/layout/Banner/CmnBanner";
 import ServiceDetailsAbout from "../../../public/service/ServiceDetailsAbout";
 import ServiceProject from "../../../public/service/ServiceProject";
 import ServiceFaq from "../../../public/service/ServiceFaq";
@@ -26,7 +25,6 @@ const ServiceDetail = () => {
   const [projectsData, setProjectsData] = useState<any>(null);
   const [contactInfo, setContactInfo] = useState<any>(null);
   const [howItWorksData, setHowItWorksData] = useState<any>(null);
-  const [detailsBanner, setDetailsBanner] = useState<any>(null);
 
   const slugify = (text: string) =>
     (text || "")
@@ -41,14 +39,20 @@ const ServiceDetail = () => {
     const fetchInitialData = async () => {
       try {
         // Fetch settings, pricing, testimonials, sponsors, FAQ, contact data and details banner in parallel
-        const [settingsRes, pricingRes, aboutRes, contactRes, howItWorksRes, testimonialsRes, detailsBannerRes] = await Promise.all([
+        const [
+          settingsRes,
+          pricingRes,
+          aboutRes,
+          contactRes,
+          howItWorksRes,
+          testimonialsRes,
+        ] = await Promise.all([
           fetch("/api/content/settings"),
           fetch("/api/content/pricing"),
           fetch("/api/content/about"),
           fetch("/api/content/contact-info"),
           fetch("/api/content/how-it-works"),
           fetch("/api/content/testimonials"),
-          fetch("/api/content/services?section=detailsBanner"),
         ]);
 
         if (settingsRes.ok) {
@@ -76,10 +80,6 @@ const ServiceDetail = () => {
         
         if(howItWorksRes.ok) {
           setHowItWorksData(await howItWorksRes.json());
-        }
-        
-        if(detailsBannerRes.ok) {
-          setDetailsBanner(await detailsBannerRes.json());
         }
       } catch (error) {
         console.error("Error fetching initial data:", error);
@@ -185,7 +185,6 @@ const ServiceDetail = () => {
   if (!serviceData) {
     return (
       <Layout settings={settings}>
-        <CmnBanner title="Service Not Found" />
         <div className="service-detail-error">
           <h2>Service not found</h2>
           <p>The service you&apos;re looking for doesn&apos;t exist.</p>
@@ -196,12 +195,6 @@ const ServiceDetail = () => {
 
   return (
     <Layout settings={settings}>
-      {/* Banner with service title and banner image if available */}
-      <CmnBanner 
-        title={serviceData.title} 
-        image={detailsBanner?.image || undefined}
-      />
-
       {/* Service Details About Section - Hero with before/after slider and dynamic content */}
       <ServiceDetailsAbout 
         serviceData={serviceData}

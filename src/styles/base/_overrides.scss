@@ -1,0 +1,42 @@
+/* ==== 
+--------- (2.4) global overrides start ---------
+==== */
+
+/* Reset forced capitalization while keeping intentional uppercase accents */
+.section * {
+  text-transform: none !important;
+}
+
+.section .sub-title,
+.section .sub-title * {
+  text-transform: uppercase !important;
+}
+
+.section .banner__content .h6,
+.section .banner__content .h6 * {
+  text-transform: uppercase !important;
+  letter-spacing: 0.15em;
+}
+
+.footer * {
+  text-transform: none !important;
+}
+
+.footer .footer__head .h5 {
+  text-transform: none !important;
+}
+
+.btn,
+.btn * {
+  text-transform: none !important;
+}
+
+.breadcrumb .breadcrumb-item,
+.breadcrumb .breadcrumb-item * {
+  text-transform: none !important;
+}
+
+/* ==== 
+--------- (2.4) global overrides end ---------
+==== */
+

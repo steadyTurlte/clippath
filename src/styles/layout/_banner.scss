@@ -341,6 +341,16 @@
   padding-bottom: 416px !important;
 }
 
+.cmn-banner--image-only {
+  min-height: 320px;
+  display: block;
+}
+
+.cmn-banner--image-only .left-triangle,
+.cmn-banner--image-only .right-triangle {
+  display: none;
+}
+
 .breadcrumb {
   margin: 0px;
   padding: 0px;

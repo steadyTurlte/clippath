@@ -214,6 +214,16 @@ const DynamicBlogMain = () => {
   return (
     <section className="section blog-main">
       <div className="container">
+        {blogSettings && (
+          <div className="blog-main__intro" data-aos="fade-up" data-aos-duration="600">
+            {blogSettings.pageTitle && (
+              <h1 className="h2 title">{blogSettings.pageTitle}</h1>
+            )}
+            {blogSettings.pageDescription && (
+              <p>{blogSettings.pageDescription}</p>
+            )}
+          </div>
+        )}
         <div className="row gaper">
           <div className="col-12 col-xl-8">
             <div className="blog-main__content">
@@ -254,17 +264,11 @@ const DynamicBlogMain = () => {
                         </Link>
                       </div>
                       <div className="meta">
-                        {(blogSettings?.showAuthor || blogSettings?.showDate) && (
+                        {blogSettings?.showAuthor && (
                           <div className="meta__left">
-                            {blogSettings?.showAuthor && (
-                              <p>
-                                <strong>Written by:</strong> {post.author}
-                              </p>
-                            )}
-                            {blogSettings?.showAuthor && blogSettings?.showDate && <span></span>}
-                            {blogSettings?.showDate && (
-                              <p>{new Date(post.date).toLocaleDateString()}</p>
-                            )}
+                            <p>
+                              <strong>Written by:</strong> {post.author}
+                            </p>
                           </div>
                         )}
                         {blogSettings?.showCategory && (
@@ -420,7 +424,6 @@ const DynamicBlogMain = () => {
                         </Link>
                       </div>
                       <div className="latest-content">
-                        <p>{new Date(post.date).toLocaleDateString()}</p>
                         <p>
                           <Link href={`/blog/${post.slug}`}>
                             {post.title}
@@ -491,6 +494,16 @@ const DynamicBlogMain = () => {
       </div>
 
       <style jsx>{`
+        .blog-main__intro {
+          margin-bottom: 40px;
+        }
+
+        .blog-main__intro p {
+          margin-top: 16px;
+          color: #475569;
+          max-width: 720px;
+        }
+
         .loading-indicator,
         .error-message,
         .no-posts-message,
