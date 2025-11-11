@@ -195,6 +195,19 @@ const ServiceDetail = () => {
 
   return (
     <Layout settings={settings}>
+      {/* Service Title Section */}
+      <section className="section" style={{ paddingTop: '80px', paddingBottom: '40px', backgroundColor: '#f8f9fa' }}>
+        <div className="container">
+          <div className="row">
+            <div className="col-12">
+              <h2 className="h2" style={{ textAlign: 'center', margin: 0, fontWeight: 700, color: '#1e293b', fontSize: '2rem' }}>
+                {serviceData.title}
+              </h2>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Service Details About Section - Hero with before/after slider and dynamic content */}
       <ServiceDetailsAbout 
         serviceData={serviceData}

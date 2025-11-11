@@ -36,6 +36,37 @@
   text-transform: none !important;
 }
 
+/* About page specific overrides */
+.about-section *,
+.about-section .paragraph *,
+.about-section .title,
+.about-section .h2,
+.about-section .h4,
+.about-section .h5,
+.about-section .h6,
+.about-section p {
+  text-transform: none !important;
+}
+
+.team-two *,
+.team-two .paragraph *,
+.team-two .title,
+.team-two .h2,
+.team-two .h4,
+.team-two .content *,
+.team-two p {
+  text-transform: none !important;
+}
+
+.about-overview *,
+.about-overview .title,
+.about-overview .h2,
+.about-overview .h4,
+.about-overview .mission-statement *,
+.about-overview p {
+  text-transform: none !important;
+}
+
 /* ==== 
 --------- (2.4) global overrides end ---------
 ==== */

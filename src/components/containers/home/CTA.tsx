@@ -14,11 +14,30 @@ interface CTAProps {
 }
 
 const CTA = ({ data }: CTAProps) => {
+  // Helper function to extract image URL from various formats
+  const getImageUrl = (imageData: any) => {
+    if (!imageData) return undefined;
+    
+    // If it's a string, return it directly
+    if (typeof imageData === "string") return imageData;
+    
+    // If it's an object with url property
+    if (typeof imageData === "object" && imageData.url) return imageData.url;
+    
+    // If it's an object with src property
+    if (typeof imageData === "object" && imageData.src) return imageData.src;
+    
+    return undefined;
+  };
+
+  const imageUrl = getImageUrl(data?.image);
+  const isLocalImage = typeof imageUrl === "string" && imageUrl.startsWith("/images/");
+
   // Defensive fallback for missing data or image
   const ctaData = {
     title: data?.title || "Ready to Get Started?",
     description: data?.description || "Transform your images today!",
-    image: data?.image || undefined,
+    image: imageUrl,
   };
 
   return (
@@ -36,7 +55,7 @@ const CTA = ({ data }: CTAProps) => {
                         alt="CTA Image"
                         width={600}
                         height={400}
-                        unoptimized={ctaData.image.startsWith("/images/")}
+                        unoptimized={isLocalImage}
                       />
                     ) : (
                       <Image src={ctaThumb} alt="Default CTA Image" />
