@@ -1,8 +1,6 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import {
   ReactCompareSlider,
   ReactCompareSliderImage,
@@ -14,16 +12,9 @@ interface ServiceDetailsAboutProps {
 }
 
 const ServiceDetailsAbout = ({ serviceData, serviceDetails }: ServiceDetailsAboutProps) => {
-  // Debug logging
-  console.log('ServiceDetailsAbout - serviceDetails:', serviceDetails);
-  console.log('ServiceDetailsAbout - hero data:', serviceDetails?.hero);
-  
   // Get before/after images from service details or use defaults
   const beforeImage = serviceDetails?.hero?.beforeImage?.url || "/images/services/before.png";
   const afterImage = serviceDetails?.hero?.afterImage?.url || "/images/services/after.png";
-  
-  console.log('Before image:', beforeImage);
-  console.log('After image:', afterImage);
   
   // Use hero content from admin panel if available, otherwise fallback to service data
   const heroTitle = (serviceDetails?.hero?.title && serviceDetails.hero.title.trim()) 

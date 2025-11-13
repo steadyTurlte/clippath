@@ -10,15 +10,22 @@ interface BlogProps {
 }
 
 const Blog = ({ settings, blogSettings }: BlogProps) => {
+  const bannerImage =
+    blogSettings?.bannerImage ||
+    blogSettings?.pageBanner?.image ||
+    blogSettings?.heroImage ||
+    blogSettings?.hero?.image;
+
   return (
     <Layout settings={settings}>
-      <CmnBanner
-        title={blogSettings?.pageTitle || "Blog"}
-        breadcrumbs={[
-          { text: "Home", link: "/" },
-          { text: blogSettings?.pageTitle || "Blog", link: "/blog" },
-        ]}
-      />
+      {bannerImage && (
+        <CmnBanner
+          title={blogSettings?.pageTitle || "Blog"}
+          image={bannerImage}
+          hideContent
+          overlayOpacity={0}
+        />
+      )}
       <DynamicBlogMain />
     </Layout>
   );

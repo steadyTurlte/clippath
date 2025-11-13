@@ -6,9 +6,9 @@ import { useEffect, useState } from "react";
 
 const FooterOne = () => {
   const [contactInfo, setContactInfo] = useState<any>({
-    email: "info@photodit.com",
+    email: "hello@clippingpathstudiopro.com",
     phone: "+1 (732) 798-0976",
-    address: "785 15h Street, Office 478 Berlin",
+    address: "785 15th Street, Office 478 Berlin",
     googleMapUrl: "https://maps.app.goo.gl/sPRBkpkodse4YU5c9",
     socialLinks: {
       facebook: "https://facebook.com",
@@ -123,7 +123,7 @@ const FooterOne = () => {
           <div className="col-12 col-sm-6 col-lg-3 col-xl-3">
             <div className="footer__single ">
               <div className="footer__head">
-                <h5 className="h5">Meet with photodit</h5>
+                <h5 className="h5">Meet Clipping Path Studio Pro</h5>
               </div>
               <div className="footer__list">
                 <ul>
@@ -232,7 +232,7 @@ const FooterOne = () => {
                   <div className="footer__copy text-center text-lg-end">
                     <p>
                       Copyright &copy; {new Date().getFullYear()}{" "}
-                      <Link href="/">Photodit</Link> All Rights Reserved.
+                    <Link href="/">Clipping Path Studio Pro</Link> All Rights Reserved.
                     </p>
                   </div>
                 </div>

@@ -13,8 +13,29 @@ interface AboutCtaProps {
 }
 
 const AboutCta = ({ data }: AboutCtaProps) => {
+  // Helper function to extract image URL from various formats
+  const getImageUrl = (imageData: any, fallback: any) => {
+    if (!imageData) return fallback;
+    
+    // If it's a string, return it directly
+    if (typeof imageData === "string") return imageData;
+    
+    // If it's an object with url property
+    if (typeof imageData === "object" && imageData.url) return imageData.url;
+    
+    // If it's an object with src property
+    if (typeof imageData === "object" && imageData.src) return imageData.src;
+    
+    // Fallback
+    return fallback;
+  };
+
+  const imageUrl = getImageUrl(data?.image, ctaThumb);
+  const isLocalImage = typeof imageUrl === "string" && imageUrl.startsWith("/images/");
+  
   const ctaData = {
     ...data,
+    image: imageUrl,
   };
   return (
     <section className="try-cta bg-white section">
@@ -35,7 +56,7 @@ const AboutCta = ({ data }: AboutCtaProps) => {
                       alt="CTA Image"
                       width={600}
                       height={400}
-                      unoptimized={ctaData.image?.startsWith("/images/")}
+                      unoptimized={isLocalImage}
                     />
                   </div>
                 </div>

@@ -6,6 +6,8 @@ import Layout from "@/components/layout/Layout";
 import CmnBanner from "@/components/layout/Banner/CmnBanner";
 import { fetchSettings } from "@/utils/fetchPageData";
 import { getData } from "@/utils/dataUtils";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface NewsItem {
   id: number;
@@ -62,16 +64,13 @@ const BlogSingle = ({
     );
   }
 
+  const hasHtmlContent =
+    typeof post.content === "string" &&
+    /<\/?[a-z][\s\S]*>/i.test(post.content.trim());
+
   return (
     <Layout settings={settings}>
-      <CmnBanner
-        title={post.title}
-        breadcrumbs={[
-          { text: "Home", link: "/" },
-          { text: "Blog", link: "/blog" },
-          { text: post.title, link: "#" },
-        ]}
-      />
+      <CmnBanner title={post.title} image={post.image} hideContent overlayOpacity={0} />
 
       <section className="section blog-single">
         <div className="container">
@@ -89,24 +88,13 @@ const BlogSingle = ({
                 </div>
 
                 {(blogSettings?.singlePageSettings?.showAuthor ||
-                  blogSettings?.singlePageSettings?.showDate ||
                   blogSettings?.singlePageSettings?.showCategory) && (
                   <div className="blog-single__meta">
-                    {(blogSettings?.singlePageSettings?.showAuthor ||
-                      blogSettings?.singlePageSettings?.showDate) && (
+                    {blogSettings?.singlePageSettings?.showAuthor && (
                       <div className="meta__left">
-                        {blogSettings?.singlePageSettings?.showAuthor && (
-                          <p>
-                            <strong>Written by:</strong> {post.author}
-                          </p>
-                        )}
-                        {blogSettings?.singlePageSettings?.showAuthor &&
-                          blogSettings?.singlePageSettings?.showDate && (
-                            <span></span>
-                          )}
-                        {blogSettings?.singlePageSettings?.showDate && (
-                          <p>{new Date(post.date).toLocaleDateString()}</p>
-                        )}
+                        <p>
+                          <strong>Written by:</strong> {post.author}
+                        </p>
                       </div>
                     )}
                     {blogSettings?.singlePageSettings?.showCategory && (
@@ -126,9 +114,22 @@ const BlogSingle = ({
                 </div>
 
                 <div className="blog-single__text">
-                  {post.content.split("\n\n").map((paragraph, index) => (
-                    <p key={index}>{paragraph}</p>
-                  ))}
+                  {post.content &&
+                    (hasHtmlContent ? (
+                      <div
+                        className="rich-text"
+                        dangerouslySetInnerHTML={{ __html: post.content }}
+                      />
+                    ) : (
+                      <ReactMarkdown  
+                        components={{
+                          p: ({ children }) => <p className="rich-text">{children}</p>,
+                        }}
+                        remarkPlugins={[remarkGfm]}
+                      >
+                        {post.content || ""}
+                      </ReactMarkdown>
+                    ))}
                 </div>
 
                 {blogSettings?.singlePageSettings?.showTags &&
@@ -229,13 +230,6 @@ const BlogSingle = ({
                                 </Link>
                               </div>
                               <div className="latest-content">
-                                {blogSettings?.singlePageSettings?.showDate && (
-                                  <p>
-                                    {new Date(
-                                      relatedPost.date
-                                    ).toLocaleDateString()}
-                                  </p>
-                                )}
                                 <p>
                                   <Link href={`/blog/${relatedPost.slug}`}>
                                     {relatedPost.title}
@@ -328,6 +322,65 @@ const BlogSingle = ({
         .blog-single__text p {
           margin-bottom: 20px;
           line-height: 1.7;
+        }
+
+        .blog-single__text .rich-text {
+          color: #1f2937;
+          line-height: 1.8;
+        }
+
+        .blog-single__text .rich-text p {
+          margin-bottom: 1.2rem;
+        }
+
+        .blog-single__text .rich-text ul,
+        .blog-single__text .rich-text ol {
+          margin: 1rem 0 1.5rem 1.5rem;
+        }
+
+        .blog-single__text .rich-text li {
+          margin-bottom: 0.6rem;
+        }
+
+        .blog-single__text .rich-text h1,
+        .blog-single__text .rich-text h2,
+        .blog-single__text .rich-text h3,
+        .blog-single__text .rich-text h4,
+        .blog-single__text .rich-text h5,
+        .blog-single__text .rich-text h6 {
+          margin-top: 2rem;
+          margin-bottom: 1rem;
+          font-weight: 600;
+        }
+
+        .blog-single__text .rich-text blockquote {
+          border-left: 4px solid #4569e7;
+          padding-left: 1rem;
+          color: #475569;
+          font-style: italic;
+          margin: 1.5rem 0;
+        }
+
+        .blog-single__text .rich-text code {
+          background-color: #f3f4f6;
+          padding: 0.25rem 0.5rem;
+          border-radius: 4px;
+          font-family: "Fira Code", monospace;
+          font-size: 0.95em;
+        }
+
+        .blog-single__text .rich-text pre {
+          background-color: #0f172a;
+          color: #f8fafc;
+          padding: 1.2rem;
+          border-radius: 8px;
+          overflow-x: auto;
+          margin: 1.5rem 0;
+        }
+
+        .blog-single__text .rich-text pre code {
+          background: transparent;
+          padding: 0;
         }
 
         .blog-single__tags {

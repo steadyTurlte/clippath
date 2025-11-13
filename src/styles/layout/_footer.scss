@@ -18,8 +18,7 @@
   .content {
     margin: 20px 0px 30px;
     p {
-      text-transform: capitalize;
-      color: #818181;
+      color: rgba(255, 255, 255, 0.78);
     }
   }
 
@@ -44,7 +43,6 @@
     .h5 {
       font-weight: 700;
       color: $white;
-      text-transform: capitalize;
     }
   }
 
@@ -57,8 +55,7 @@
     }
     a {
       font-size: 16px;
-      text-transform: capitalize;
-      color: #818181;
+      color: rgba(255, 255, 255, 0.78);
       &:hover {
         color: $white;
         padding-left: 8px;
@@ -78,8 +75,7 @@
       gap: 10px;
       font-size: 16px;
       line-height: 26px;
-      text-transform: capitalize;
-      color: #818181;
+      color: rgba(255, 255, 255, 0.78);
       i {
         color: $tertiary-color;
         transition: inherit;
@@ -120,8 +116,7 @@
       flex-wrap: wrap;
       row-gap: 10px;
       a {
-        text-transform: capitalize;
-        color: #818181;
+        color: rgba(255, 255, 255, 0.78);
         &:hover {
           color: $white;
         }
@@ -131,8 +126,7 @@
 
   .footer__copy {
     p {
-      text-transform: capitalize;
-      color: #818181;
+      color: rgba(255, 255, 255, 0.78);
     }
     a {
       &:hover {
@@ -179,7 +173,7 @@
 
   p {
     color: $white;
-    text-transform: capitalize;
+    text-transform: none;
   }
 
   .h5 {
