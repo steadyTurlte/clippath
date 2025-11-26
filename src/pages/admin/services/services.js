@@ -292,36 +292,30 @@ const ServicesItemsEditor = () => {
         return mainServiceData;
       });
 
-      // Save main services data
-      const response = await fetch('/api/content/services?section=services', {
+      // Prepare details map keyed by slug
+      const detailsMap = {};
+      servicesData.forEach(service => {
+        const slug = slugify(service.title);
+        if (slug && service.details) {
+          detailsMap[slug] = service.details;
+        }
+      });
+
+      // Save everything in one go
+      const response = await fetch('/api/content/services?section=items-and-details', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(dataToSave)
+        body: JSON.stringify({
+          services: dataToSave,
+          details: detailsMap
+        })
       });
 
       if (!response.ok) {
         throw new Error('Failed to save services');
       }
-
-      // Save service details for each service
-      const detailsSavePromises = servicesData.map(async (service) => {
-        const slug = slugify(service.title);
-        if (service.details && slug) {
-          const detailsResponse = await fetch(`/api/content/services?section=details&slug=${encodeURIComponent(slug)}`, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(service.details)
-          });
-          return detailsResponse.ok;
-        }
-        return true;
-      });
-
-      await Promise.all(detailsSavePromises);
 
       toast.success("Services and details saved successfully!");
     } catch (error) {

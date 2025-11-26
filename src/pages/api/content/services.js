@@ -315,6 +315,30 @@ export default async function handler(req, res) {
             redirectTo: "/admin/about/sponsors",
           });
         }
+        if (section === "items-and-details") {
+          const { services, details } = updatedData;
+          
+          if (!services || !details) {
+             return res.status(400).json({ message: "Both services and details are required" });
+          }
+
+          // Update both services list and details map
+          data = {
+            ...data,
+            services: services,
+            details: {
+              ...data.details,
+              ...details
+            }
+          };
+          
+          const success = await saveData("services", data);
+          if (!success) {
+            return res.status(500).json({ message: "Failed to save services and details" });
+          }
+          return res.status(200).json({ message: "Services and details updated successfully", data });
+        }
+        
         data = {
           ...data,
           [section]: updatedData,
