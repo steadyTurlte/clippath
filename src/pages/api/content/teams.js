@@ -1,4 +1,4 @@
-import { getData, saveData } from "@/utils/dataUtils";
+import { getData, saveData, updateSection } from "@/utils/dataUtils";
 
 export default async function handler(req, res) {
   // GET request to retrieve teams data
@@ -33,8 +33,14 @@ export default async function handler(req, res) {
       const { section } = req.query;
       const updatedData = req.body;
 
-      // Save the updated data
-      const success = await saveData("teams", updatedData);
+      let success;
+      if (section) {
+        // Update only the specific section
+        success = await updateSection("teams", section, updatedData);
+      } else {
+        // Save the entire data
+        success = await saveData("teams", updatedData);
+      }
 
       if (!success) {
         return res.status(500).json({ message: "Failed to save teams data" });
