@@ -247,6 +247,10 @@ const HeaderOne = ({ openNav, handleNav, setOpenNav }: HeaderProps) => {
                                         alt={service?.title || "Service"}
                                         width={50}
                                         height={50}
+                                        style={{ 
+                                          objectFit: "cover",
+                                          objectPosition: "center"
+                                        }}
                                       />
                                       <span>{service?.title}</span>
                                     </Link>
