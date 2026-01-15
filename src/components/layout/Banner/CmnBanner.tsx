@@ -85,7 +85,7 @@ const CmnBanner = ({
               </h2>
             </div>
             <div className="col-12 col-md-4">
-              <nav aria-label="breadcrumb">
+              {/* <nav aria-label="breadcrumb">
                 <ol
                   className="breadcrumb justify-content-md-end"
                   data-aos="fade-up"
@@ -114,7 +114,7 @@ const CmnBanner = ({
                     </li>
                   ))}
                 </ol>
-              </nav>
+              </nav> */}
             </div>
           </div>
         </div>
