@@ -7,7 +7,7 @@ const TeamsAdmin = () => {
   return (
     <AdminLayout>
       <Head>
-        <title>Teams Page | Photodit Admin</title>
+        <title>Teams Page</title>
       </Head>
 
       <div className="admin-home">
