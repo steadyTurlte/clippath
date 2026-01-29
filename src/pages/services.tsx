@@ -52,6 +52,18 @@ export const getServerSideProps: GetServerSideProps = async () => {
     );
     const settings = await settingsResponse.json();
 
+    // Fetch testimonials data from dedicated endpoint
+    const testimonialsResponse = await fetch(
+      `${
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
+      }/api/content/testimonials`
+    );
+    let testimonials = null;
+    if (testimonialsResponse.ok) {
+      testimonials = await testimonialsResponse.json();
+      servicesData.testimonials = testimonials;
+    }
+
     return {
       props: {
         servicesData,

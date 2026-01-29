@@ -1,61 +1,98 @@
-import { getData, saveData, updateSection } from "@/utils/dataUtils";
+import { getData, saveData } from "@/utils/dataUtils";
+
+// Default teams data
+const defaultTeamsData = {
+  banner: {
+    title: "Our Team",
+    image: "",
+    breadcrumbs: [
+      {
+        text: "Home",
+        link: "/",
+      },
+      {
+        text: "Team",
+        link: "/teams",
+      },
+    ],
+  },
+  team: {
+    subtitle: "expert team",
+    title: "Meet the awesome team",
+    description:
+      "Our team of skilled professionals is dedicated to delivering exceptional results for every project.",
+    members: [],
+  },
+  section: {
+    subtitle: "team section",
+    title: "Team Section Title",
+    description: "Team section description",
+    largeImage: "",
+  },
+};
 
 export default async function handler(req, res) {
-  // GET request to retrieve teams data
-  if (req.method === "GET") {
-    try {
-      const { section } = req.query;
+  const { method, body, query } = req;
+  const configKey = "teams";
+  const { section } = query;
 
-      // Get the teams data from the JSON file
-      const teamsData = await getData("teams");
+  try {
+    switch (method) {
+      case "GET":
+        // Get all teams data or a specific section
+        const data = await getData(configKey) || defaultTeamsData;
 
-      // If no data exists, return an empty object
-      if (!teamsData) {
-        return res.status(404).json({ message: "Teams data not found" });
-      }
+        if (section) {
+          if (data[section]) {
+            return res.status(200).json(data[section]);
+          }
+          return res.status(404).json({ error: `Section ${section} not found` });
+        }
 
-      // If a specific section is requested, return only that section
-      if (section && teamsData[section]) {
-        return res.status(200).json(teamsData[section]);
-      }
+        return res.status(200).json(data);
 
-      // Return the entire teams data
-      return res.status(200).json(teamsData);
-    } catch (error) {
-      console.error("Error fetching teams data:", error);
-      return res.status(500).json({ message: "Internal server error" });
+      case "PUT":
+        // Update teams data
+        if (!body) {
+          return res.status(400).json({ error: "Request body is required" });
+        }
+
+        // Check if updating a specific section
+        if (section) {
+          const currentData = await getData(configKey) || { ...defaultTeamsData };
+          currentData[section] = body;
+
+          const success = await saveData(configKey, currentData);
+          if (!success) {
+            throw new Error("Failed to save teams data");
+          }
+
+          return res.status(200).json({
+            message: "Teams section updated successfully",
+            data: currentData[section],
+          });
+        }
+
+        // Update entire teams data
+        const bulkSuccess = await saveData(configKey, body);
+        if (!bulkSuccess) {
+          throw new Error("Failed to update teams data");
+        }
+
+        return res.status(200).json({
+          message: "Teams data updated successfully",
+          data: body,
+        });
+
+      default:
+        res.setHeader("Allow", ["GET", "PUT"]);
+        return res.status(405).end(`Method ${method} Not Allowed`);
     }
+  } catch (error) {
+    console.error("Teams API error:", error);
+    return res.status(500).json({
+      error: "An error occurred while processing your request",
+      details: error.message,
+    });
   }
-
-  // PUT request to update teams data
-  if (req.method === "PUT") {
-    try {
-      const { section } = req.query;
-      const updatedData = req.body;
-
-      let success;
-      if (section) {
-        // Update only the specific section
-        success = await updateSection("teams", section, updatedData);
-      } else {
-        // Save the entire data
-        success = await saveData("teams", updatedData);
-      }
-
-      if (!success) {
-        return res.status(500).json({ message: "Failed to save teams data" });
-      }
-
-      return res.status(200).json({
-        message: "Teams data updated successfully",
-        data: updatedData,
-      });
-    } catch (error) {
-      console.error("Error updating teams data:", error);
-      return res.status(500).json({ message: "Internal server error" });
-    }
-  }
-
-  // Method not allowed
-  return res.status(405).json({ message: "Method not allowed" });
 }

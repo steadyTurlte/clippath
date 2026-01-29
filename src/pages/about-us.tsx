@@ -14,6 +14,7 @@ import { GetServerSideProps } from "next";
 export const getServerSideProps: GetServerSideProps = async () => {
   try {
     // Fetch about page data
+    console.log("Fetching about page data...",process.env.NEXT_PUBLIC_API_URL);
     const aboutResponse = await fetch(
       `${
         process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
@@ -21,14 +22,21 @@ export const getServerSideProps: GetServerSideProps = async () => {
     );
     const aboutData = await aboutResponse.json();
 
-    // Fetch testimonials data
-    const services = await fetch(
+    // Fetch team data from dedicated teams endpoint
+    const teamResponse = await fetch(
       `${
         process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
-      }/api/content/services`
+      }/api/content/teams?section=team`
     );
-    const servicesData = await services.json();
-    const testimonials = servicesData.testimonials || null;
+    const teamData = await teamResponse.json();
+
+    // Fetch testimonials data from dedicated testimonials endpoint
+    const testimonialsResponse = await fetch(
+      `${
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
+      }/api/content/testimonials`
+    );
+    const testimonials = await testimonialsResponse.json();
 
     // Fetch settings data
     const settingsResponse = await fetch(
@@ -49,6 +57,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
     return {
       props: {
         aboutData,
+        teamData,
         testimonials,
         settings,
         portfolio,
@@ -61,6 +70,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
     return {
       props: {
         aboutData: null,
+        teamData: null,
         testimonials: null,
         settings: null,
         portfolio: null,
@@ -71,6 +81,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
 
 interface AboutUsProps {
   aboutData?: any;
+  teamData?: any;
   testimonials?: any;
   settings?: any;
   portfolio?: any;
@@ -78,6 +89,7 @@ interface AboutUsProps {
 
 const AboutUs = ({
   aboutData,
+  teamData,
   testimonials,
   settings,
   portfolio,
@@ -89,7 +101,7 @@ const AboutUs = ({
       <AboutOverview data={aboutData?.overview} />
       <AboutMain data={aboutData?.main} />
       <AboutSponsor data={aboutData?.sponsors} />
-      <AboutTeam data={aboutData?.team} />
+      <AboutTeam data={teamData} />
       <AboutFaq data={aboutData?.faq} />
       <TestimonialSec data={testimonials} />
       <AboutCta data={aboutData?.cta} />

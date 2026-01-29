@@ -57,44 +57,6 @@ const defaultAboutData = {
       "/images/sponsor/six.png",
     ],
   },
-  team: {
-    subtitle: "expert team",
-    title: "Meet the awesome team",
-    description:
-      "Our team of skilled professionals is dedicated to delivering exceptional results for every project.",
-    members: [
-      {
-        id: 1,
-        name: "Achim Thiemer mann",
-        position: "Social Media Marketing",
-        image: "/images/team/one.png",
-      },
-      {
-        id: 2,
-        name: "Sarah Johnson",
-        position: "Lead Designer",
-        image: "/images/team/two.png",
-      },
-      {
-        id: 3,
-        name: "Michael Chen",
-        position: "Senior Editor",
-        image: "/images/team/three.png",
-      },
-      {
-        id: 4,
-        name: "Emily Rodriguez",
-        position: "Project Manager",
-        image: "/images/team/four.png",
-      },
-      {
-        id: 5,
-        name: "David Kim",
-        position: "Customer Support",
-        image: "/images/team/five.png",
-      },
-    ],
-  },
   faq: {
     subtitle: "FAQ",
     title: "Frequently Asked Questions",

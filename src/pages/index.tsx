@@ -44,11 +44,16 @@ export const getServerSideProps: GetServerSideProps = async () => {
       };
     }
 
-    if (servicesData && servicesData.testimonials) {
-      homeData.testimonials = {
-        ...homeData.testimonials,
-        items: servicesData.testimonials.items,
-      };
+    // Fetch testimonials from dedicated testimonials endpoint
+    const testimonialsResponse = await fetch(
+      `${
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
+      }/api/content/testimonials`
+    );
+    const testimonialsData = await testimonialsResponse.json();
+
+    if (testimonialsData && testimonialsData.items) {
+      homeData.testimonials = testimonialsData;
     }
 
     const pricingResponse = await fetch(

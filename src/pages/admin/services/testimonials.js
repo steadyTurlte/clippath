@@ -15,7 +15,9 @@ const TestimonialsEditor = () => {
         const res = await fetch('/api/content/testimonials');
         if (res.ok) {
           const data = await res.json();
-          setTestimonials(Array.isArray(data) ? data : data.items || []);
+          // Handle both array and object with items property
+          const items = Array.isArray(data) ? data : (data.items || []);
+          setTestimonials(items);
         } else {
           toast.error('Failed to load testimonials');
         }
@@ -90,7 +92,7 @@ const TestimonialsEditor = () => {
         </div>
         <div className="admin-editor__content">
           {testimonials.map((testimonial, index) => (
-            <div key={index} className="admin-editor__repeater-item-container">
+            <div key={testimonial.id || index} className="admin-editor__repeater-item-container">
               <h4>Testimonial #{index + 1}</h4>
               <div className="admin-editor__field">
                 <label className="admin-editor__label">Name</label>

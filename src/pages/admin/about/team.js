@@ -23,7 +23,7 @@ const AboutTeamEditor = () => {
     // Fetch the team data when the component mounts
     const fetchTeamData = async () => {
       try {
-        const response = await fetch('/api/content/about?section=team');
+        const response = await fetch('/api/content/teams?section=team');
         const data = await response.json();
         setTeamData(data);
         setLoading(false);
@@ -146,7 +146,7 @@ const AboutTeamEditor = () => {
     setError(null);
 
     try {
-      const response = await fetch('/api/content/about?section=team', {
+      const response = await fetch('/api/content/teams?section=team', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
