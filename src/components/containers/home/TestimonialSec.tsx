@@ -11,8 +11,8 @@ interface TestimonialData {
     title?: string;
     items?: {
         name: string;
-        position: string;
-        text: string;
+        role: string;
+        content: string;
         image?: {
             url: string;
             publicId: string;
@@ -25,6 +25,7 @@ interface TestimonialSecProps {
 }
 
 const TestimonialSec = ({ data }: TestimonialSecProps) => {
+  console.log("TestimonialSec data:", data);
   if (!data || !data.items || data.items.length === 0) {
     return null;
   }
@@ -65,7 +66,7 @@ const TestimonialSec = ({ data }: TestimonialSecProps) => {
                     </div>
                     <div className="testimonial-content">
                         <p className="text">
-                           {testimonial.text}
+                           {testimonial.content}
                         </p>
                         <div className="author-meta">
                             <div className="author-thumb">
@@ -78,7 +79,7 @@ const TestimonialSec = ({ data }: TestimonialSecProps) => {
                             </div>
                             <div className="author-info">
                                 <h5 className="author-name">{testimonial.name}</h5>
-                                <p className="author-position">{testimonial.position}</p>
+                                <p className="author-position">{testimonial.role}</p>
                             </div>
                         </div>
                     </div>

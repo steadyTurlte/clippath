@@ -25,125 +25,14 @@ const TeamMembersEditor = () => {
         if (response.ok) {
           const data = await response.json();
 
-          // Default members to use if none exist
-          const defaultMembers = [
-            {
-              id: 1,
-              name: "Sergio R. Haas",
-              position: "Creative Designer",
-              image: "/images/team/one-m.png",
-              social: {
-                facebook: "/",
-                twitter: "/",
-                instagram: "/",
-                linkedin: "/"
-              }
-            },
-            {
-              id: 2,
-              name: "Sergio R. Haas",
-              position: "Creative Designer",
-              image: "/images/team/two-m.png",
-              social: {
-                facebook: "/",
-                twitter: "/",
-                instagram: "/",
-                linkedin: "/"
-              }
-            },
-            {
-              id: 3,
-              name: "Sergio R. Haas",
-              position: "Creative Designer",
-              image: "/images/team/three-m.png",
-              social: {
-                facebook: "/",
-                twitter: "/",
-                instagram: "/",
-                linkedin: "/"
-              }
-            },
-            {
-              id: 4,
-              name: "Sergio R. Haas",
-              position: "Creative Designer",
-              image: "/images/team/four-m.png",
-              social: {
-                facebook: "/",
-                twitter: "/",
-                instagram: "/",
-                linkedin: "/"
-              }
-            },
-            {
-              id: 5,
-              name: "Sergio R. Haas",
-              position: "Creative Designer",
-              image: "/images/team/five-m.png",
-              social: {
-                facebook: "/",
-                twitter: "/",
-                instagram: "/",
-                linkedin: "/"
-              }
-            },
-            {
-              id: 6,
-              name: "Sergio R. Haas",
-              position: "Creative Designer",
-              image: "/images/team/six-m.png",
-              social: {
-                facebook: "/",
-                twitter: "/",
-                instagram: "/",
-                linkedin: "/"
-              }
-            }
-          ];
-
-          // Check if members array exists and has items
-          if (!data.members || data.members.length === 0) {
-            // If no members exist, automatically initialize with default members
-            const updatedData = {
-              ...data,
-              subtitle: data.subtitle || '',
-              title: data.title || '',
-              description: data.description || '',
-              members: defaultMembers,
-              largeImage: data.largeImage || '' // Preserve largeImage if it exists
-            };
-
-            // Save the default members to the database
-            try {
-              const saveResponse = await fetch('/api/content/teams?section=team', {
-                method: 'PUT',
-                headers: {
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(updatedData)
-              });
-
-              if (saveResponse.ok) {
-                console.log('Default team members initialized successfully');
-              } else {
-                console.error('Failed to initialize default team members');
-              }
-            } catch (saveError) {
-              console.error('Error initializing default team members:', saveError);
-            }
-
-            // Update the state with the default members
-            setTeamData(updatedData);
-          } else {
-            // If members exist, use them
-            setTeamData({
-              subtitle: data.subtitle || '',
-              title: data.title || '',
-              description: data.description || '',
-              members: data.members,
-              largeImage: data.largeImage || '' // Preserve largeImage if it exists
-            });
-          }
+          // Set the data as-is from the database, no defaults
+          setTeamData({
+            subtitle: data.subtitle || '',
+            title: data.title || '',
+            description: data.description || '',
+            members: data.members || [],
+            largeImage: data.largeImage || ''
+          });
         } else {
           setError('Failed to load team data');
         }
@@ -158,13 +47,14 @@ const TeamMembersEditor = () => {
     fetchTeamData();
   }, []);
 
-  const handleImageUpload = (imageUrl, publicId) => {
+  const handleImageUpload = (imageUrl, publicId, memberIndex) => {
     const updatedMembers = [...teamData.members];
-    updatedMembers.forEach((member) => {
-      if (member.id === publicId) {
-        member.image = imageUrl;
-      }
-    });
+    if (memberIndex !== undefined && memberIndex !== null) {
+      updatedMembers[memberIndex] = {
+        ...updatedMembers[memberIndex],
+        image: imageUrl
+      };
+    }
     setTeamData({
       ...teamData,
       members: updatedMembers
@@ -462,7 +352,7 @@ const TeamMembersEditor = () => {
                         <div className="admin-page__member-image">
                           <ImageUploader
                             currentImage={member.image}
-                            onImageUpload={handleImageUpload}
+                            onImageUpload={(url, publicId) => handleImageUpload(url, publicId, index)}
                             folder="team/members"
                             label="Member Photo"
                             recommendedSize="400x400px"

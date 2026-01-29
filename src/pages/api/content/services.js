@@ -164,36 +164,6 @@ const defaultServicesData = {
       },
     ],
   },
-  testimonials: {
-    subtitle: "testimonials",
-    title: "What Our Clients Say",
-    items: [
-      {
-        id: 1,
-        name: "Kathryn Murphy",
-        position: "CEO, Founder",
-        image: "/images/testimonial/one.png",
-        rating: 5,
-        text: "Photodit is a fantastic service for anyone looking to enhance their product photography. The team is professional, responsive, and delivers high-quality results consistently.",
-      },
-      {
-        id: 2,
-        name: "Leslie Alexander",
-        position: "Marketing Director",
-        image: "/images/testimonial/two.png",
-        rating: 5,
-        text: "I've been using Photodit for all my e-commerce product images, and the results have been outstanding. Their attention to detail and quick turnaround time have helped me improve my online store significantly.",
-      },
-      {
-        id: 3,
-        name: "Jenny Wilson",
-        position: "Product Manager",
-        image: "/images/testimonial/three.png",
-        rating: 5,
-        text: "The team at Photodit has been instrumental in helping us maintain a consistent look across all our product images. Their clipping path service is precise and their customer service is excellent.",
-      },
-    ],
-  },
   sponsors: {
     title: "Trusted by Leading Brands",
     logos: [

@@ -58,7 +58,7 @@ export default async function handler(req, res) {
           return res.status(200).json(testimonial);
         }
         
-        return res.status(200).json(data.items || data);
+        return res.status(200).json(data);
 
       case 'POST':
         // Add a new testimonial
@@ -88,9 +88,31 @@ export default async function handler(req, res) {
         return res.status(201).json(newTestimonial);
 
       case 'PUT':
-        // Update an existing testimonial
-        if (!id || !body) {
-          return res.status(400).json({ error: 'ID and request body are required' });
+        // Update an existing testimonial or bulk update testimonials
+        if (!body) {
+          return res.status(400).json({ error: 'Request body is required' });
+        }
+        
+        // Check if this is a bulk update (body contains items array)
+        if (body.items && Array.isArray(body.items)) {
+          // Bulk update entire testimonials
+          const bulkUpdateData = {
+            ...defaultTestimonials,
+            ...body,
+            updatedAt: new Date().toISOString()
+          };
+          
+          const bulkUpdateSuccess = await saveData(configKey, bulkUpdateData);
+          if (!bulkUpdateSuccess) {
+            throw new Error('Failed to update testimonials');
+          }
+          
+          return res.status(200).json(bulkUpdateData);
+        }
+        
+        // Single item update - requires ID
+        if (!id) {
+          return res.status(400).json({ error: 'ID is required for single item update' });
         }
         
         const currentData = await getData(configKey) || { items: [] };
