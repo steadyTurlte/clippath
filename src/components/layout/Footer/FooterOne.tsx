@@ -1,3 +1,5 @@
+'use client';
+
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -5,6 +7,7 @@ import LogoLight from "public/images/logo/new-logo.png";
 import { useEffect, useState } from "react";
 
 const FooterOne = () => {
+  const [companyName, setCompanyName] = useState<string>("Image Retouching Pro");
   const [contactInfo, setContactInfo] = useState<any>({
     email: "hello@clippingpathstudiopro.com",
     phone: "+1 (732) 798-0976",
@@ -40,7 +43,7 @@ const FooterOne = () => {
             <div className="footer__single ">
               <div className="logo">
                 <Link href="/">
-                  <Image src={LogoLight} alt="Image" width={200} />
+                  <Image src={LogoLight} alt="Image" width={280} height={100} />
                 </Link>
               </div>
               <div className="content">
@@ -123,7 +126,7 @@ const FooterOne = () => {
           <div className="col-12 col-sm-6 col-lg-3 col-xl-3">
             <div className="footer__single ">
               <div className="footer__head">
-                <h5 className="h5">Meet Clipping Path Studio Pro</h5>
+                <h5 className="h5">Meet Image Retouching Pro</h5>
               </div>
               <div className="footer__list">
                 <ul>
@@ -154,7 +157,7 @@ const FooterOne = () => {
           <div className="col-12 col-sm-6 col-lg-3 col-xl-3">
             <div className="footer__single ">
               <div className="footer__head">
-                <h5 className="h5">get in touch</h5>
+                <h5 className="h5">Get in touch</h5>
               </div>
               <div className="footer__address">
                 <ul>
@@ -232,7 +235,7 @@ const FooterOne = () => {
                   <div className="footer__copy text-center text-lg-end">
                     <p>
                       Copyright &copy; {new Date().getFullYear()}{" "}
-                    <Link href="/">Clipping Path Studio Pro</Link> All Rights Reserved.
+                    <Link href="/">{companyName}</Link> All Rights Reserved.
                     </p>
                   </div>
                 </div>

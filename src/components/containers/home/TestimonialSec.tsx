@@ -25,7 +25,7 @@ interface TestimonialSecProps {
 }
 
 const TestimonialSec = ({ data }: TestimonialSecProps) => {
-  console.log("TestimonialSec data:", data);
+  //console.log("TestimonialSec data:", data);
   if (!data || !data.items || data.items.length === 0) {
     return null;
   }
