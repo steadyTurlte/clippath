@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import Image from 'next/image';
-import Logo from 'public/images/logo.png';
+import Logo from 'public/images/logo/new-logo.png';
 
 const AdminLogin = () => {
   const [password, setPassword] = useState('');
@@ -48,7 +48,7 @@ const AdminLogin = () => {
       <div className="admin-login">
         <div className="admin-login__container">
           <div className="admin-login__logo">
-            <Image src={Logo} alt="Photodit Logo" width={150} height={50} />
+            <Image src={Logo} alt="Logo" width={240} height={80} />
           </div>
           <h1 className="admin-login__title">Admin Login</h1>
           
