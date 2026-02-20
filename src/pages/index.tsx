@@ -21,21 +21,21 @@ export const getServerSideProps: GetServerSideProps = async () => {
         process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
       }/api/content/home`
     );
-    const homeData = await homeResponse.json();
+    const homeData = homeResponse.ok ? await homeResponse.json() : {};
 
     const newsResponse = await fetch(
       `${
         process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
       }/api/content/news`
     );
-    const newsData = await newsResponse.json();
+    const newsData = newsResponse.ok ? await newsResponse.json() : { news: [] };
 
     const servicesResponse = await fetch(
       `${
         process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
       }/api/content/services`
     );
-    const servicesData = await servicesResponse.json();
+    const servicesData = servicesResponse.ok ? await servicesResponse.json() : {};
 
     if (servicesData && servicesData.services) {
       homeData.services = {
@@ -50,7 +50,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
         process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
       }/api/content/testimonials`
     );
-    const testimonialsData = await testimonialsResponse.json();
+    const testimonialsData = testimonialsResponse.ok ? await testimonialsResponse.json() : {};
 
     if (testimonialsData && testimonialsData.items) {
       homeData.testimonials = testimonialsData;
@@ -61,14 +61,14 @@ export const getServerSideProps: GetServerSideProps = async () => {
         process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
       }/api/content/pricing?section=main`
     );
-    const pricingData = await pricingResponse.json();
+    const pricingData = pricingResponse.ok ? await pricingResponse.json() : {};
 
     const settingsResponse = await fetch(
       `${
         process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
       }/api/settings`
     );
-    const settingsData = await settingsResponse.json();
+    const settingsData = settingsResponse.ok ? await settingsResponse.json() : {};
 
     // Fetch sponsors data from about.json
     const aboutResponse = await fetch(
@@ -76,7 +76,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
         process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
       }/api/content/about?section=sponsors`
     );
-    const sponsorsData = await aboutResponse.json();
+    const sponsorsData = aboutResponse.ok ? await aboutResponse.json() : {};
 
     // Fetch payment methods data from pricing.json
     const paymentMethodsResponse = await fetch(
@@ -84,7 +84,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
         process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
       }/api/content/pricing?section=paymentMethods`
     );
-    const paymentMethodsData = await paymentMethodsResponse.json();
+    const paymentMethodsData = paymentMethodsResponse.ok ? await paymentMethodsResponse.json() : {};
 
     homeData.pricing = pricingData;
     homeData.sponsors = sponsorsData;

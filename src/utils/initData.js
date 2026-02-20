@@ -286,7 +286,7 @@ const defaultHomeData = {
 // Default data for settings
 const defaultSettingsData = {
   site: {
-    title: "Photodit - Clipping Path Service",
+    title: "Image retouching pro",
     description:
       "Professional photo editing services for e-commerce businesses and photographers.",
   },

@@ -164,7 +164,7 @@ const HeaderOne = ({ openNav, handleNav, setOpenNav }: HeaderProps) => {
                 <div className="nav__content">
                   <div className="nav__logo">
                     <Link href="/">
-                      <Image priority src={logoSrc} alt="Logo" width={180} />
+                      <Image priority src={logoSrc} alt="Logo" width={240} />
                     </Link>
                     <button
                       aria-label="open sidebar"
@@ -186,7 +186,7 @@ const HeaderOne = ({ openNav, handleNav, setOpenNav }: HeaderProps) => {
                   >
                     <div className="nav__menu-logo d-flex d-xl-none">
                       <Link href="/" className="text-center hide-nav">
-                        <Image priority src={Logo} alt="Logo" />
+                        <Image priority src={Logo} alt="Logo" width={240} height={80} />
                       </Link>
                       <a className="nav__menu-close" onClick={closeNav}>
                         <i className="fa-solid fa-xmark"></i>

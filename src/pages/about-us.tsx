@@ -20,7 +20,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
         process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
       }/api/content/about`
     );
-    const aboutData = await aboutResponse.json();
+    const aboutData = aboutResponse.ok ? await aboutResponse.json() : {};
 
     // Fetch team data from dedicated teams endpoint
     const teamResponse = await fetch(
@@ -28,7 +28,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
         process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
       }/api/content/teams?section=team`
     );
-    const teamData = await teamResponse.json();
+    const teamData = teamResponse.ok ? await teamResponse.json() : {};
 
     // Fetch testimonials data from dedicated testimonials endpoint
     const testimonialsResponse = await fetch(
@@ -36,7 +36,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
         process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
       }/api/content/testimonials`
     );
-    const testimonials = await testimonialsResponse.json();
+    const testimonials = testimonialsResponse.ok ? await testimonialsResponse.json() : {};
 
     // Fetch settings data
     const settingsResponse = await fetch(
@@ -44,7 +44,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
         process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
       }/api/content/settings`
     );
-    const settings = await settingsResponse.json();
+    const settings = settingsResponse.ok ? await settingsResponse.json() : {};
 
     // Fetch portfolio data
     const portfolioResponse = await fetch(
@@ -52,7 +52,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
         process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
       }/api/content/portfolio`
     );
-    const portfolio = await portfolioResponse.json();
+    const portfolio = portfolioResponse.ok ? await portfolioResponse.json() : {};
 
     return {
       props: {

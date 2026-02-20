@@ -15,9 +15,9 @@ type LayoutProps = {
 const Layout = ({
   children,
   settings,
-  title = "Photodit | Clipping Path Service React NextJs Template",
-  description = "Clipping Path Service React NextJs Template",
-  keywords = "photodit, image editing, edit, react",
+  title = "Image retouching pro",
+  description = "Professional photo editing services for e-commerce businesses and photographers",
+  keywords = "image retouching, photo editing, edit, react",
 }: LayoutProps) => {
   const [openNav, setOpenNav] = useState(false);
 

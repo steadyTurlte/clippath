@@ -9,7 +9,7 @@ export default async function handler(req, res) {
       // Define complete default settings structure
       const defaultSettings = {
         site: {
-          title: "Photodit - Clipping Path Service",
+          title: "Image retouching pro",
           description:
             "Professional photo editing services for e-commerce businesses and photographers.",
           logo: "/images/logo.png",
