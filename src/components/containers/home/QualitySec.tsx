@@ -169,11 +169,13 @@ const QualitySec = ({ data }: QualitySecProps) => {
                   }`}
                 >
                   <div className="rangu" style={{ maxWidth: "800px", margin: "0 auto" }}>
-                    <BeforeAfterComparisonWrapper
-                      beforeImage={category.beforeAfterImages[0].before}
-                      afterImage={category.beforeAfterImages[0].after}
-                      alt={category.name}
-                    />
+                    {category.beforeAfterImages?.[0] && (
+                      <BeforeAfterComparisonWrapper
+                        beforeImage={category.beforeAfterImages[0].before}
+                        afterImage={category.beforeAfterImages[0].after}
+                        alt={category.name}
+                      />
+                    )}
                   </div>
                 </div>
               ))}
