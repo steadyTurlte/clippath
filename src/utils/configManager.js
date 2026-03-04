@@ -6,7 +6,7 @@ import { Pool } from 'pg';
 class DatabaseConfigManager {
   constructor() {
     this.pool = new Pool({
-      connectionString: process.env.DB_URL,
+      connectionString: process.env.DATABASE_URL,
       ssl: { rejectUnauthorized: false },
     });
     this.cache = new Map();
