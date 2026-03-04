@@ -17,7 +17,7 @@ const defaultAboutData = {
     ],
   },
   overview: {
-    images: ["/images/about/overview-1.png", "/images/about/overview-2.png"],
+    images: ["/images/about/about-overview-one.png", "/images/about/about-overview-two.png"],
     title: "Our good work goes beyond perfect edits",
     description:
       "We're a team of passionate photo editors dedicated to delivering high-quality image editing services. Our expertise spans across various industries, helping businesses showcase their products in the best light possible.",

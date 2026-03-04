@@ -5,6 +5,7 @@ import Image from 'next/image';
 import AdminLayout from '@/components/admin/AdminLayout';
 import ImageUploader from '@/components/admin/common/ImageUploader';
 import { toast } from 'react-toastify';
+import { get } from 'http';
 
 const AboutOverviewEditor = () => {
   const [overviewData, setOverviewData] = useState({
@@ -20,49 +21,58 @@ const AboutOverviewEditor = () => {
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [error, setError] = useState(null);
 
+  // Extract public ID from a Cloudinary URL
+  const getPublicIdFromUrl = (url) => {
+    if (!url) return '';
+    // Extract public ID from Cloudinary URL format
+    const matches = url.match(/upload\/v\d+\/([^\/]+)\./);
+    return matches ? matches[1] : '';
+  };
+
+  // Fetch overview data function
+  const fetchOverviewData = async () => {
+    try {
+      const response = await fetch('/api/content/about?section=overview');
+      const data = await response.json();
+      
+      // Initialize imagePublicIds based on the fetched data
+      if (data.images && data.images.length > 0) {
+        const initialPublicIds = data.images.map(image => {
+          if (typeof image === 'object' && image.publicId) {
+            return image.publicId;
+          }
+          // Extract public ID from URL if it's a Cloudinary URL
+          if (typeof image === 'string' && image.includes('cloudinary')) {
+            const parts = image.split('/');
+            const publicId = parts[parts.length - 1].split('.')[0];
+            return publicId;
+          }
+          return null;
+        });
+        setImagePublicIds(initialPublicIds);
+        
+        // Convert images to array of strings (URLs) for backward compatibility
+        if (data.images.some(img => typeof img === 'object')) {
+          data.images = data.images.map(img => 
+            typeof img === 'object' ? img.url : img
+          );
+        }
+      } else {
+        // Initialize with empty public IDs if no images
+        setImagePublicIds(Array(3).fill(null));
+      }
+      
+      setOverviewData(data);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching overview data:', error);
+      toast.error('Failed to load overview data');
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     // Fetch the overview data when the component mounts
-    const fetchOverviewData = async () => {
-      try {
-        const response = await fetch('/api/content/about?section=overview');
-        const data = await response.json();
-        
-        // Initialize imagePublicIds based on the fetched data
-        if (data.images && data.images.length > 0) {
-          const initialPublicIds = data.images.map(image => {
-            if (typeof image === 'object' && image.publicId) {
-              return image.publicId;
-            }
-            // Extract public ID from URL if it's a Cloudinary URL
-            if (typeof image === 'string' && image.includes('cloudinary')) {
-              const parts = image.split('/');
-              const publicId = parts[parts.length - 1].split('.')[0];
-              return publicId;
-            }
-            return null;
-          });
-          setImagePublicIds(initialPublicIds);
-          
-          // Convert images to array of strings (URLs) for backward compatibility
-          if (data.images.some(img => typeof img === 'object')) {
-            data.images = data.images.map(img => 
-              typeof img === 'object' ? img.url : img
-            );
-          }
-        } else {
-          // Initialize with empty public IDs if no images
-          setImagePublicIds(Array(3).fill(null));
-        }
-        
-        setOverviewData(data);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching overview data:', error);
-        toast.error('Failed to load overview data');
-        setLoading(false);
-      }
-    };
-
     fetchOverviewData();
   }, []);
 
@@ -89,17 +99,17 @@ const AboutOverviewEditor = () => {
 
   const handleImageChange = (index, imageUrl, publicId = null) => {
     const updatedImages = [...overviewData.images];
-    const updatedPublicIds = [...imagePublicIds];
+   // const updatedPublicIds = [...imagePublicIds];
     
-    updatedImages[index] = imageUrl;
-    updatedPublicIds[index] = publicId || updatedPublicIds[index];
+    updatedImages[index] = { url: imageUrl, publicId: getPublicIdFromUrl(imageUrl) };
+   // updatedPublicIds[index] = publicId || updatedPublicIds[index];
 
     setOverviewData({
       ...overviewData,
       images: updatedImages
     });
     
-    setImagePublicIds(updatedPublicIds);
+   // setImagePublicIds(updatedPublicIds);
   };
 
   const handleImageUpload = (index, imageUrl, publicId) => {
@@ -112,13 +122,10 @@ const AboutOverviewEditor = () => {
     setError(null);
 
     try {
-      // Prepare data with images including public IDs
+      // Prepare data with images as simple strings and public IDs
       const dataToSave = {
         ...overviewData,
-        images: overviewData.images.map((url, index) => ({
-          url,
-          publicId: imagePublicIds[index] || null
-        }))
+        images: overviewData.images
       };
 
       const response = await fetch('/api/content/about?section=overview', {
@@ -132,6 +139,9 @@ const AboutOverviewEditor = () => {
       if (response.ok) {
         // Set the inline success message
         setSaveSuccess(true);
+
+        // Refetch the data to show updated images
+        await fetchOverviewData();
 
         // Hide success message after 3 seconds
         setTimeout(() => {
@@ -234,7 +244,38 @@ const AboutOverviewEditor = () => {
             </div>
           </div>
 
-          {/* Overview Images section removed as per requirements */}
+          <div className="admin-editor__section">
+            <h2 className="admin-editor__section-title">Overview Images</h2>
+            <p className="admin-editor__help-text" style={{ marginBottom: '16px' }}>
+              Upload two images to display in the overview section
+            </p>
+            
+            <div className="admin-editor__image-grid">
+              <div className="admin-editor__image-field">
+                <label className="admin-editor__label">Image 1</label>
+                <ImageUploader
+                  onImageUpload={(url, publicId) => handleImageUpload(0, url, publicId)}
+                  currentImage={overviewData.images[0]?.url || ''}
+                  folder="images/about"
+                  label="Upload first overview image"
+                  recommendedSize="1920x400px"
+                  className="banner-editor__image-uploader"
+                />
+              </div>
+
+              <div className="admin-editor__image-field">
+                <label className="admin-editor__label">Image 2</label>
+                <ImageUploader
+                  onImageUpload={(url, publicId) => handleImageUpload(1, url, publicId)}
+                  currentImage={overviewData.images[1]?.url || ''}
+                  folder="images/about"
+                  label="Upload second overview image"
+                  recommendedSize="1920x400px"
+                  className="banner-editor__image-uploader"
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -452,6 +493,24 @@ const AboutOverviewEditor = () => {
         
         .admin-editor__image-uploader {
           width: 100%;
+        }
+
+        .admin-editor__image-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 24px;
+        }
+
+        @media (max-width: 768px) {
+          .admin-editor__image-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        .admin-editor__help-text {
+          font-size: 12px;
+          color: #64748b;
+          margin-top: 4px;
         }
       `}</style>
     </AdminLayout>
