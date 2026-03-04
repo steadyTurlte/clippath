@@ -36,31 +36,31 @@ const AboutOverviewEditor = () => {
       const data = await response.json();
       
       // Initialize imagePublicIds based on the fetched data
-      if (data.images && data.images.length > 0) {
-        const initialPublicIds = data.images.map(image => {
-          if (typeof image === 'object' && image.publicId) {
-            return image.publicId;
-          }
-          // Extract public ID from URL if it's a Cloudinary URL
-          if (typeof image === 'string' && image.includes('cloudinary')) {
-            const parts = image.split('/');
-            const publicId = parts[parts.length - 1].split('.')[0];
-            return publicId;
-          }
-          return null;
-        });
-        setImagePublicIds(initialPublicIds);
+      // if (data.images && data.images.length > 0) {
+      //   const initialPublicIds = data.images.map(image => {
+      //     if (typeof image === 'object' && image.publicId) {
+      //       return image.publicId;
+      //     }
+      //     // Extract public ID from URL if it's a Cloudinary URL
+      //     if (typeof image === 'string' && image.includes('cloudinary')) {
+      //       const parts = image.split('/');
+      //       const publicId = parts[parts.length - 1].split('.')[0];
+      //       return publicId;
+      //     }
+      //     return null;
+      //   });
+      //   setImagePublicIds(initialPublicIds);
         
-        // Convert images to array of strings (URLs) for backward compatibility
-        if (data.images.some(img => typeof img === 'object')) {
-          data.images = data.images.map(img => 
-            typeof img === 'object' ? img.url : img
-          );
-        }
-      } else {
-        // Initialize with empty public IDs if no images
-        setImagePublicIds(Array(3).fill(null));
-      }
+      //   // Convert images to array of strings (URLs) for backward compatibility
+      //   if (data.images.some(img => typeof img === 'object')) {
+      //     data.images = data.images.map(img => 
+      //       typeof img === 'object' ? img.url : img
+      //     );
+      //   }
+      // } else {
+      //   // Initialize with empty public IDs if no images
+      //   setImagePublicIds(Array(3).fill(null));
+      // }
       
       setOverviewData(data);
       setLoading(false);
@@ -101,7 +101,7 @@ const AboutOverviewEditor = () => {
     const updatedImages = [...overviewData.images];
    // const updatedPublicIds = [...imagePublicIds];
     
-    updatedImages[index] = { url: imageUrl, publicId: getPublicIdFromUrl(imageUrl) };
+    updatedImages[index] = imageUrl;
    // updatedPublicIds[index] = publicId || updatedPublicIds[index];
 
     setOverviewData({
@@ -255,7 +255,7 @@ const AboutOverviewEditor = () => {
                 <label className="admin-editor__label">Image 1</label>
                 <ImageUploader
                   onImageUpload={(url, publicId) => handleImageUpload(0, url, publicId)}
-                  currentImage={overviewData.images[0]?.url || ''}
+                  currentImage={overviewData.images[0]?.url || overviewData.images[0] || ''}
                   folder="images/about"
                   label="Upload first overview image"
                   recommendedSize="1920x400px"
@@ -267,7 +267,7 @@ const AboutOverviewEditor = () => {
                 <label className="admin-editor__label">Image 2</label>
                 <ImageUploader
                   onImageUpload={(url, publicId) => handleImageUpload(1, url, publicId)}
-                  currentImage={overviewData.images[1]?.url || ''}
+                  currentImage={overviewData.images[1]?.url || overviewData.images[1] || ''}
                   folder="images/about"
                   label="Upload second overview image"
                   recommendedSize="1920x400px"
