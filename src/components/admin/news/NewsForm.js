@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
+import RichTextEditor from '@/components/admin/common/RichTextEditor';
 
 const NewsForm = ({ news, onSave, onCancel }) => {
   const [formData, setFormData] = useState(news || {
@@ -188,14 +189,11 @@ const NewsForm = ({ news, onSave, onCancel }) => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="content">Content</label>
-            <textarea
-              id="content"
-              name="content"
+            <label htmlFor="content">Content (Rich Text)</label>
+            <RichTextEditor
               value={formData.content}
-              onChange={handleChange}
-              className={`form-control ${errors.content ? 'is-invalid' : ''}`}
-              rows={10}
+              onChange={(content) => setFormData({ ...formData, content: content })}
+              placeholder="Write the full article content here"
             />
             {errors.content && <div className="invalid-feedback">{errors.content}</div>}
           </div>
