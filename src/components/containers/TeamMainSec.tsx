@@ -99,7 +99,7 @@ const TeamMainSec = ({ teamData }: TeamMainSecProps) => {
                       <p>{member.position}</p>
                     </div>
                     <ul className="social">
-                      {member.social.facebook && (
+                      {member?.social?.facebook && (
                         <li>
                           <Link
                             href={member.social.facebook}
@@ -109,7 +109,7 @@ const TeamMainSec = ({ teamData }: TeamMainSecProps) => {
                           </Link>
                         </li>
                       )}
-                      {member.social.twitter && (
+                      {member?.social?.twitter && (
                         <li>
                           <Link
                             href={member.social.twitter}
@@ -119,7 +119,7 @@ const TeamMainSec = ({ teamData }: TeamMainSecProps) => {
                           </Link>
                         </li>
                       )}
-                      {member.social.instagram && (
+                      {member?.social?.instagram && (
                         <li>
                           <Link
                             href={member.social.instagram}
@@ -129,7 +129,7 @@ const TeamMainSec = ({ teamData }: TeamMainSecProps) => {
                           </Link>
                         </li>
                       )}
-                      {member.social.linkedin && (
+                      {member?.social?.linkedin && (
                         <li>
                           <Link
                             href={member.social.linkedin}

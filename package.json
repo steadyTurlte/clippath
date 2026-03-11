@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@next/third-parties": "^16.1.6",
     "@types/isotope-layout": "^3.0.9",
     "@types/node": "20.5.0",
     "@types/react": "18.2.20",
