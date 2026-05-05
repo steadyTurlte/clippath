@@ -58,6 +58,11 @@ const Layout = ({
           content={settings?.site?.description || description}
         />
 
+        <meta
+          name="google-site-verification"
+          content="xPx0e4r59hxPtocAaDUZb5d7pBN3hqGoKufKRBzddMI"
+        />
+
         {/* OpenGraph SEO (recommended) */}
         <meta property="og:title" content={settings?.site?.title || title} />
         <meta
