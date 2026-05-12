@@ -3,7 +3,6 @@ import Head from "next/head";
 import HeaderOne from "./Header/HeaderOne";
 import FooterOne from "./Footer/FooterOne";
 import ScrollProgressBtn from "./ScrollProgressBtn/ScrollProgressBtn";
-import { GoogleTagManager } from "@next/third-parties/google";
 
 type LayoutProps = {
   children: React.ReactNode;
@@ -63,6 +62,21 @@ const Layout = ({
           content="xPx0e4r59hxPtocAaDUZb5d7pBN3hqGoKufKRBzddMI"
         />
 
+        <script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-0TGJJ8QT72"
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-0TGJJ8QT72');
+            `,
+          }}
+        />
+
         {/* OpenGraph SEO (recommended) */}
         <meta property="og:title" content={settings?.site?.title || title} />
         <meta
@@ -73,16 +87,6 @@ const Layout = ({
       </Head>
 
       <div className={`${combinedClasses}${openNav ? " body-active" : " "}`}>
-        {/* Google Tag Manager (noscript fallback) */}
-        <noscript>
-          <iframe
-            src="https://www.googletagmanager.com/ns.html?id=GTM-M75FF4DQ"
-            height="0"
-            width="0"
-            style={{ display: "none", visibility: "hidden" }}
-          />
-        </noscript>
-
         <HeaderOne
           openNav={openNav}
           handleNav={handleNav}
@@ -95,9 +99,6 @@ const Layout = ({
 
         <ScrollProgressBtn />
       </div>
-
-      {/* Google Tag Manager script */}
-      <GoogleTagManager gtmId="GTM-M75FF4DQ" />
     </Fragment>
   );
 };
