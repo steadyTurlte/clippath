@@ -141,7 +141,10 @@ export default async function handler(req, res) {
           [section]: updatedData,
         };
       } else {
-        data = updatedData;
+        data = {
+          ...data,
+          ...updatedData,
+        };
       }
       const success = await saveData("about", data);
       if (!success) {

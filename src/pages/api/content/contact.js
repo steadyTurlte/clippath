@@ -75,8 +75,11 @@ export default async function handler(req, res) {
           [section]: updatedData,
         };
       } else {
-        // Update the entire contact page data
-        data = updatedData;
+        // Update contact page data safely by merging
+        data = {
+          ...data,
+          ...updatedData,
+        };
       }
 
       // Save the updated data

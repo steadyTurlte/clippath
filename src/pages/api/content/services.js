@@ -315,12 +315,17 @@ export default async function handler(req, res) {
         };
       } else {
         const currentPricing = data.pricing;
+        const currentDetails = data.details || {};
         const aboutData = await getData("about");
         const sponsors = aboutData && aboutData.sponsors ? aboutData.sponsors : data.sponsors;
         data = {
           ...updatedData,
           pricing: currentPricing,
           sponsors: sponsors,
+          details: {
+            ...currentDetails,
+            ...(updatedData.details || {})
+          }
         };
       }
       const success = await saveData("services", data);

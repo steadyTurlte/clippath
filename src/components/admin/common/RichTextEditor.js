@@ -20,6 +20,24 @@ const modules = {
       ['clean']
     ],
     handlers: {
+      link: function(value) {
+        if (!value) {
+          this.quill.format('link', false);
+          return;
+        }
+
+        const url = prompt('Enter the link URL (for example, https://facebook.com):');
+        if (!url) return;
+
+        const trimmedUrl = url.trim();
+        // Browsers treat a bare domain as a relative path. Add HTTPS so links such
+        // as "facebook.com" always point to the external site.
+        const normalizedUrl = /^(?:[a-z][a-z\d+.-]*:|\/|#)/i.test(trimmedUrl)
+          ? trimmedUrl
+          : `https://${trimmedUrl}`;
+
+        this.quill.format('link', normalizedUrl);
+      },
       image: function() {
         const input = document.createElement('input');
         input.setAttribute('type', 'file');
@@ -141,5 +159,4 @@ const RichTextEditor = ({ value = '', onChange, placeholder = '' }) => {
 };
 
 export default RichTextEditor;
-
 

@@ -13,9 +13,10 @@ interface AboutSponsorProps {
 
 const AboutSponsor = ({ data }: AboutSponsorProps) => {
   const sponsorData = {
-    ...data,
-    logos: data.logos,
+    title: data?.title || "Serving the world's top brands",
+    logos: Array.isArray(data?.logos) ? data.logos : [],
   };
+  if (!sponsorData.logos.length) return null;
   return (
     <div className="sponsor-three sponsor-alt section pb-0">
       <div className="container">
