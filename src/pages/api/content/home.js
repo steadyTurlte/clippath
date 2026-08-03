@@ -3,7 +3,7 @@ import { getData, saveData } from "@/utils/dataUtils";
 // Default data for the home page
 const defaultHomeData = {
   banner: {
-    subtitle: "Welcome to Photodit",
+    subtitle: "s",
     title: "Professional Photo Editing Service",
     images: {
       main: "/images/banner/thumb.png",

@@ -35,11 +35,11 @@ const AboutOverview = ({ data }: AboutOverviewProps) => {
 
   const overviewData = {
     ...data,
-    images: data.images || [],
+    images: data?.images || [],
   };
 
-  const image1 = getImageUrl(overviewData.images[0], One);
-  const image2 = getImageUrl(overviewData.images[1], Two);
+  const image1 = getImageUrl(overviewData.images?.[0], One);
+  const image2 = getImageUrl(overviewData.images?.[1], Two);
 
   return (
     <section className="about-overview section" style={{ top: 0, marginBottom: 0 }}>

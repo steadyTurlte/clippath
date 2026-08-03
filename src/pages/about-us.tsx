@@ -10,48 +10,37 @@ import TestimonialSec from "@/components/containers/home/TestimonialSec";
 import AboutCta from "@/components/containers/about/AboutCta";
 import { GetServerSideProps } from "next";
 
+const getBaseUrl = () => {
+  const url = process.env.NEXT_PUBLIC_API_URL;
+  if (url && (url.startsWith("http://") || url.startsWith("https://"))) {
+    return url;
+  }
+  return "http://localhost:3000";
+};
+
 // This gets called on every request
 export const getServerSideProps: GetServerSideProps = async () => {
   try {
+    const baseUrl = getBaseUrl();
     // Fetch about page data
-    console.log("Fetching about page data...",process.env.NEXT_PUBLIC_API_URL);
-    const aboutResponse = await fetch(
-      `${
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
-      }/api/content/about`
-    );
+    console.log("Fetching about page data...", baseUrl);
+    const aboutResponse = await fetch(`${baseUrl}/api/content/about`);
     const aboutData = aboutResponse.ok ? await aboutResponse.json() : {};
 
     // Fetch team data from dedicated teams endpoint
-    const teamResponse = await fetch(
-      `${
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
-      }/api/content/teams?section=team`
-    );
+    const teamResponse = await fetch(`${baseUrl}/api/content/teams?section=team`);
     const teamData = teamResponse.ok ? await teamResponse.json() : {};
 
     // Fetch testimonials data from dedicated testimonials endpoint
-    const testimonialsResponse = await fetch(
-      `${
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
-      }/api/content/testimonials`
-    );
+    const testimonialsResponse = await fetch(`${baseUrl}/api/content/testimonials`);
     const testimonials = testimonialsResponse.ok ? await testimonialsResponse.json() : {};
 
     // Fetch settings data
-    const settingsResponse = await fetch(
-      `${
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
-      }/api/content/settings`
-    );
+    const settingsResponse = await fetch(`${baseUrl}/api/content/settings`);
     const settings = settingsResponse.ok ? await settingsResponse.json() : {};
 
     // Fetch portfolio data
-    const portfolioResponse = await fetch(
-      `${
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
-      }/api/content/portfolio`
-    );
+    const portfolioResponse = await fetch(`${baseUrl}/api/content/portfolio`);
     const portfolio = portfolioResponse.ok ? await portfolioResponse.json() : {};
 
     return {

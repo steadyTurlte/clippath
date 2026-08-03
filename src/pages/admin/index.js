@@ -11,7 +11,7 @@ const AdminDashboard = () => {
       </Head>
 
       <div className="admin-dashboard">
-        <h1 className="admin-dashboard__title">Welcome to Photodit Admin Panel</h1>
+        <h1 className="admin-dashboard__title">sAdmin Panel</h1>
         <div className="admin-dashboard__welcome-box">
           <div className="admin-dashboard__welcome-icon">
             <i className="fa-solid fa-wand-magic-sparkles"></i>
