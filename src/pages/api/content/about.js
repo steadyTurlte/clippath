@@ -107,16 +107,10 @@ export default async function handler(req, res) {
     try {
       const { section } = req.query;
       let data = await getData("about");
-      if (!data || Object.keys(data).length === 0) {
-        await saveData("about", defaultAboutData);
-        data = { ...defaultAboutData };
+      if (!data) {
+        data = {};
       }
       if (section) {
-        if (!data[section] && defaultAboutData[section]) {
-          data[section] = defaultAboutData[section];
-          await saveData("about", data);
-          return res.status(200).json(defaultAboutData[section]);
-        }
         return res.status(200).json(data[section] || {});
       }
       return res.status(200).json(data);
@@ -132,9 +126,6 @@ export default async function handler(req, res) {
       const { section } = req.query;
       const updatedData = req.body;
       let data = (await getData("about")) || {};
-      if (!data || Object.keys(data).length === 0) {
-        data = { ...defaultAboutData };
-      }
       if (section) {
         data = {
           ...data,

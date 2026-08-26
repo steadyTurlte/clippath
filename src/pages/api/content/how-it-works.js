@@ -20,11 +20,7 @@ export default async function handler(req, res) {
     case 'GET':
       try {
         const data = await getData(HOW_IT_WORKS_KEY);
-        if (!data) {
-          await saveData(HOW_IT_WORKS_KEY, defaultData);
-          return res.status(200).json(defaultData);
-        }
-        res.status(200).json(data);
+        res.status(200).json(data || {});
       } catch (error) {
         res.status(500).json({ message: 'Error fetching data', error });
       }

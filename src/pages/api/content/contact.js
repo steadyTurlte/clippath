@@ -28,25 +28,12 @@ export default async function handler(req, res) {
       // Get the contact page data from the JSON file
       let data = await getData("contact");
 
-      // If no data exists, use the default data
-      if (!data || Object.keys(data).length === 0) {
-        // Save the default data to the JSON file
-        await saveData("contact", defaultContactData);
-        data = { ...defaultContactData };
+      if (!data) {
+        data = {};
       }
 
       // If a specific section is requested, return only that section
       if (section) {
-        // If the section doesn't exist, return the default section data
-        if (!data[section] && defaultContactData[section]) {
-          // Update the contact data with the default section
-          data[section] = defaultContactData[section];
-          await saveData("contact", data);
-
-          return res.status(200).json(defaultContactData[section]);
-        }
-
-        // Return the requested section
         return res.status(200).json(data[section] || {});
       }
 
