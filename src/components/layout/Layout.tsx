@@ -64,7 +64,7 @@ const Layout = ({
 
         <script
           async
-          src="https://www.googletagmanager.com/gtag/js?id=G-0TGJJ8QT72"
+          src="https://www.googletagmanager.com/gtag/js?id=G-4MRB15168G"
         />
         <script
           dangerouslySetInnerHTML={{
@@ -72,7 +72,7 @@ const Layout = ({
               window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments);}
               gtag('js', new Date());
-              gtag('config', 'G-0TGJJ8QT72');
+              gtag('config', 'G-4MRB15168G');
             `,
           }}
         />
