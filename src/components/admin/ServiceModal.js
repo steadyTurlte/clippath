@@ -285,7 +285,7 @@ const ServiceModal = ({ isOpen, onClose, onSave, service, isNew }) => {
                 </div>
 
                 {formData.details.projects.length === 0 ? (
-                  <p className="empty-text">No projects added yet. Click "+ Add Project" to add one.</p>
+                  <p className="empty-text">No projects added yet. Click &quot;+ Add Project&quot; to add one.</p>
                 ) : (
                   formData.details.projects.map((project, idx) => (
                     <div key={idx} className="project-card">
