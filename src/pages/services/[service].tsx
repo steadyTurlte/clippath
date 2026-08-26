@@ -229,8 +229,10 @@ const ServiceDetail = () => {
       {/* Client Testimonials Section - Common for all services */}
       <TestimonialSec data={testimonialData || []} />
 
-      {/* FAQ Section - Common for all services */}
-      <ServiceFaq data={faqData || { faqs: [] }} />
+      {/* FAQ Section - Service specific FAQs */}
+      {detail?.faqs && Array.isArray(detail.faqs) && detail.faqs.length > 0 && (
+        <ServiceFaq items={detail.faqs} />
+      )}
 
       {/* Contact Us Section - Functional contact form */}
       {contactInfo && (
