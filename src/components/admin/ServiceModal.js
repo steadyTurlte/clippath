@@ -20,7 +20,8 @@ const ServiceModal = ({ isOpen, onClose, onSave, service, isNew }) => {
         beforeImage: { url: '', publicId: '' },
         afterImage: { url: '', publicId: '' }
       },
-      projects: []
+      projects: [],
+      faqs: []
     }
   });
 
@@ -45,7 +46,8 @@ const ServiceModal = ({ isOpen, onClose, onSave, service, isNew }) => {
               ? service.details.hero.afterImage
               : { url: service.details?.hero?.afterImage || '', publicId: '' }
           },
-          projects: Array.isArray(service.details?.projects) ? service.details.projects : []
+          projects: Array.isArray(service.details?.projects) ? service.details.projects : [],
+          faqs: Array.isArray(service.details?.faqs) ? service.details.faqs : []
         }
       });
     } else {
@@ -64,7 +66,8 @@ const ServiceModal = ({ isOpen, onClose, onSave, service, isNew }) => {
             beforeImage: { url: '', publicId: '' },
             afterImage: { url: '', publicId: '' }
           },
-          projects: []
+          projects: [],
+          faqs: []
         }
       });
     }
@@ -130,6 +133,43 @@ const ServiceModal = ({ isOpen, onClose, onSave, service, isNew }) => {
     }));
   };
 
+  const handleAddFaq = () => {
+    setFormData((prev) => ({
+      ...prev,
+      details: {
+        ...prev.details,
+        faqs: [...(prev.details.faqs || []), { question: '', answer: '' }]
+      }
+    }));
+  };
+
+  const handleFaqChange = (index, field, value) => {
+    setFormData((prev) => {
+      const faqs = [...(prev.details.faqs || [])];
+      faqs[index] = {
+        ...faqs[index],
+        [field]: value
+      };
+      return {
+        ...prev,
+        details: {
+          ...prev.details,
+          faqs
+        }
+      };
+    });
+  };
+
+  const handleRemoveFaq = (index) => {
+    setFormData((prev) => ({
+      ...prev,
+      details: {
+        ...prev.details,
+        faqs: (prev.details.faqs || []).filter((_, i) => i !== index)
+      }
+    }));
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!formData.title.trim()) {
@@ -170,6 +210,13 @@ const ServiceModal = ({ isOpen, onClose, onSave, service, isNew }) => {
             onClick={() => setActiveTab('projects')}
           >
             Projects ({formData.details.projects.length})
+          </button>
+          <button
+            type="button"
+            className={`tab-btn ${activeTab === 'faqs' ? 'active' : ''}`}
+            onClick={() => setActiveTab('faqs')}
+          >
+            FAQs ({(formData.details.faqs || []).length})
           </button>
         </div>
 
@@ -318,6 +365,55 @@ const ServiceModal = ({ isOpen, onClose, onSave, service, isNew }) => {
                           onImageUpload={(url, publicId) =>
                             handleProjectChange(idx, 'image', { url, publicId })
                           }
+                        />
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
+            {activeTab === 'faqs' && (
+              <div className="tab-content">
+                <div className="projects-header">
+                  <h3>Service FAQs</h3>
+                  <button type="button" className="btn-secondary" onClick={handleAddFaq}>
+                    + Add FAQ
+                  </button>
+                </div>
+
+                {(formData.details.faqs || []).length === 0 ? (
+                  <p className="empty-text">No custom FAQs added for this service. Click &quot;+ Add FAQ&quot; to create one.</p>
+                ) : (
+                  formData.details.faqs.map((faq, idx) => (
+                    <div key={idx} className="project-card">
+                      <div className="project-card__header">
+                        <h4>FAQ #{idx + 1}</h4>
+                        <button
+                          type="button"
+                          className="btn-danger-sm"
+                          onClick={() => handleRemoveFaq(idx)}
+                        >
+                          Delete
+                        </button>
+                      </div>
+
+                      <div className="form-group">
+                        <label>Question</label>
+                        <input
+                          type="text"
+                          value={faq.question || ''}
+                          onChange={(e) => handleFaqChange(idx, 'question', e.target.value)}
+                          placeholder="e.g. How fast is the turn around time for Clipping Path?"
+                        />
+                      </div>
+
+                      <div className="form-group">
+                        <label>Answer</label>
+                        <textarea
+                          rows={3}
+                          value={faq.answer || ''}
+                          onChange={(e) => handleFaqChange(idx, 'answer', e.target.value)}
+                          placeholder="Detailed answer for this service..."
                         />
                       </div>
                     </div>

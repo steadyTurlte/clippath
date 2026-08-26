@@ -4,39 +4,14 @@ import Thumb from "public/images/faq-three-thumb.png";
 
 interface ServiceFaqProps {
   data?: any;
+  items?: Array<{ id?: number | string; question: string; answer: string }>;
 }
 
-const ServiceFaq = ({ data }: ServiceFaqProps) => {
+const ServiceFaq = ({ data, items }: ServiceFaqProps) => {
   const [imgTab, setImgTab] = useState(0);
-  
-  // Use dynamic FAQ data if available, otherwise fallback to default
-  const faqItems = data?.faqs || [
-    {
-      id: 1,
-      question: "What is included in your photo editing services?",
-      answer: "Our comprehensive photo editing services include background removal, color correction, retouching, shadow creation, and much more to enhance your images professionally."
-    },
-    {
-      id: 2,
-      question: "How long does it take to complete an order?",
-      answer: "Turnaround time depends on the complexity and quantity of images. Most standard edits are completed within 24-48 hours, while complex projects may take 3-5 business days."
-    },
-    {
-      id: 3,
-      question: "What file formats do you accept?",
-      answer: "We accept all major image formats including JPEG, PNG, TIFF, PSD, and RAW files from various camera manufacturers."
-    },
-    {
-      id: 4,
-      question: "Do you offer bulk discounts?",
-      answer: "Yes, we offer competitive pricing for bulk orders. The more images you send, the better rates you'll receive. Contact us for custom pricing."
-    },
-    {
-      id: 5,
-      question: "Is there a revision policy?",
-      answer: "We offer unlimited revisions until you're completely satisfied with the results. Your satisfaction is our top priority."
-    }
-  ];
+
+  const faqItems = items || (Array.isArray(data?.faqs) ? data.faqs : Array.isArray(data) ? data : []);
+  if (!faqItems || faqItems.length === 0) return null;
   return (
     <section className="section faq-two faq-three">
       <div className="container">

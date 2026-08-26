@@ -312,11 +312,16 @@ export default async function handler(req, res) {
               ? incoming.projects
               : (Array.isArray(existing.projects) ? existing.projects : []);
 
+            const faqsMerged = Array.isArray(incoming.faqs)
+              ? incoming.faqs
+              : (Array.isArray(existing.faqs) ? existing.faqs : []);
+
             mergedDetails[slugKey] = {
               ...existing,
               ...incoming,
               hero: heroMerged,
-              projects: projectsMerged
+              projects: projectsMerged,
+              faqs: faqsMerged
             };
           });
 
@@ -409,7 +414,8 @@ export default async function handler(req, res) {
         ...currentDetails,
         [slug]: details || {
           hero: { title: '', subtitle: '', description: '', beforeImage: { url: '', publicId: '' }, afterImage: { url: '', publicId: '' } },
-          projects: []
+          projects: [],
+          faqs: []
         }
       };
 
