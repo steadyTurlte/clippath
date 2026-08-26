@@ -187,18 +187,13 @@ export default async function handler(req, res) {
     try {
       const { section, slug } = req.query;
       let data = await getData("services");
-      if (!data || Object.keys(data).length === 0) {
-        await saveData("services", defaultServicesData);
-        data = { ...defaultServicesData };
+      if (!data) {
+        data = {};
       }
       if (section) {
         // Handle service details banner
         if (section === "detailsBanner") {
-          if (!data.detailsBanner && defaultServicesData.detailsBanner) {
-            data.detailsBanner = defaultServicesData.detailsBanner;
-            await saveData("services", data);
-          }
-          return res.status(200).json(data.detailsBanner || defaultServicesData.detailsBanner);
+          return res.status(200).json(data.detailsBanner || { image: "" });
         }
         // Handle dynamic service details
         if (section === "details") {
@@ -219,15 +214,11 @@ export default async function handler(req, res) {
         if (section === "pricing") {
           const pricingData = await getData("pricing");
           if (pricingData && pricingData.main) {
-            data.pricing = pricingData.main;
-            await saveData("services", data);
             return res.status(200).json(pricingData.main);
           }
         }
-        if (!data[section] && defaultServicesData[section]) {
-          data[section] = defaultServicesData[section];
-          await saveData("services", data);
-          return res.status(200).json(defaultServicesData[section]);
+        if (section === "services") {
+          return res.status(200).json(data.services || []);
         }
         return res.status(200).json(data[section] || {});
       }
@@ -287,28 +278,62 @@ export default async function handler(req, res) {
         }
         if (section === "items-and-details") {
           const { services, details } = updatedData;
-          
+
           if (!services || !details) {
-             return res.status(400).json({ message: "Both services and details are required" });
+            return res.status(400).json({ message: "Both services and details are required" });
           }
+
+          // Check for duplicate service titles
+          const titlesSet = new Set();
+          for (const s of services) {
+            const normTitle = (s.title || '').trim().toLowerCase();
+            if (titlesSet.has(normTitle)) {
+              return res.status(400).json({ message: `A service with the name "${s.title}" already exists.` });
+            }
+            titlesSet.add(normTitle);
+          }
+
+          // Deep merge details only for active services present in incoming details
+          const mergedDetails = {};
+          Object.keys(details).forEach(slugKey => {
+            const existing = (data.details && data.details[slugKey]) || {};
+            const incoming = details[slugKey] || {};
+
+            // Merge hero preserving non-empty existing values if incoming is blank
+            const heroMerged = {
+              title: incoming.hero?.title || existing.hero?.title || '',
+              subtitle: incoming.hero?.subtitle || existing.hero?.subtitle || '',
+              description: incoming.hero?.description || existing.hero?.description || '',
+              beforeImage: incoming.hero?.beforeImage?.url ? incoming.hero.beforeImage : (existing.hero?.beforeImage || { url: '', publicId: '' }),
+              afterImage: incoming.hero?.afterImage?.url ? incoming.hero.afterImage : (existing.hero?.afterImage || { url: '', publicId: '' }),
+            };
+
+            const projectsMerged = (Array.isArray(incoming.projects) && incoming.projects.length > 0)
+              ? incoming.projects
+              : (Array.isArray(existing.projects) ? existing.projects : []);
+
+            mergedDetails[slugKey] = {
+              ...existing,
+              ...incoming,
+              hero: heroMerged,
+              projects: projectsMerged
+            };
+          });
 
           // Update both services list and details map
           data = {
             ...data,
             services: services,
-            details: {
-              ...data.details,
-              ...details
-            }
+            details: mergedDetails
           };
-          
+
           const success = await saveData("services", data);
           if (!success) {
             return res.status(500).json({ message: "Failed to save services and details" });
           }
           return res.status(200).json({ message: "Services and details updated successfully", data });
         }
-        
+
         data = {
           ...data,
           [section]: updatedData,
@@ -338,5 +363,124 @@ export default async function handler(req, res) {
       return res.status(500).json({ message: "Internal server error" });
     }
   }
+  if (req.method === "POST") {
+    try {
+      const { service, details } = req.body;
+      if (!service || !service.title) {
+        return res.status(400).json({ message: "Service title is required" });
+      }
+
+      let data = (await getData("services")) || {};
+      const services = Array.isArray(data.services) ? data.services : [];
+      const currentDetails = data.details || {};
+
+      // Check if service title already exists (case-insensitive)
+      const isDuplicate = services.some(
+        (s) => (s.title || '').trim().toLowerCase() === (service.title || '').trim().toLowerCase()
+      );
+      if (isDuplicate) {
+        return res.status(400).json({ message: `A service with the name "${service.title}" already exists.` });
+      }
+
+      const slugify = (text) =>
+        (text || '')
+          .toString()
+          .toLowerCase()
+          .trim()
+          .replace(/\s+/g, '-')
+          .replace(/[^\w\-]+/g, '')
+          .replace(/\-\-+/g, '-');
+
+      const slug = slugify(service.title);
+      const newId = service.id || Date.now();
+
+      const newService = {
+        id: newId,
+        title: service.title,
+        price: service.price || '',
+        description: service.description || '',
+        image: service.image || '',
+        link: service.link || 'service-details',
+        className: service.className || 'on'
+      };
+
+      const updatedServices = [...services, newService];
+      const updatedDetails = {
+        ...currentDetails,
+        [slug]: details || {
+          hero: { title: '', subtitle: '', description: '', beforeImage: { url: '', publicId: '' }, afterImage: { url: '', publicId: '' } },
+          projects: []
+        }
+      };
+
+      data = {
+        ...data,
+        services: updatedServices,
+        details: updatedDetails
+      };
+
+      const success = await saveData("services", data);
+      if (!success) {
+        return res.status(500).json({ message: "Failed to create service" });
+      }
+
+      return res.status(201).json({ message: "Service created successfully", service: newService, slug });
+    } catch (error) {
+      console.error("Error creating service:", error);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  }
+
+  if (req.method === "DELETE") {
+    try {
+      const { id, slug } = req.query;
+      if (!id && !slug) {
+        return res.status(400).json({ message: "Service ID or slug is required for deletion" });
+      }
+
+      let data = (await getData("services")) || {};
+      let services = Array.isArray(data.services) ? data.services : [];
+      let detailsMap = { ...(data.details || {}) };
+
+      const slugify = (text) =>
+        (text || '')
+          .toString()
+          .toLowerCase()
+          .trim()
+          .replace(/\s+/g, '-')
+          .replace(/[^\w\-]+/g, '')
+          .replace(/\-\-+/g, '-');
+
+      let targetSlug = slug;
+      if (!targetSlug && id) {
+        const found = services.find((s) => String(s.id) === String(id));
+        if (found) {
+          targetSlug = slugify(found.title);
+        }
+      }
+
+      services = services.filter((s) => String(s.id) !== String(id) && slugify(s.title) !== targetSlug);
+      if (targetSlug && detailsMap[targetSlug]) {
+        delete detailsMap[targetSlug];
+      }
+
+      data = {
+        ...data,
+        services: services,
+        details: detailsMap
+      };
+
+      const success = await saveData("services", data);
+      if (!success) {
+        return res.status(500).json({ message: "Failed to delete service" });
+      }
+
+      return res.status(200).json({ message: "Service deleted successfully", id, slug: targetSlug });
+    } catch (error) {
+      console.error("Error deleting service:", error);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  }
+
   return res.status(405).json({ message: "Method not allowed" });
 }

@@ -1,999 +1,606 @@
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
-import Image from 'next/image';
-import AdminLayout from '@/components/admin/AdminLayout';
-import ImageUploader from '@/components/admin/common/ImageUploader';
-import RichTextEditor from '@/components/admin/common/RichTextEditor';
 import { toast } from 'react-toastify';
+import AdminLayout from '@/components/admin/AdminLayout';
+import ServiceModal from '@/components/admin/ServiceModal';
 
-const ServicesItemsEditor = () => {
+const slugify = (text) =>
+  (text || '')
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/[^\w\-]+/g, '')
+    .replace(/\-\-+/g, '-');
+
+const ServicesAdmin = () => {
   const [servicesData, setServicesData] = useState([]);
-  const [imagePublicIds, setImagePublicIds] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
-  const [expandedService, setExpandedService] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
-  const slugify = (text = '') =>
-    (text || '')
-      .toLowerCase()
-      .trim()
-      .replace(/&/g, 'and') // Replace & with "and" before removing other special chars
-      .replace(/[^a-z0-9\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-');
+  // Modal states
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingService, setEditingService] = useState(null);
+  const [isNew, setIsNew] = useState(false);
+
+  // Fetch all services and details
+  const fetchServices = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const res = await fetch('/api/content/services');
+      if (!res.ok) {
+        throw new Error('Failed to fetch services data');
+      }
+      const data = await res.json();
+      const rawServices = Array.isArray(data.services) ? data.services : [];
+      const detailsMap = data.details || {};
+
+      // Combine services with their details
+      const normalizedServices = rawServices.map((service) => {
+        const slug = slugify(service.title);
+        const details = detailsMap[slug] || {
+          hero: { title: '', subtitle: '', description: '', beforeImage: { url: '', publicId: '' }, afterImage: { url: '', publicId: '' } },
+          projects: []
+        };
+        return {
+          ...service,
+          details
+        };
+      });
+
+      setServicesData(normalizedServices);
+    } catch (err) {
+      console.error('Error fetching services:', err);
+      setError('Failed to load services');
+      toast.error('Failed to load services');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    // Fetch the services data when the component mounts
-    const fetchServicesData = async () => {
-      try {
-        const response = await fetch('/api/content/services?section=services');
-        const data = await response.json();
-
-        if (data && data.length > 0) {
-          // Initialize services data and public IDs
-          const initialServices = [];
-          const initialPublicIds = [];
-
-          // Fetch details for each service
-          const servicesWithDetails = await Promise.all(
-            data.map(async (service) => {
-              const slug = slugify(service.title);
-              let serviceDetails = {
-                hero: {
-                  title: '',
-                  subtitle: '',
-                  description: '',
-                  beforeImage: { url: '', publicId: '' },
-                  afterImage: { url: '', publicId: '' }
-                },
-                projects: []
-              };
-
-              // Fetch service details from the API
-              if (slug) {
-                try {
-                  const detailsResponse = await fetch(`/api/content/services?section=details&slug=${encodeURIComponent(slug)}`);
-                  if (detailsResponse.ok) {
-                    const detailsData = await detailsResponse.json();
-                    if (detailsData) {
-                      serviceDetails = {
-                        hero: {
-                          ...serviceDetails.hero,
-                          ...detailsData.hero
-                        },
-                        projects: Array.isArray(detailsData.projects) ? detailsData.projects : []
-                      };
-                    }
-                  }
-                } catch (err) {
-                  console.error(`Error fetching details for ${service.title}:`, err);
-                }
-              }
-
-              return {
-                ...service,
-                details: serviceDetails
-              };
-            })
-          );
-
-          servicesWithDetails.forEach(service => {
-            if (service.image && typeof service.image === 'object') {
-              initialServices.push({
-                ...service,
-                image: service.image.url || ''
-              });
-              initialPublicIds.push(service.image.publicId || '');
-            } else {
-              initialServices.push({
-                ...service,
-                image: service.image || ''
-              });
-              initialPublicIds.push('');
-            }
-          });
-
-          setServicesData(initialServices);
-          setImagePublicIds(initialPublicIds);
-        } else {
-          setServicesData([]);
-          setImagePublicIds([]);
-        }
-
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching services data:', error);
-        setError('Failed to load services data');
-        setLoading(false);
-      }
-    };
-
-    fetchServicesData();
+    fetchServices();
   }, []);
 
-  const handleServiceChange = (index, field, value, publicId = null) => {
-    const updatedServices = [...servicesData];
-    updatedServices[index] = {
-      ...updatedServices[index],
-      [field]: value
-    };
+  const handleOpenAddModal = () => {
+    setEditingService(null);
+    setIsNew(true);
+    setIsModalOpen(true);
+  };
 
-    setServicesData(updatedServices);
+  const handleOpenEditModal = (service) => {
+    setEditingService(service);
+    setIsNew(false);
+    setIsModalOpen(true);
+  };
 
-    // Update public ID if provided
-    if (publicId !== null && field === 'image') {
-      const updatedPublicIds = [...imagePublicIds];
-      updatedPublicIds[index] = publicId;
-      setImagePublicIds(updatedPublicIds);
+  const handleDeleteService = async (service) => {
+    if (!window.confirm(`Are you sure you want to delete "${service.title}"?`)) {
+      return;
     }
-  };
-
-  const handleAddService = () => {
-    setServicesData([
-      ...servicesData,
-      {
-        id: Date.now(),
-        title: '',
-        image: '',
-        price: '',
-        description: '',
-        link: 'service-details',
-        className: '',
-        details: {
-          hero: {
-            title: '',
-            subtitle: '',
-            description: '',
-            beforeImage: { url: '', publicId: '' },
-            afterImage: { url: '', publicId: '' }
-          },
-          projects: [],
-        }
-      }
-    ]);
-
-    // Add an empty public ID for the new service
-    setImagePublicIds([...imagePublicIds, '']);
-
-    toast.success("Service added successfully!");
-  };
-
-  const handleRemoveService = (index) => {
-    const updatedServices = [...servicesData];
-    updatedServices.splice(index, 1);
-
-    const updatedPublicIds = [...imagePublicIds];
-    updatedPublicIds.splice(index, 1);
-
-    setServicesData(updatedServices);
-    setImagePublicIds(updatedPublicIds);
-
-    toast.success("Service removed successfully!");
-  };
-
-  const handleImageUpload = (index, imageUrl, publicId) => {
-    // Update the service with the new image URL
-    const updatedServices = [...servicesData];
-    updatedServices[index] = {
-      ...updatedServices[index],
-      image: imageUrl
-    };
-    setServicesData(updatedServices);
-
-    // Update the public ID
-    const updatedPublicIds = [...imagePublicIds];
-    updatedPublicIds[index] = publicId || '';
-    setImagePublicIds(updatedPublicIds);
-  };
-
-  const handleDetailChange = (serviceIndex, section, field, value) => {
-    const updatedServices = [...servicesData];
-    updatedServices[serviceIndex].details = {
-      ...updatedServices[serviceIndex].details,
-      [section]: {
-        ...updatedServices[serviceIndex].details[section],
-        [field]: value
-      }
-    };
-    setServicesData(updatedServices);
-  };
-
-  const handleProjectChange = (serviceIndex, projectIndex, field, value) => {
-    const updatedServices = [...servicesData];
-    const newProjects = [...updatedServices[serviceIndex].details.projects];
-    newProjects[projectIndex] = {
-      ...newProjects[projectIndex],
-      [field]: value
-    };
-    // Update projects directly without using handleDetailChange
-    updatedServices[serviceIndex].details = {
-      ...updatedServices[serviceIndex].details,
-      projects: newProjects
-    };
-    setServicesData(updatedServices);
-  };
-
-  const addProject = (serviceIndex) => {
-    const updatedServices = [...servicesData];
-
-    // Ensure details and projects exist
-    if (!updatedServices[serviceIndex].details) {
-      updatedServices[serviceIndex].details = {};
-    }
-
-    // Ensure projects is always an array
-    let currentProjects = updatedServices[serviceIndex].details.projects;
-    if (!Array.isArray(currentProjects)) {
-      currentProjects = [];
-    }
-
-    const newProjects = [...currentProjects, { title: '', image: { url: '', publicId: '' } }];
-
-    updatedServices[serviceIndex].details.projects = newProjects;
-    setServicesData(updatedServices);
-  };
-
-  const removeProject = (serviceIndex, projectIndex) => {
-    const updatedServices = [...servicesData];
-    const newProjects = updatedServices[serviceIndex].details.projects.filter((_, i) => i !== projectIndex);
-    // Update projects directly without using handleDetailChange
-    updatedServices[serviceIndex].details = {
-      ...updatedServices[serviceIndex].details,
-      projects: newProjects
-    };
-    setServicesData(updatedServices);
-  };
-
-  const handleProjectImageUpload = (serviceIndex, projectIndex, url, publicId) => {
-    const updatedServices = [...servicesData];
-    const newProjects = [...updatedServices[serviceIndex].details.projects];
-    newProjects[projectIndex].image = { url, publicId };
-    // Update projects directly without using handleDetailChange
-    updatedServices[serviceIndex].details = {
-      ...updatedServices[serviceIndex].details,
-      projects: newProjects
-    };
-    setServicesData(updatedServices);
-  };
-
-  const handleHeroImageUpload = (serviceIndex, imageType, url, publicId) => {
-    const updatedServices = [...servicesData];
-    if (!updatedServices[serviceIndex].details.hero) {
-      updatedServices[serviceIndex].details.hero = {};
-    }
-    updatedServices[serviceIndex].details.hero[imageType] = { url, publicId };
-    setServicesData(updatedServices);
-  };
-
-
-  const handleSave = async () => {
-    setSaving(true);
-    setError(null);
 
     try {
-      // Prepare data with images including public IDs
-      const dataToSave = servicesData.map((service, index) => {
-        const serviceData = { ...service };
-
-        // Only include image object if there's an image URL
-        if (service.image) {
-          serviceData.image = {
-            url: service.image,
-            publicId: imagePublicIds[index] || ''
-          };
-        } else {
-          serviceData.image = '';
-        }
-
-        // Remove details from main service data as they're saved separately
-        const { details, ...mainServiceData } = serviceData;
-        return mainServiceData;
+      const slug = slugify(service.title);
+      const res = await fetch(`/api/content/services?id=${encodeURIComponent(service.id)}&slug=${encodeURIComponent(slug)}`, {
+        method: 'DELETE'
       });
 
-      // Prepare details map keyed by slug
-      const detailsMap = {};
-      servicesData.forEach(service => {
-        const slug = slugify(service.title);
-        if (slug && service.details) {
-          detailsMap[slug] = service.details;
-        }
-      });
-
-      // Save everything in one go
-      const response = await fetch('/api/content/services?section=items-and-details', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          services: dataToSave,
-          details: detailsMap
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to save services');
+      if (!res.ok) {
+        throw new Error('Failed to delete service');
       }
 
-      toast.success("Services and details saved successfully!");
-    } catch (error) {
-      console.error('Error saving services data:', error);
-      setError('Failed to save Services section');
-      toast.error('Failed to save Services section');
-    } finally {
-      setSaving(false);
+      toast.success(`Service "${service.title}" deleted successfully!`);
+      fetchServices();
+    } catch (err) {
+      console.error('Error deleting service:', err);
+      toast.error('Failed to delete service');
     }
   };
 
-  if (loading) {
-    return (
-      <AdminLayout>
-        <div className="admin-editor__loading">Loading...</div>
-      </AdminLayout>
+  const handleSaveModal = async (formData) => {
+    // Check if service title already exists (ignoring current service when editing)
+    const normTitle = (formData.title || '').trim().toLowerCase();
+    const isDuplicate = servicesData.some(
+      (item) =>
+        (item.title || '').trim().toLowerCase() === normTitle &&
+        (isNew || String(item.id) !== String(formData.id))
     );
-  }
+
+    if (isDuplicate) {
+      toast.error(`A service with the name "${formData.title}" already exists.`);
+      return;
+    }
+
+    try {
+      if (isNew) {
+        // Create new service via POST
+        const res = await fetch('/api/content/services', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            service: {
+              id: Date.now(),
+              title: formData.title,
+              price: formData.price,
+              description: formData.description,
+              image: formData.image,
+              className: formData.className || 'on'
+            },
+            details: formData.details
+          })
+        });
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.message || 'Failed to create service');
+        }
+
+        toast.success('Service created successfully!');
+      } else {
+        // Update existing service list via items-and-details PUT
+        const slug = slugify(formData.title);
+        const updatedList = servicesData.map((item) => {
+          if (String(item.id) === String(formData.id)) {
+            return {
+              id: formData.id,
+              title: formData.title,
+              price: formData.price,
+              description: formData.description,
+              image: formData.image,
+              className: formData.className || item.className || 'on'
+            };
+          }
+          return {
+            id: item.id,
+            title: item.title,
+            price: item.price,
+            description: item.description,
+            image: item.image,
+            className: item.className
+          };
+        });
+
+        const detailsMap = {};
+        servicesData.forEach((item) => {
+          const s = slugify(item.title);
+          if (String(item.id) === String(formData.id)) {
+            detailsMap[slug] = formData.details;
+          } else {
+            detailsMap[s] = item.details;
+          }
+        });
+
+        const res = await fetch('/api/content/services?section=items-and-details', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            services: updatedList,
+            details: detailsMap
+          })
+        });
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.message || 'Failed to update service');
+        }
+
+        toast.success('Service updated successfully!');
+      }
+
+      setIsModalOpen(false);
+      fetchServices();
+    } catch (err) {
+      console.error('Error saving service:', err);
+      toast.error(err.message || 'Failed to save service');
+    }
+  };
+
+  // Filtered services
+  const filteredServices = servicesData.filter(
+    (service) =>
+      service.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      service.description?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <AdminLayout>
       <Head>
-        <title>Edit Services Items | Photodit Admin</title>
+        <title>Manage Services | Photodit Admin</title>
       </Head>
 
-      <div className="admin-editor">
-        <div className="admin-editor__header">
-          <h1 className="admin-editor__title">Edit Services Items</h1>
-          <div className="admin-editor__actions">
-            <Link href="/admin/services" className="admin-editor__back-button">
-              Back to Services
+      <div className="admin-services-page">
+        {/* Header section */}
+        <div className="page-header">
+          <div>
+            <h1 className="page-title">Service Items Management</h1>
+            <p className="page-subtitle">View, create, edit and manage service offerings.</p>
+          </div>
+
+          <div className="header-actions">
+            <Link href="/admin/services" className="btn-back">
+              <i className="fa-solid fa-arrow-left"></i> Back to Section List
             </Link>
-            <button
-              className="admin-editor__save-button"
-              onClick={handleSave}
-              disabled={saving}
-            >
-              {saving ? 'Saving...' : 'Save Changes'}
+            <button className="btn-create" onClick={handleOpenAddModal}>
+              <i className="fa-solid fa-plus"></i> + Add New Service
             </button>
           </div>
         </div>
 
-        {error && (
-          <div className="admin-editor__error">
-            <p>{error}</p>
+        {/* Toolbar & Search */}
+        <div className="table-toolbar">
+          <div className="search-box">
+            <i className="fa-solid fa-magnifying-glass search-icon"></i>
+            <input
+              type="text"
+              placeholder="Search services by title or description..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            {searchTerm && (
+              <button className="clear-search" onClick={() => setSearchTerm('')}>
+                &times;
+              </button>
+            )}
           </div>
-        )}
+          <div className="item-count">{filteredServices.length} Services Total</div>
+        </div>
 
-        <div className="admin-editor__content">
-          {servicesData.map((service, index) => (
-            <div key={service.id || index} className="admin-editor__service-item">
-              <div className="admin-editor__service-header">
-                <h3 className="admin-editor__service-title">Service #{index + 1}</h3>
-                <button
-                  type="button"
-                  className="admin-editor__remove-button"
-                  onClick={() => handleRemoveService(index)}
-                >
-                  Remove
-                </button>
-              </div>
-
-              <div className="admin-editor__service-grid">
-                <div className="admin-editor__field">
-                  <label className="admin-editor__label">Title</label>
-                  <input
-                    type="text"
-                    className="admin-editor__input"
-                    value={service.title}
-                    onChange={(e) => handleServiceChange(index, 'title', e.target.value)}
-                    placeholder="Enter service title"
-                  />
-                </div>
-
-                <div className="admin-editor__field">
-                  <label className="admin-editor__label">Price</label>
-                  <input
-                    type="text"
-                    className="admin-editor__input"
-                    value={service.price}
-                    onChange={(e) => handleServiceChange(index, 'price', e.target.value)}
-                    placeholder="Enter price (e.g. $0.39 Only)"
-                  />
-                </div>
-              </div>
-
-              <div className="admin-editor__field">
-                <label className="admin-editor__label">Description</label>
-                <textarea
-                  className="admin-editor__textarea"
-                  value={service.description}
-                  onChange={(e) => handleServiceChange(index, 'description', e.target.value)}
-                  placeholder="Enter service description"
-                  rows={3}
-                />
-              </div>
-
-              <div className="admin-editor__service-grid">
-                <div className="admin-editor__field">
-                  <label className="admin-editor__label">Link</label>
-                  <input
-                    type="text"
-                    className="admin-editor__input"
-                    value={service.link}
-                    onChange={(e) => handleServiceChange(index, 'link', e.target.value)}
-                    placeholder="This will be auto-generated from title"
-                    disabled
-                  />
-                </div>
-
-                <div className="admin-editor__field">
-                  <label className="admin-editor__label">Class Name</label>
-                  <select
-                    className="admin-editor__select"
-                    value={service.className}
-                    onChange={(e) => handleServiceChange(index, 'className', e.target.value)}
-                  >
-                    <option value="">Select a class</option>
-                    <option value="on">Primary (on)</option>
-                    <option value="fi">Secondary (fi)</option>
-                    <option value="tw">Tertiary (tw)</option>
-                    <option value="th">Quaternary (th)</option>
-                    <option value="fo">Quinary (fo)</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="admin-editor__field">
-                <label className="admin-editor__label">Service Image</label>
-                <div className="admin-editor__image-upload">
-                  <ImageUploader
-                    currentImage={service.image}
-                    onImageSelect={(file) => {
-                      const updatedServices = [...servicesData];
-                      updatedServices[index] = {
-                        ...updatedServices[index],
-                        image: URL.createObjectURL(file)
-                      };
-                      setServicesData(updatedServices);
-                    }}
-                    onImageUpload={(url, publicId) => handleImageUpload(index, url, publicId)}
-                    folder="services/items"
-                    label={`Service ${index + 1} Image`}
-                    recommendedSize="300x300px"
-                    className="admin-editor__image-uploader"
-                    oldPublicId={imagePublicIds[index] || ''}
-                    uploadOnSelect={true}
-                  />
-                  {service.image && (
-                    <div className="admin-editor__image-preview">
-                      <Image
-                        src={service.image}
-                        alt={`Preview ${index}`}
-                        width={200}
-                        height={200}
-                        className="admin-editor__preview-image"
-                        onError={(e) => {
-                          e.target.onerror = null;
-                          e.target.src = '/images/placeholder-image.png';
-                        }}
-                      />
-                    </div>
-                  )}
-                </div>
-                <p className="admin-editor__help-text">
-                  <strong>Recommended size:</strong> 400x300px
-                </p>
-                <p className="admin-editor__help-text">
-                  <strong>Image types:</strong> JPEG, PNG, WEBP
-                </p>
-              </div>
-              <div className="admin-editor__field">
-                <button
-                  type="button"
-                  className="admin-editor__add-button"
-                  onClick={(e) => {
-                    e.stopPropagation(); // Prevent event bubbling
-                    setExpandedService(expandedService === index ? null : index);
-                  }}
-                >
-                  {expandedService === index ? 'Hide Details' : 'Show Details'}
-                </button>
-              </div>
-
-              {expandedService === index && (
-                <div
-                  className="admin-editor__service-details"
-                  onClick={(e) => e.stopPropagation()} // Prevent event bubbling
-                >
-                  <h4 className="admin-editor__section-title">Service Details</h4>
-
-                  {/* Hero Section */}
-                  <div className="admin-editor__subsection">
-                    <h5 className="admin-editor__subsection-title">Hero Section</h5>
-                    <div className="admin-editor__field">
-                      <label className="admin-editor__label">Hero Title</label>
-                      <input
-                        type="text"
-                        className="admin-editor__input"
-                        value={service.details?.hero?.title || ''}
-                        onChange={(e) => handleDetailChange(index, 'hero', 'title', e.target.value)}
-                        placeholder="Enter hero section title"
-                      />
-                    </div>
-                    <div className="admin-editor__field">
-                      <label className="admin-editor__label">Hero Subtitle</label>
-                      <input
-                        type="text"
-                        className="admin-editor__input"
-                        value={service.details?.hero?.subtitle || ''}
-                        onChange={(e) => handleDetailChange(index, 'hero', 'subtitle', e.target.value)}
-                        placeholder="Enter hero section subtitle"
-                      />
-                    </div>
-                    <div className="admin-editor__field">
-                      <label className="admin-editor__label">Hero Description</label>
-                      <RichTextEditor
-                        value={service.details?.hero?.description || ''}
-                        onChange={(val) => handleDetailChange(index, 'hero', 'description', val)}
-                        placeholder="Write rich description..."
-                      />
-                    </div>
-                    <div className="admin-editor__field">
-                      <label className="admin-editor__label">Before Image</label>
-                      <ImageUploader
-                        currentImage={service.details?.hero?.beforeImage?.url}
-                        onImageUpload={(url, publicId) => handleHeroImageUpload(index, 'beforeImage', url, publicId)}
-                        folder={`services/${slugify(service.title)}/hero`}
-                        oldPublicId={service.details?.hero?.beforeImage?.publicId}
-                        uploadOnSelect={true}
-                        label="Before Image"
-                      />
-                    </div>
-                    <div className="admin-editor__field">
-                      <label className="admin-editor__label">After Image</label>
-                      <ImageUploader
-                        currentImage={service.details?.hero?.afterImage?.url}
-                        onImageUpload={(url, publicId) => handleHeroImageUpload(index, 'afterImage', url, publicId)}
-                        folder={`services/${slugify(service.title)}/hero`}
-                        oldPublicId={service.details?.hero?.afterImage?.publicId}
-                        uploadOnSelect={true}
-                        label="After Image"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Projects Section */}
-                  <div className="admin-editor__subsection">
-                    <h5 className="admin-editor__subsection-title">Projects</h5>
-                    {Array.isArray(service.details?.projects) ? service.details.projects.map((project, projectIndex) => (
-                      <div key={projectIndex} className="admin-editor__project-item">
-                        <h6>Project #{projectIndex + 1}</h6>
-                        <div className="admin-editor__field">
-                          <label className="admin-editor__label">Title</label>
-                          <input
-                            type="text"
-                            className="admin-editor__input"
-                            value={project.title}
-                            onChange={(e) => handleProjectChange(index, projectIndex, 'title', e.target.value)}
-                          />
-                        </div>
-                        <div className="admin-editor__field">
-                          <label className="admin-editor__label">Image</label>
-                          <ImageUploader
-                            currentImage={project.image?.url}
-                            onImageUpload={(url, publicId) => handleProjectImageUpload(index, projectIndex, url, publicId)}
-                            folder={`services/${slugify(service.title)}/projects`}
-                            oldPublicId={project.image?.publicId}
-                            uploadOnSelect={true}
-                          />
-                        </div>
-                        <button
-                          type="button"
-                          className="admin-editor__remove-button"
-                          onClick={() => removeProject(index, projectIndex)}
-                        >
-                          Remove Project
-                        </button>
-                      </div>
-                    )) : null}
-                    <button
-                      type="button"
-                      className="admin-editor__add-button"
-                      onClick={() => addProject(index)}
-                    >
-                      Add Project
-                    </button>
-                  </div>
-                </div>
-              )}
+        {/* Services Table */}
+        <div className="table-container">
+          {loading ? (
+            <div className="table-status">Loading services...</div>
+          ) : error ? (
+            <div className="table-status error">{error}</div>
+          ) : filteredServices.length === 0 ? (
+            <div className="table-status empty">
+              <p>No services found.</p>
+              <button className="btn-create-sm" onClick={handleOpenAddModal}>
+                + Add Your First Service
+              </button>
             </div>
-          ))}
+          ) : (
+            <table className="services-table">
+              <thead>
+                <tr>
+                  <th style={{ width: '80px' }}>Image</th>
+                  <th>Title</th>
+                  <th>Slug</th>
+                  <th>Price</th>
+                  <th>Description</th>
+                  <th style={{ width: '120px' }}>Projects</th>
+                  <th style={{ width: '140px', textAlign: 'right' }}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredServices.map((service) => {
+                  const slug = slugify(service.title);
+                  const imageUrl = typeof service.image === 'object' ? service.image?.url : service.image;
+                  const projectsCount = Array.isArray(service.details?.projects)
+                    ? service.details.projects.length
+                    : 0;
 
-          {/* Add New Service Button */}
-          <div className="admin-editor__add-service-section">
-            <button
-              type="button"
-              className="admin-editor__add-service-button"
-              onClick={handleAddService}
-            >
-              <i className="fa-solid fa-plus"></i>
-              Add New Service
-            </button>
-          </div>
+                  return (
+                    <tr key={service.id || slug}>
+                      <td>
+                        <div className="thumbnail-box">
+                          {imageUrl ? (
+                            <img src={imageUrl} alt={service.title} />
+                          ) : (
+                            <span className="no-img">No Image</span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="title-cell">
+                        <strong>{service.title}</strong>
+                      </td>
+                      <td>
+                        <code className="slug-tag">/{slug}</code>
+                      </td>
+                      <td>{service.price || '-'}</td>
+                      <td className="desc-cell">{service.description || '-'}</td>
+                      <td>
+                        <span className="badge">{projectsCount} Projects</span>
+                      </td>
+                      <td style={{ textAlign: 'right' }}>
+                        <div className="actions-cell">
+                          <button
+                            className="action-btn edit-btn"
+                            title="Edit Service"
+                            onClick={() => handleOpenEditModal(service)}
+                          >
+                            Edit
+                          </button>
+                          <button
+                            className="action-btn delete-btn"
+                            title="Delete Service"
+                            onClick={() => handleDeleteService(service)}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          )}
         </div>
+
+        {/* Modal */}
+        <ServiceModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onSave={handleSaveModal}
+          service={editingService}
+          isNew={isNew}
+        />
       </div>
 
       <style jsx>{`
-        .admin-editor__image-upload {
-          display: flex;
-          flex-direction: column;
-          gap: 1rem;
-          margin-bottom: 1rem;
-        }
-        
-        .admin-editor__image-preview {
-          max-width: 200px;
-          border: 1px solid #e2e8f0;
-          border-radius: 0.5rem;
-          overflow: hidden;
-        }
-        
-        .admin-editor__preview-image {
-          width: 100%;
-          height: auto;
-          display: block;
-        }
-        
-        .admin-editor__help-text {
-          margin: 0.25rem 0;
-          color: #64748b;
-          font-size: 0.875rem;
-        }
-        
-        .admin-editor__loading {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          height: 200px;
-          font-size: 18px;
-          color: #64748b;
+        .admin-services-page {
+          padding: 24px;
+          background: #f8fafc;
+          min-height: 100vh;
         }
 
-        .admin-editor__header {
+        .page-header {
           display: flex;
           justify-content: space-between;
-          align-items: center;
+          align-items: flex-start;
           margin-bottom: 24px;
         }
 
-        .admin-editor__title {
+        .page-title {
           font-size: 24px;
-          font-weight: 600;
-          color: #1e293b;
+          font-weight: 700;
+          color: #0f172a;
+          margin: 0 0 4px 0;
         }
 
-        .admin-editor__actions {
+        .page-subtitle {
+          font-size: 14px;
+          color: #64748b;
+          margin: 0;
+        }
+
+        .header-actions {
           display: flex;
           gap: 12px;
         }
 
-        .admin-editor__back-button {
-          padding: 8px 16px;
-          background-color: #f1f5f9;
-          color: #1e293b;
-          border: none;
-          border-radius: 4px;
-          cursor: pointer;
-          text-decoration: none;
+        .btn-back {
+          padding: 10px 16px;
+          background: #ffffff;
+          border: 1px solid #cbd5e1;
+          border-radius: 8px;
+          color: #475569;
           font-size: 14px;
+          font-weight: 500;
+          text-decoration: none;
           display: inline-flex;
           align-items: center;
+          gap: 8px;
+          transition: all 0.2s;
         }
 
-        .admin-editor__save-button {
-          padding: 8px 16px;
-          background-color: #4569e7;
-          color: white;
+        .btn-back:hover {
+          background: #f1f5f9;
+        }
+
+        .btn-create {
+          padding: 10px 18px;
+          background: #2563eb;
+          color: #ffffff;
           border: none;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 14px;
-        }
-
-        .admin-editor__save-button:disabled {
-          background-color: #94a3b8;
-          cursor: not-allowed;
-        }
-
-        .admin-editor__error,
-        .admin-editor__success,
-        .admin-editor__upload-success {
-          padding: 16px 20px;
           border-radius: 8px;
-          margin-bottom: 24px;
-          display: flex;
-          align-items: center;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-          animation: slideIn 0.3s ease-out;
-        }
-
-        @keyframes slideIn {
-          from {
-            opacity: 0;
-            transform: translateY(-10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .admin-editor__error {
-          background-color: #fee2e2;
-          color: #b91c1c;
-          border-left: 4px solid #ef4444;
-        }
-
-        .admin-editor__success,
-        .admin-editor__upload-success {
-          background-color: #dcfce7;
-          color: #166534;
-          border-left: 4px solid #22c55e;
-        }
-
-        .admin-editor__upload-success {
-          padding: 8px 12px;
-          margin-top: 8px;
           font-size: 14px;
-        }
-
-        .admin-editor__error p,
-        .admin-editor__success p,
-        .admin-editor__upload-success p {
-          margin: 0;
-          font-weight: 500;
-        }
-
-        .admin-editor__error p::before {
-          content: '❌ ';
-        }
-
-        .admin-editor__success p::before,
-        .admin-editor__upload-success p::before {
-          content: '✅ ';
-        }
-
-        .admin-editor__content {
-          background-color: white;
-          border-radius: 8px;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-          padding: 24px;
-        }
-
-        .admin-editor__section {
-          margin-bottom: 24px;
-        }
-
-        .admin-editor__section-title {
-          font-size: 18px;
           font-weight: 600;
-          color: #1e293b;
-          margin-bottom: 16px;
-          padding-bottom: 8px;
-          border-bottom: 1px solid #e2e8f0;
+          cursor: pointer;
+          transition: background 0.2s;
         }
 
-        .admin-editor__section-header {
+        .btn-create:hover {
+          background: #1d4ed8;
+        }
+
+        .table-toolbar {
           display: flex;
           justify-content: space-between;
           align-items: center;
           margin-bottom: 16px;
-          padding-bottom: 8px;
-          border-bottom: 1px solid #e2e8f0;
+          background: #ffffff;
+          padding: 12px 16px;
+          border-radius: 10px;
+          border: 1px solid #e2e8f0;
         }
 
-        .admin-editor__field {
-          margin-bottom: 16px;
+        .search-box {
+          position: relative;
+          width: 360px;
         }
 
-        .admin-editor__label {
-          display: block;
+        .search-box input {
+          width: 100%;
+          padding: 8px 36px 8px 12px;
+          border: 1px solid #cbd5e1;
+          border-radius: 6px;
           font-size: 14px;
+          outline: none;
+        }
+
+        .search-box input:focus {
+          border-color: #2563eb;
+        }
+
+        .clear-search {
+          position: absolute;
+          right: 8px;
+          top: 50%;
+          transform: translateY(-50%);
+          background: none;
+          border: none;
+          font-size: 18px;
+          color: #94a3b8;
+          cursor: pointer;
+        }
+
+        .item-count {
+          font-size: 13px;
           font-weight: 500;
           color: #64748b;
-          margin-bottom: 8px;
         }
 
-        .admin-editor__input,
-        .admin-editor__textarea,
-        .admin-editor__select {
-          width: 100%;
-          padding: 8px 12px;
+        .table-container {
+          background: #ffffff;
+          border-radius: 10px;
           border: 1px solid #e2e8f0;
-          border-radius: 4px;
-          font-size: 14px;
-        }
-
-        .admin-editor__textarea {
-          resize: vertical;
-        }
-
-        .admin-editor__image-preview {
-          margin-bottom: 16px;
-          max-width: 200px;
-          background-color: #f8fafc;
-          border: 1px solid #e2e8f0;
-          border-radius: 4px;
           overflow: hidden;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
-        .admin-editor__image-upload-wrapper {
+        .table-status {
+          padding: 48px;
+          text-align: center;
+          color: #64748b;
+          font-size: 15px;
+        }
+
+        .table-status.error {
+          color: #dc2626;
+        }
+
+        .table-status.empty p {
           margin-bottom: 16px;
         }
-        
-        .admin-editor__image-uploader {
+
+        .btn-create-sm {
+          padding: 8px 16px;
+          background: #2563eb;
+          color: white;
+          border: none;
+          border-radius: 6px;
+          font-size: 14px;
+          cursor: pointer;
+        }
+
+        .services-table {
           width: 100%;
-          max-width: 300px;
+          border-collapse: collapse;
+          text-align: left;
         }
 
-        .admin-editor__service-item {
-          background-color: #f8fafc;
-          border-radius: 8px;
-          padding: 20px;
-          margin-bottom: 20px;
-        }
-
-        .admin-editor__service-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 16px;
-        }
-
-        .admin-editor__service-title {
-          font-size: 16px;
+        .services-table th {
+          background: #f8fafc;
+          padding: 14px 16px;
+          font-size: 13px;
           font-weight: 600;
+          color: #475569;
+          border-bottom: 1px solid #e2e8f0;
+        }
+
+        .services-table td {
+          padding: 14px 16px;
+          font-size: 14px;
           color: #1e293b;
-          margin: 0;
+          border-bottom: 1px solid #f1f5f9;
+          vertical-align: middle;
         }
 
-        .admin-editor__service-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 16px;
+        .services-table tr:last-child td {
+          border-bottom: none;
         }
 
-        .admin-editor__add-button {
-          padding: 6px 12px;
-          background-color: #10b981;
-          color: white;
-          border: none;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 14px;
-        }
-
-        .admin-editor__remove-button {
-          padding: 6px 12px;
-          background-color: #ef4444;
-          color: white;
-          border: none;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 14px;
-        }
-
-        .admin-editor__features-list {
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-          margin-top: 8px;
-        }
-
-        .admin-editor__feature-item {
+        .thumbnail-box {
+          width: 54px;
+          height: 44px;
+          border-radius: 6px;
+          background: #f1f5f9;
+          overflow: hidden;
           display: flex;
           align-items: center;
+          justify-content: center;
+          border: 1px solid #e2e8f0;
+        }
+
+        .thumbnail-box img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        .no-img {
+          font-size: 10px;
+          color: #94a3b8;
+        }
+
+        .slug-tag {
+          background: #f1f5f9;
+          padding: 3px 8px;
+          border-radius: 4px;
+          font-size: 12px;
+          color: #475569;
+        }
+
+        .desc-cell {
+          max-width: 260px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          color: #64748b;
+        }
+
+        .badge {
+          display: inline-block;
+          padding: 4px 8px;
+          background: #f0fdf4;
+          color: #166534;
+          border: 1px solid #bbf7d0;
+          border-radius: 12px;
+          font-size: 12px;
+          font-weight: 500;
+        }
+
+        .actions-cell {
+          display: inline-flex;
           gap: 8px;
         }
 
-        .admin-editor__project-item {
-          background-color: #f1f5f9;
-          border-radius: 8px;
-          padding: 16px;
-          margin-bottom: 16px;
+        .action-btn {
+          padding: 6px 12px;
+          border-radius: 6px;
+          font-size: 13px;
+          font-weight: 500;
+          cursor: pointer;
+          border: 1px solid transparent;
+          transition: all 0.2s;
         }
 
-        .admin-editor__project-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 12px;
+        .edit-btn {
+          background: #eff6ff;
+          color: #2563eb;
+          border-color: #bfdbfe;
         }
 
-        .admin-editor__project-title {
-          font-size: 14px;
-          font-weight: 600;
-          color: #1e293b;
-          margin: 0;
+        .edit-btn:hover {
+          background: #dbeafe;
         }
 
-        .admin-editor__project-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 16px;
+        .delete-btn {
+          background: #fef2f2;
+          color: #dc2626;
+          border-color: #fecaca;
         }
 
-        .admin-editor__service-details {
-            background-color: #fff;
-            border-top: 1px solid #e2e8f0;
-            margin-top: 20px;
-            padding-top: 20px;
-        }
-
-        .admin-editor__subsection {
-            margin-bottom: 24px;
-            padding: 16px;
-            border: 1px solid #f1f5f9;
-            border-radius: 8px;
-        }
-        
-        .admin-editor__subsection-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #334155;
-            margin-bottom: 16px;
-        }
-
-        .admin-editor__project-item {
-            padding: 16px;
-            border: 1px dashed #cbd5e1;
-            border-radius: 8px;
-            margin-bottom: 16px;
-        }
-
-        .admin-editor__add-service-section {
-            text-align: center;
-            margin-top: 30px;
-            padding-top: 30px;
-            border-top: 1px solid #e2e8f0;
-        }
-
-        .admin-editor__add-service-button {
-            padding: 12px 24px;
-            background-color: #10b981;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .admin-editor__add-service-button:hover {
-            background-color: #059669;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-        }
-
-        .admin-editor__add-service-button i {
-            font-size: 18px;
-        }
-
-        @media (max-width: 768px) {
-          .admin-editor__service-grid {
-            grid-template-columns: 1fr;
-          }
-          .admin-editor__project-grid {
-            grid-template-columns: 1fr;
-          }
+        .delete-btn:hover {
+          background: #fee2e2;
         }
       `}</style>
     </AdminLayout>
   );
 };
 
-export default ServicesItemsEditor;
+export default ServicesAdmin;

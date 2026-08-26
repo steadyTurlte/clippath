@@ -1,8 +1,10 @@
 import { Pool } from "pg";
 
+const isRemoteDb = process.env.DATABASE_URL?.includes("sslmode=require") || process.env.DATABASE_URL?.includes("neon.tech") || process.env.NODE_ENV === "production";
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  ssl: isRemoteDb ? { rejectUnauthorized: false } : false,
 });
 
 export async function query(text, params) {

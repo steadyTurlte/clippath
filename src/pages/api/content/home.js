@@ -264,9 +264,8 @@ export default async function handler(req, res) {
   if (req.method === "GET") {
     try {
       let data = await getData("home");
-      if (!data || Object.keys(data).length === 0) {
-        await saveData("home", defaultHomeData);
-        data = { ...defaultHomeData };
+      if (!data) {
+        data = {};
       }
       const { section } = req.query;
       if (section) {
@@ -276,24 +275,7 @@ export default async function handler(req, res) {
             return res.status(200).json(aboutData.sponsors);
           }
         }
-        if (section === "whySpecial") {
-          if (!data[section]) {
-            data[section] = defaultHomeData[section];
-          } else if (!data[section].videoUrl) {
-            data[section].videoUrl = defaultHomeData.whySpecial.videoUrl;
-          }
-          await saveData("home", data);
-          return res.status(200).json(data[section]);
-        }
-        if (!data[section] && defaultHomeData[section]) {
-          data[section] = defaultHomeData[section];
-          await saveData("home", data);
-          return res.status(200).json(defaultHomeData[section]);
-        }
         return res.status(200).json(data[section] || {});
-      }
-      if (data.whySpecial && !data.whySpecial.videoUrl) {
-        data.whySpecial.videoUrl = defaultHomeData.whySpecial.videoUrl;
       }
       return res.status(200).json(data);
     } catch (error) {

@@ -148,17 +148,11 @@ export default async function handler(req, res) {
   if (req.method === "GET") {
     try {
       let data = await getData("pricing");
-      if (!data || Object.keys(data).length === 0) {
-        await saveData("pricing", DEFAULT_PRICING_DATA);
-        data = { ...DEFAULT_PRICING_DATA };
+      if (!data) {
+        data = {};
       }
       const { section } = req.query;
       if (section) {
-        if (!data[section] && DEFAULT_PRICING_DATA[section]) {
-          data[section] = DEFAULT_PRICING_DATA[section];
-          await saveData("pricing", data);
-          return res.status(200).json(DEFAULT_PRICING_DATA[section]);
-        }
         return res.status(200).json(data[section] || {});
       }
       return res.status(200).json(data);

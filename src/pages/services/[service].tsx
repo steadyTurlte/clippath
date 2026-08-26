@@ -58,7 +58,7 @@ const ServiceDetail = () => {
         if (settingsRes.ok) {
           setSettings(await settingsRes.json());
         }
-        
+
         if (pricingRes.ok) {
           setPricingData(await pricingRes.json());
         }
@@ -77,8 +77,8 @@ const ServiceDetail = () => {
         if (contactRes.ok) {
           setContactInfo(await contactRes.json());
         }
-        
-        if(howItWorksRes.ok) {
+
+        if (howItWorksRes.ok) {
           setHowItWorksData(await howItWorksRes.json());
         }
       } catch (error) {
@@ -122,12 +122,12 @@ const ServiceDetail = () => {
           fetch(`/api/content/services?section=details&slug=${encodeURIComponent(decodedService)}`),
           fetch(`/api/content/portfolio?service=${encodeURIComponent(decodedService)}`)
         ]);
-        
+
         if (detailRes.ok) {
           const detailData = await detailRes.json();
           setDetail(detailData);
         }
-        
+
         if (projectsRes.ok) {
           const portfolioData = await projectsRes.json();
           setProjectsData(portfolioData?.projects || portfolioData || []);
@@ -209,7 +209,7 @@ const ServiceDetail = () => {
       </section>
 
       {/* Service Details About Section - Hero with before/after slider and dynamic content */}
-      <ServiceDetailsAbout 
+      <ServiceDetailsAbout
         serviceData={serviceData}
         serviceDetails={detail}
       />
@@ -218,7 +218,7 @@ const ServiceDetail = () => {
       {howItWorksData && <HowItWorks data={howItWorksData} />}
 
       {/* Service Projects Section - Specific to each service */}
-      <ServiceProject 
+      <ServiceProject
         serviceData={serviceData}
         projectsData={Array.isArray(projectsData) ? projectsData : (detail?.projects || [])}
       />
@@ -234,8 +234,8 @@ const ServiceDetail = () => {
 
       {/* Contact Us Section - Functional contact form */}
       {contactInfo && (
-        <ContactSec 
-          contactInfo={contactInfo} 
+        <ContactSec
+          contactInfo={contactInfo}
           mapData={{ embedUrl: "" }}
           title="Contact Us"
           description="Ready to get started? Contact us today for a free quote and let us transform your images."
