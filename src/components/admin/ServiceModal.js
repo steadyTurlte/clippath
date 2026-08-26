@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ImageUploader from './common/ImageUploader';
+import RichTextEditor from './common/RichTextEditor';
 
 const ServiceModal = ({ isOpen, onClose, onSave, service, isNew }) => {
   const [activeTab, setActiveTab] = useState('basic');
@@ -242,10 +243,9 @@ const ServiceModal = ({ isOpen, onClose, onSave, service, isNew }) => {
 
                 <div className="form-group">
                   <label>Hero Description</label>
-                  <textarea
-                    rows={4}
+                  <RichTextEditor
                     value={formData.details.hero.description}
-                    onChange={(e) => handleHeroChange('description', e.target.value)}
+                    onChange={(content) => handleHeroChange('description', content)}
                     placeholder="Hero section description..."
                   />
                 </div>
