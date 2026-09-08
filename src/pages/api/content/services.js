@@ -182,6 +182,14 @@ const defaultServicesData = {
   }
 };
 
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '10mb',
+    },
+  },
+}
+
 export default async function handler(req, res) {
   if (req.method === "GET") {
     try {

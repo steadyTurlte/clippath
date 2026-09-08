@@ -51,6 +51,14 @@ const defaultClientLogos = {
   ]
 };
 
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '10mb',
+    },
+  },
+}
+
 export default async function handler(req, res) {
   const { method, body, query } = req;
   const configKey = 'client_logos';

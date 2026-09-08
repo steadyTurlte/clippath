@@ -59,6 +59,14 @@ const saveEmailSettings = async (settings) => {
   }
 };
 
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '10mb',
+    },
+  },
+}
+
 export default async function handler(req, res) {
   // Only allow GET and PUT methods
   if (req.method !== "GET" && req.method !== "PUT") {

@@ -2,6 +2,14 @@ import { getData } from '@/utils/dataUtils';
 import { getAdminEmail } from '@/utils/emailUtils';
 import nodemailer from 'nodemailer';
 
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '10mb',
+    },
+  },
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' });

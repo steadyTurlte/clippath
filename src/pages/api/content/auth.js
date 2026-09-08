@@ -1,5 +1,13 @@
 import { getData, saveData } from '@/utils/dataUtils';
 
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '10mb',
+    },
+  },
+}
+
 export default async function handler(req, res) {
   // GET request to retrieve auth data
   if (req.method === 'GET') {
