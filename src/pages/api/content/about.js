@@ -101,6 +101,14 @@ const defaultAboutData = {
   },
 };
 
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '10mb',
+    },
+  },
+}
+
 export default async function handler(req, res) {
   // GET request to retrieve about page data
   if (req.method === "GET") {
